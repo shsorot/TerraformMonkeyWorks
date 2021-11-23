@@ -1,0 +1,51 @@
+resource "azurerm_virtual_machine" "f5vm01" {
+for_each       = { for instance in var.waf-vm : instance.name => instance }
+  name                         = each.value.name
+  location                     = local.location
+  resource_group_name          = local.virtual-machine-resource-group-name
+  primary_network_interface_id = module.BigF5-mgmt-Network-Interfaces[each.key].id
+  #network_interface_ids        = [module.BigF5-mgmt-Network-Interfaces[each.key].id,module.BigF5-trusted-Network-Interfaces[each.key].id,module.BigF5-untrusted-Network-Interfaces[each.key].id]
+  network_interface_ids        = [module.BigF5-mgmt-Network-Interfaces[each.key].id]
+  vm_size                      = each.value.size == null ? "Standard_E4s_v3" : each.value.size
+
+  # Uncomment this line to delete the OS disk automatically when deleting the VM
+  delete_os_disk_on_termination = false
+
+
+  # Uncomment this line to delete the data disks automatically when deleting the VM
+  delete_data_disks_on_termination = false
+
+  storage_image_reference {
+    sku       = each.value.image-sku == null ? "f5-big-all-1slot-byol" : each.value.image-sku
+    publisher = each.value.image-publisher == null ? "f5-networks" : each.value.image-publisher
+    offer     = each.value.image-offer == null ? "f5-big-ip-byol" : each.value.image-offer
+    version   = each.value.image-version == null ? "latest" : each.value.image-version
+}
+
+  storage_os_disk {
+    name              = "${each.value.name}-osdisk"
+    caching           = "ReadWrite"
+    create_option     = "FromImage"
+    managed_disk_type = "Premium_LRS"
+  }
+
+  os_profile {
+    computer_name  = each.value.name
+    admin_username = var.admin-username
+    admin_password = local.admin-password
+    //custom_data    = var.az_key_vault_authentication ? data.template_file.init_file1[0].rendered : data.template_file.init_file[0].rendered
+    //custom_data = coalesce(var.custom_user_data, data.template_file.init_file.rendered)
+  }
+
+  os_profile_linux_config {
+    disable_password_authentication = false
+  }
+
+  plan {
+    name      = each.value.image-sku == null ? "f5-big-all-1slot-byol" : each.value.image-sku
+    publisher = each.value.image-publisher == null ? "f5-networks" : each.value.image-publisher
+    product   = each.value.image-offer == null ? "f5-big-ip-byol" : each.value.image-offer
+  }
+  zones = ["${each.value.zone}"]
+  tags = local.tags
+}
