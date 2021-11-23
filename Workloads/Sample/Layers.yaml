@@ -1,0 +1,503 @@
+parameters:
+  - name: ArtifactCodePath
+    type: string
+    default: "Workloads/Infrastructure-Code/1.0"
+    displayName: "Relative directory path to the unpacked artifact"
+
+  - name: ArtifactFeed
+    type: string
+    default: "LandingZoneDevOps"
+    displayName: "Name of the feed from where to pull the artifact from."
+  
+  - name: ArtifactVersion
+    type: string
+    default: "*"
+    displayName: "Version of the artifact to download. Use * for latest"
+  
+  - name: ArtifactName
+    type: string
+    default: "core_terraform_modules"
+    displayName: "Name of the Artifact."
+    
+  - name: Entity
+    type: string
+    default: "Infrastructure"
+    displayName: "Name of the Entity/Subscription Owner/Business Owner. Denotes a directory under KitRoot path"
+
+  - name: Environment
+    type: string
+    default: "Dev"
+    displayName: "Special Tag denoting the directory structure under Entity."
+
+  - name: KitRoot
+    type: string
+    default: "CoreServices"
+    displayName: "Name of the Directory to look under for TF variable files."
+    
+  - name: ServiceConnection
+    type: string
+    default: "Microsoft Terraform"
+    displayName: "Service Connection to use for AZ Cli login.Must have access to backend storage account mentioned in KitRoot/Entity/Environment/backendConfig.json"
+  
+  - name: tf_version
+    type: string
+    default: "1.0.4"
+    displayName: "Version of the Terraform binary to be used. This should to set to specific version. If 'Latest' is specified, the latest version is pulled and unzipped."
+
+  - name: skip
+    type: boolean
+    default: false
+    displayName: "Skip Pipeline execution."
+    
+  
+  - name: apply_skip
+    type: boolean
+    default: false
+    displayName: "Skip Pipeline Terraform-Apply task."
+    
+  
+stages:
+- stage: "Terraform_Plan_${{ parameters.Entity }}_${{ parameters.Environment }}"
+  displayName: "Prepare environment for Terraform environment ${{ parameters.Entity }} \ ${{ parameters.Environment }}"
+  jobs:
+  - job: Start_Job
+    steps:
+      - powershell: write-host "This exists to have a non-dynamic job in the stage without depends_on"
+
+  - ${{ if contains( parameters.skip, false) }}:
+    - job: "Pre_Requisites"
+      dependsOn: Start_Job
+      displayName: "Download, Configure & Prepare Terraform files for environment = ${{ parameters.Entity }} / ${{ parameters.Environment }}"
+      pool:
+        vmImage: vs2017-win2016
+      steps:
+        - task: UniversalPackages@0
+          displayName: "Download Core terraform module artifact from = ${{ parameters.ArtifactFeed}} / ${{ parameters.ArtifactName }} - ${{ parameters.ArtifactVersion }}"
+          inputs:
+            downloadDirectory: $(System.DefaultWorkingDirectory)
+            feedListDownload: ${{ parameters.ArtifactFeed }}
+            packageListDownload: ${{ parameters.ArtifactName }}
+            versionListDownload: ${{ parameters.ArtifactVersion }}
+            verbosity: Information
+        - task: AzureCLI@2
+          displayName: "Pre-Execution Tasks/ State Setup = ${{ parameters.Entity }} / ${{ parameters.Environment }}"
+          name: state_setup
+          inputs:
+                azureSubscription: ${{ parameters.ServiceConnection  }}
+                scriptType: ps
+                scriptLocation: inlineScript
+                inlineScript: |
+                  # Read the JSON file to fetch connection details
+                  # set working directory
+                  set-location -LiteralPath "$(System.DefaultWorkingDirectory)"
+                  ls
+                  $directory = "${{ parameters.KitRoot }}/${{ parameters.Entity }}/${{ parameters.Environment }}"
+                  $configFile = get-childitem -path $directory -filter "*.json"
+                  write-host $configFile.FullName
+                  
+                  # Read the content of the file and export the backend state information to be used in the next stage
+                  $configJson = get-content -literalPath $configFile.FullName | convertfrom-json 
+                  
+                  #export the variables to pipe
+                  write-host "##vso[task.setvariable variable=TF_SUBSCRIPTION_ID;isOutput=true]$($configJson.subscription_id)"
+                  write-host "##vso[task.setvariable variable=TF_STORAGE_RG;isOutput=true]$($configJson.resource_group_name)"
+                  write-host "##vso[task.setvariable variable=TF_STORAGE_ACCOUNT;isOutput=true]$($configJson.storage_account_name)"
+                  write-host "##vso[task.setvariable variable=TF_CONTAINER;isOutput=true]$($configJson.container_name)"
+                  write-host "##vso[task.setvariable variable=TF_STATE_KEY;isOutput=true]$($configJson.key_file_name)"
+                  write-host "##vso[task.setvariable variable=TF_SERVICE_CONN;isOutput=true]$($configJson.service_connection_name)"
+                                
+                  # Copy the tfvars files to the TF code and packahe as artifact
+                  $tfVars = get-childitem -path $directory -filter "*.tfvars"
+                  copy-item $tfvars.FullName -destination "$(System.DefaultWorkingDirectory)/${{ parameters.ArtifactCodePath }}"
+                  
+                  #export tfvar file name as it's required in the later task
+                  write-host "##vso[task.setvariable variable=TF_TFVARS_FILE;isOutput=true]$($tfVars.fullname)"
+
+                  write-host "##vso[task.setvariable variable=TF_WORKING_DIR;]$(System.DefaultWorkingDirectory)/${{ parameters.ArtifactCodePath }}"
+                  # All done'
+                  write-host " All Done. Moving to Next task."
+                addSpnToEnvironment: true
+                cwd: $(System.DefaultWorkingDirectory)
+
+        - task: ms-devlabs.custom-terraform-tasks.custom-terraform-installer-task.TerraformInstaller@0
+          displayName: "Terraform-Install-${{ parameters.tf_version }}"
+          inputs:
+            terraformVersion: '${{ parameters.tf_version }}'
+            
+
+        - task: TerraformTaskV2@2
+          inputs:
+            provider: "azurerm"
+            command: "init"
+            workingDirectory: $(System.DefaultWorkingDirectory)/${{ parameters.ArtifactCodePath }}
+            #backendServiceArm: $(state_setup.TF_SERVICE_CONN)
+            backendServiceArm: ${{ parameters.ServiceConnection}}
+            backendAzureRmResourceGroupName: $(state_setup.TF_STORAGE_RG)
+            backendAzureRmStorageAccountName: $(state_setup.TF_STORAGE_ACCOUNT)
+            backendAzureRmContainerName: $(state_setup.TF_CONTAINER)
+            backendAzureRmKey: $(state_setup.TF_STATE_KEY)
+          displayName: "Terraform-Init"
+          enabled: true
+
+        - task: TerraformTaskV2@2
+          inputs:
+            provider: 'azurerm'
+            command: 'plan'
+            commandOptions: '--var-file $(state_setup.TF_TFVARS_FILE) --out plan.tfplan'
+            environmentServiceNameAzureRM: ${{ parameters.ServiceConnection}}
+            workingDirectory: $(System.DefaultWorkingDirectory)/${{ parameters.ArtifactCodePath }}
+          displayName: "Terraform-Plan"
+          enabled: true
+
+        - task: PublishBuildArtifacts@1
+          inputs:
+            PathtoPublish: '$(System.DefaultWorkingDirectory)/${{ parameters.ArtifactCodePath}}/plan.tfplan'
+            ArtifactName: 'tf_cooked_plan'
+            publishLocation: 'Container'
+
+      # <TODO> , export variables to file to pass to next Stage. Perform a Init and apply at next stage using downloaded planfile.
+
+- stage: "Terraform_Apply_${{ parameters.Entity }}_${{ parameters.Environment }}"
+  displayName: "Deploy environment for Terraform environment ${{ parameters.Entity }} \ ${{ parameters.Environment }}"
+  dependsOn: "Terraform_Plan_${{ parameters.Entity }}_${{ parameters.Environment }}"
+  pool:
+    vmImage: vs2017-win2016
+  #variables:
+ 
+  jobs:
+  - job: Start_Job
+    steps:
+      - powershell: write-host "This exists to have a non-dynamic job in the stage without depends_on"
+  - ${{ if contains( parameters.skip, false) }}:
+    - job: "Infra_Apply"
+      dependsOn: Start_Job
+      displayName: "Deploy Terraform IaCS for environment = ${{ parameters.Entity }} / ${{ parameters.Environment }}"
+      pool:
+        vmImage: vs2017-win2016
+      steps:
+        - task: UniversalPackages@0
+          displayName: "Download Core terraform module artifact from = ${{ parameters.ArtifactFeed}} / ${{ parameters.ArtifactName }} - ${{ parameters.ArtifactVersion }}"
+          inputs:
+            downloadDirectory: $(System.DefaultWorkingDirectory)
+            feedListDownload: ${{ parameters.ArtifactFeed }}
+            packageListDownload: ${{ parameters.ArtifactName }}
+            versionListDownload: ${{ parameters.ArtifactVersion }}
+            verbosity: Information
+        - task: AzureCLI@2
+          displayName: "State Setup = ${{ parameters.Entity }} / ${{ parameters.Environment }}"
+          name: state_setup
+          inputs:
+                azureSubscription: ${{ parameters.ServiceConnection  }}
+                scriptType: ps
+                scriptLocation: inlineScript
+                inlineScript: |
+                  # Read the JSON file to fetch connection details
+                  # set working directory
+                  set-location -LiteralPath "$(System.DefaultWorkingDirectory)"
+                  ls
+                  $directory = "${{ parameters.KitRoot }}/${{ parameters.Entity }}/${{ parameters.Environment }}"
+                  $configFile = get-childitem -path $directory -filter "*.json"
+                  write-host $configFile.FullName
+                  
+                  # Read the content of the file and export the backend state information to be used in the next stage
+                  $configJson = get-content -literalPath $configFile.FullName | convertfrom-json 
+                  
+                  #export the variables to pipe
+                  write-host "##vso[task.setvariable variable=TF_SUBSCRIPTION_ID;isOutput=true]$($configJson.subscription_id)"
+                  write-host "##vso[task.setvariable variable=TF_STORAGE_RG;isOutput=true]$($configJson.resource_group_name)"
+                  write-host "##vso[task.setvariable variable=TF_STORAGE_ACCOUNT;isOutput=true]$($configJson.storage_account_name)"
+                  write-host "##vso[task.setvariable variable=TF_CONTAINER;isOutput=true]$($configJson.container_name)"
+                  write-host "##vso[task.setvariable variable=TF_STATE_KEY;isOutput=true]$($configJson.key_file_name)"
+                  write-host "##vso[task.setvariable variable=TF_SERVICE_CONN;isOutput=true]$($configJson.service_connection_name)"
+                  write-host " All Done. Moving to Next task."
+                addSpnToEnvironment: true
+                cwd: $(System.DefaultWorkingDirectory)
+        
+        - task: ms-devlabs.custom-terraform-tasks.custom-terraform-installer-task.TerraformInstaller@0
+          displayName: "Terraform-Install-${{ parameters.tf_version }}"
+          inputs:
+            terraformVersion: '${{ parameters.tf_version }}'
+            
+
+        - task: TerraformTaskV2@2
+          inputs:
+            provider: "azurerm"
+            command: "init"
+            workingDirectory: $(System.DefaultWorkingDirectory)/${{ parameters.ArtifactCodePath }}
+            #backendServiceArm: $(state_setup.TF_SERVICE_CONN)
+            backendServiceArm: ${{ parameters.ServiceConnection}}
+            backendAzureRmResourceGroupName: $(state_Setup.TF_STORAGE_RG)
+            backendAzureRmStorageAccountName: $(state_Setup.TF_STORAGE_ACCOUNT)
+            backendAzureRmContainerName: $(state_Setup.TF_CONTAINER)
+            backendAzureRmKey: $(state_Setup.TF_STATE_KEY)
+          displayName: "Terraform-Init"
+          enabled: true
+
+        - task: DownloadBuildArtifacts@1
+          inputs:
+            buildType: 'current'
+            downloadType: 'single'
+            artifactName: 'tf_cooked_plan'
+            downloadPath: '$(System.DefaultWorkingDirectory)/${{ parameters.ArtifactCodePath}}'
+
+        - task: TerraformTaskV2@2
+          inputs:
+            provider: 'azurerm'
+            command: 'apply'
+            workingDirectory: '$(System.DefaultWorkingDirectory)/${{ parameters.ArtifactCodePath }}'
+            commandOptions: 'plan.tfplan'
+          displayName: "Terraform-Apply"
+          enabled: "${{ parameters.apply_skip }}"
+        
+aparameters:
+  - name: ArtifactCodePath
+    type: string
+    default: "Workloads/Infrastructure-Code/1.0"
+    displayName: "Relative directory path to the unpacked artifact"
+
+  - name: ArtifactFeed
+    type: string
+    default: "LandingZoneDevOps"
+    displayName: "Name of the feed from where to pull the artifact from."
+  
+  - name: ArtifactVersion
+    type: string
+    default: "*"
+    displayName: "Version of the artifact to download. Use * for latest"
+  
+  - name: ArtifactName
+    type: string
+    default: "core_terraform_modules"
+    displayName: "Name of the Artifact."
+    
+  - name: Entity
+    type: string
+    default: "Infrastructure"
+    displayName: "Name of the Entity/Subscription Owner/Business Owner. Denotes a directory under KitRoot path"
+
+  - name: Environment
+    type: string
+    default: "Dev"
+    displayName: "Special Tag denoting the directory structure under Entity."
+
+  - name: KitRoot
+    type: string
+    default: "CoreServices"
+    displayName: "Name of the Directory to look under for TF variable files."
+    
+  - name: ServiceConnection
+    type: string
+    default: "Microsoft Terraform"
+    displayName: "Service Connection to use for AZ Cli login.Must have access to backend storage account mentioned in KitRoot/Entity/Environment/backendConfig.json"
+  
+  - name: tf_version
+    type: string
+    default: "1.0.4"
+    displayName: "Version of the Terraform binary to be used. This should to set to specific version. If 'Latest' is specified, the latest version is pulled and unzipped."
+
+  - name: skip
+    type: boolean
+    default: false
+    displayName: "Skip Pipeline execution. Enable for diagnostics/troubleshooting"
+    
+  
+  - name: enable_apply
+    type: boolean
+    default: true
+    displayName: "Enable Terraform apply task. Disable for diagnostics/troubleshooting."
+    
+  
+stages:
+- stage: "Terraform_Plan_${{ parameters.Entity }}_${{ parameters.Environment }}"
+  displayName: "Prepare environment for Terraform environment ${{ parameters.Entity }} \ ${{ parameters.Environment }}"
+  jobs:
+  - job: Start_Job
+    steps:
+      - powershell: write-host "This exists to have a non-dynamic job in the stage without depends_on"
+
+  - ${{ if contains( parameters.skip, false) }}:
+    - job: "Pre_Requisites"
+      dependsOn: Start_Job
+      displayName: "Download, Configure & Prepare Terraform files for environment = ${{ parameters.Entity }} / ${{ parameters.Environment }}"
+      pool:
+        vmImage: vs2017-win2016
+      steps:
+        - task: UniversalPackages@0
+          displayName: "Download Core terraform module artifact from = ${{ parameters.ArtifactFeed}} / ${{ parameters.ArtifactName }} - ${{ parameters.ArtifactVersion }}"
+          inputs:
+            downloadDirectory: $(System.DefaultWorkingDirectory)
+            feedListDownload: ${{ parameters.ArtifactFeed }}
+            packageListDownload: ${{ parameters.ArtifactName }}
+            versionListDownload: ${{ parameters.ArtifactVersion }}
+            verbosity: Information
+        - task: AzureCLI@2
+          displayName: "Pre-Execution Tasks/ State Setup = ${{ parameters.Entity }} / ${{ parameters.Environment }}"
+          name: state_setup
+          inputs:
+                azureSubscription: ${{ parameters.ServiceConnection  }}
+                scriptType: ps
+                scriptLocation: inlineScript
+                inlineScript: |
+                  # Read the JSON file to fetch connection details
+                  # set working directory
+                  set-location -LiteralPath "$(System.DefaultWorkingDirectory)"
+                  ls
+                  $directory = "${{ parameters.KitRoot }}/${{ parameters.Entity }}/${{ parameters.Environment }}"
+                  $configFile = get-childitem -path $directory -filter "*.json"
+                  write-host $configFile.FullName
+                  
+                  # Read the content of the file and export the backend state information to be used in the next stage
+                  $configJson = get-content -literalPath $configFile.FullName | convertfrom-json 
+                  
+                  #export the variables to pipe
+                  write-host "##vso[task.setvariable variable=TF_SUBSCRIPTION_ID;isOutput=true]$($configJson.subscription_id)"
+                  write-host "##vso[task.setvariable variable=TF_STORAGE_RG;isOutput=true]$($configJson.resource_group_name)"
+                  write-host "##vso[task.setvariable variable=TF_STORAGE_ACCOUNT;isOutput=true]$($configJson.storage_account_name)"
+                  write-host "##vso[task.setvariable variable=TF_CONTAINER;isOutput=true]$($configJson.container_name)"
+                  write-host "##vso[task.setvariable variable=TF_STATE_KEY;isOutput=true]$($configJson.key_file_name)"
+                  write-host "##vso[task.setvariable variable=TF_SERVICE_CONN;isOutput=true]$($configJson.service_connection_name)"
+                                
+                  # Copy the tfvars files to the TF code and packahe as artifact
+                  $tfVars = get-childitem -path $directory -filter "*.tfvars"
+                  copy-item $tfvars.FullName -destination "$(System.DefaultWorkingDirectory)/${{ parameters.ArtifactCodePath }}"
+                  
+                  #export tfvar file name as it's required in the later task
+                  write-host "##vso[task.setvariable variable=TF_TFVARS_FILE;isOutput=true]$($tfVars.fullname)"
+
+                  write-host "##vso[task.setvariable variable=TF_WORKING_DIR;]$(System.DefaultWorkingDirectory)/${{ parameters.ArtifactCodePath }}"
+                  # All done'
+                  write-host " All Done. Moving to Next task."
+                addSpnToEnvironment: true
+                cwd: $(System.DefaultWorkingDirectory)
+
+        - task: ms-devlabs.custom-terraform-tasks.custom-terraform-installer-task.TerraformInstaller@0
+          displayName: "Terraform-Install-${{ parameters.tf_version }}"
+          inputs:
+            terraformVersion: '${{ parameters.tf_version }}'
+            
+
+        - task: TerraformTaskV2@2
+          inputs:
+            provider: "azurerm"
+            command: "init"
+            workingDirectory: $(System.DefaultWorkingDirectory)/${{ parameters.ArtifactCodePath }}
+            #backendServiceArm: $(state_setup.TF_SERVICE_CONN)
+            backendServiceArm: ${{ parameters.ServiceConnection}}
+            backendAzureRmResourceGroupName: $(state_setup.TF_STORAGE_RG)
+            backendAzureRmStorageAccountName: $(state_setup.TF_STORAGE_ACCOUNT)
+            backendAzureRmContainerName: $(state_setup.TF_CONTAINER)
+            backendAzureRmKey: $(state_setup.TF_STATE_KEY)
+          displayName: "Terraform-Init"
+          enabled: true
+
+        - task: TerraformTaskV2@2
+          inputs:
+            provider: 'azurerm'
+            command: 'plan'
+            commandOptions: '--var-file $(state_setup.TF_TFVARS_FILE) --out plan.tfplan'
+            environmentServiceNameAzureRM: ${{ parameters.ServiceConnection}}
+            workingDirectory: $(System.DefaultWorkingDirectory)/${{ parameters.ArtifactCodePath }}
+          displayName: "Terraform-Plan"
+          enabled: true
+
+        - task: PublishBuildArtifacts@1
+          inputs:
+            PathtoPublish: '$(System.DefaultWorkingDirectory)/${{ parameters.ArtifactCodePath}}/plan.tfplan'
+            ArtifactName: 'tf_cooked_plan'
+            publishLocation: 'Container'
+
+      # <TODO> , export variables to file to pass to next Stage. Perform a Init and apply at next stage using downloaded planfile.
+
+- stage: "Terraform_Apply_${{ parameters.Entity }}_${{ parameters.Environment }}"
+  displayName: "Deploy environment for Terraform environment ${{ parameters.Entity }} \ ${{ parameters.Environment }}"
+  dependsOn: "Terraform_Plan_${{ parameters.Entity }}_${{ parameters.Environment }}"
+  pool:
+    vmImage: vs2017-win2016
+  #variables:
+ 
+  jobs:
+  - job: Start_Job
+    steps:
+      - powershell: write-host "This exists to have a non-dynamic job in the stage without depends_on"
+  - ${{ if contains( parameters.skip, false) }}:
+    - job: "Infra_Apply"
+      dependsOn: Start_Job
+      displayName: "Deploy Terraform IaCS for environment = ${{ parameters.Entity }} / ${{ parameters.Environment }}"
+      pool:
+        vmImage: vs2017-win2016
+      steps:
+        - task: UniversalPackages@0
+          displayName: "Download Core terraform module artifact from = ${{ parameters.ArtifactFeed}} / ${{ parameters.ArtifactName }} - ${{ parameters.ArtifactVersion }}"
+          inputs:
+            downloadDirectory: $(System.DefaultWorkingDirectory)
+            feedListDownload: ${{ parameters.ArtifactFeed }}
+            packageListDownload: ${{ parameters.ArtifactName }}
+            versionListDownload: ${{ parameters.ArtifactVersion }}
+            verbosity: Information
+        - task: AzureCLI@2
+          displayName: "State Setup = ${{ parameters.Entity }} / ${{ parameters.Environment }}"
+          name: state_setup
+          inputs:
+                azureSubscription: ${{ parameters.ServiceConnection  }}
+                scriptType: ps
+                scriptLocation: inlineScript
+                inlineScript: |
+                  # Read the JSON file to fetch connection details
+                  # set working directory
+                  set-location -LiteralPath "$(System.DefaultWorkingDirectory)"
+                  ls
+                  $directory = "${{ parameters.KitRoot }}/${{ parameters.Entity }}/${{ parameters.Environment }}"
+                  $configFile = get-childitem -path $directory -filter "*.json"
+                  write-host $configFile.FullName
+                  
+                  # Read the content of the file and export the backend state information to be used in the next stage
+                  $configJson = get-content -literalPath $configFile.FullName | convertfrom-json 
+                  
+                  #export the variables to pipe
+                  write-host "##vso[task.setvariable variable=TF_SUBSCRIPTION_ID;isOutput=true]$($configJson.subscription_id)"
+                  write-host "##vso[task.setvariable variable=TF_STORAGE_RG;isOutput=true]$($configJson.resource_group_name)"
+                  write-host "##vso[task.setvariable variable=TF_STORAGE_ACCOUNT;isOutput=true]$($configJson.storage_account_name)"
+                  write-host "##vso[task.setvariable variable=TF_CONTAINER;isOutput=true]$($configJson.container_name)"
+                  write-host "##vso[task.setvariable variable=TF_STATE_KEY;isOutput=true]$($configJson.key_file_name)"
+                  write-host "##vso[task.setvariable variable=TF_SERVICE_CONN;isOutput=true]$($configJson.service_connection_name)"
+                  write-host " All Done. Moving to Next task."
+                addSpnToEnvironment: true
+                cwd: $(System.DefaultWorkingDirectory)
+        
+        - task: ms-devlabs.custom-terraform-tasks.custom-terraform-installer-task.TerraformInstaller@0
+          displayName: "Terraform-Install-${{ parameters.tf_version }}"
+          inputs:
+            terraformVersion: '${{ parameters.tf_version }}'
+            
+
+        - task: TerraformTaskV2@2
+          inputs:
+            provider: "azurerm"
+            command: "init"
+            workingDirectory: $(System.DefaultWorkingDirectory)/${{ parameters.ArtifactCodePath }}
+            #backendServiceArm: $(state_setup.TF_SERVICE_CONN)
+            backendServiceArm: ${{ parameters.ServiceConnection}}
+            backendAzureRmResourceGroupName: $(state_Setup.TF_STORAGE_RG)
+            backendAzureRmStorageAccountName: $(state_Setup.TF_STORAGE_ACCOUNT)
+            backendAzureRmContainerName: $(state_Setup.TF_CONTAINER)
+            backendAzureRmKey: $(state_Setup.TF_STATE_KEY)
+          displayName: "Terraform-Init"
+          enabled: true
+
+        - task: DownloadBuildArtifacts@1
+          inputs:
+            buildType: 'current'
+            downloadType: 'single'
+            artifactName: 'tf_cooked_plan'
+            downloadPath: '$(System.DefaultWorkingDirectory)/${{ parameters.ArtifactCodePath}}'
+
+        - task: TerraformTaskV2@2
+          inputs:
+            provider: 'azurerm'
+            command: 'apply'
+            workingDirectory: '$(System.DefaultWorkingDirectory)/${{ parameters.ArtifactCodePath }}'
+            commandOptions: 'tf_cooked_plan/plan.tfplan'
+            environmentServiceNameAzureRM: ${{ parameters.ServiceConnection}}
+          displayName: "Terraform-Apply"
+          enabled: ${{ parameters.enable_apply }}
+        
