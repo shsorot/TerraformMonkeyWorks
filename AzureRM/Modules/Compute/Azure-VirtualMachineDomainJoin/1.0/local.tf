@@ -17,7 +17,7 @@ locals {
 }
 
 data "azurerm_virtual_machine" "this" {
-  count               = var.virtual_machine.name == null ? 1 : 0
+  count               = var.virtual_machine.name == null ? 0 : 1
   name                = var.virtual_machine.name
   resource_group_name = var.virtual_machine.resource_group_name
 }

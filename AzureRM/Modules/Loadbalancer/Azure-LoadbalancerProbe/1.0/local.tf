@@ -16,10 +16,16 @@ locals {
   resource_group_name = var.loadbalancer.resource_group_name == null ? var.resource_group_name : var.loadbalancer.resource_group_name
 }
 
+data "azurerm_lb" "this" {
+  count               = var.loadbalancer.name == null && var.loadbalancer.resource_group_name == null ? 0 : 1
+  name                = var.loadbalancer.name
+  resource_group_name = var.loadbalancer.resource_group_name
+}
+
 locals {
   loadbalancer_id = var.loadbalancer.id == null ? (
-    var.loadbalancer.name == null ? (
+    var.loadbalancer.name == null && var.loadbalancer.resource_group_name == null ? (
       var.loadbalancers[var.loadbalancer.tag].id
-    ) : "/subscriptions/${local.subscription_id}/resourceGroups/${local.resource_group_name}/providers/Microsoft.Network/loadBalancers/${var.loadbalancer.name}"
+    ) : data.azurerm_lb.this[0].id
   ) : var.loadbalancer.id
 }

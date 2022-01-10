@@ -1,9 +1,10 @@
 variable "key_vault_key" {
   type = object({
-    id             = optional(string)
-    key_vault_name = optional(string)
-    key_identifier = optional(string)
-    tag            = optional(string)
+    id                  = optional(string)
+    name                = optional(string)
+    key_vault_name      = optional(string)
+    resource_group_name = optional(string)
+    tag                 = optional(string)
   })
 }
 

@@ -8,13 +8,13 @@ module "Landscape-Virtual-Hubs" {
   for_each        = var.VirtualHubs
   name            = each.value.name == null ? each.key : each.value.name
   resource_group  = each.value.resource_group
-  location        = each.value.location
-  tags            = each.value.tags
+  location        = try(each.value.location,null)
+  tags            = try(each.value.tags,local.tags)
   inherit_tags    = each.value.inherit_tags
   address_prefix  = try(each.value.address_prefix, null)
   sku             = try(each.value.sku, null)
   route           = try(each.value.route, null)
-  virtual_wan     = each.value.virtual_wan
+  virtual_wan     = try(each.value.virtual_wan,null)
   virtual_wans    = module.Landscape-Virtual-WANs
   resource_groups = module.Landscape-Resource-Groups
 }

@@ -7,7 +7,7 @@ module "Landscape-Virtual-WANs" {
   for_each                          = var.VirtualWANs
   name                              = each.value.name == null ? each.key : each.value.name
   resource_group                    = each.value.resource_group
-  location                          = each.value.location
+  location                          = try(each.value.location,null)
   tags                              = each.value.tags
   inherit_tags                      = each.value.inherit_tags
   disable_vpn_encryption            = try(each.value.disable_vpn_encryption, false)
