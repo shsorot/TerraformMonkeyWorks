@@ -1,0 +1,8 @@
+{
+    "subscription_id" :  "dffb5876-cf2b-4bc9-a2bd-d4cb4ad4ff79",
+    "resource_group_name" : "rg-terraform-backend-test-eastus2",
+    "storage_account_name" : "statfbackendtesteastus2",
+    "container_name" : "infrastructure-dev-tfstate",
+    "key_file_name" :"infrastructure-statefile.tfstate:DEV",
+    "service_connection_name" : "Microsoft Terraform"
+}
