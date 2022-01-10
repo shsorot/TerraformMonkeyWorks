@@ -1,0 +1,23 @@
+variables:
+  - name: appid
+    value: iqvia                         # <--- CHANGE TO APPLICATION appid
+  - name: agent_pool
+    value: sub-prod-platform-eucore01
+  - name: projectName
+    value: "Foundation Landing Zone"                    # <--- CHANGE TO YOUR ADO PROJECT NAME
+  - name: pipelineId
+    value: 207
+  - name: preferTriggeringPipeline
+    value: true
+  - name: downloadPath
+    value: $(Build.ArtifactStagingDirectory)
+  - name: runVersion
+    value: latestFromBranch
+  - name: runBranch
+    value: refs/heads/main
+  - name: artifactFeedCredentials         # PAT based service connection to Azure Artifacts feed
+    value: "LandingZoneDevOps"
+  - name: artifactFeed
+    value: "LandingZoneDevOps"
+  - name: kitPath
+    value: "./" # YOU MUST UPDATE THIS VALUE FOR THE PIPELINE TO RUN!

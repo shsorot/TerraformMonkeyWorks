@@ -1,0 +1,67 @@
+trigger:
+  branches:
+    include:
+      - main
+  paths:
+    include:
+      - /Workloads/Sample/* # YOU MUST UPDATE THIS VALUE FOR THE PIPELINE TO RUN!
+    exclude:
+      - /**/*.md
+      - /secret/*.*
+      - /.attachments
+
+variables:
+  - template: Variables.yaml
+
+pool: $(agent_pool)
+
+stages:
+  - template: ./Layers.yaml
+    parameters:
+      environment: prd
+
+      layers:
+        - name: resourcegroupprimary
+          type: resourcegroup
+          version: "*"
+          skip: true
+          provider: terraform
+          destroy: false
+
+#deploy adds service
+        - name: spokeroutetable
+          type: routetable
+          version: "*"
+          skip: true
+          provider: terraform
+          destroy: false
+          depends_on:
+            resourcegroup: resourcegroupprimary
+
+        - name: spokenetworkingprimary
+          type: networking
+          version: "*"
+          skip: true
+          provider: terraform
+          destroy: false
+          depends_on:
+            routetable: spokeroutetable
+
+        - name: core_to_spokevnetpeering
+          type: vnetpeering
+          version: "*"
+          skip: true
+          provider: terraform
+          destroy: false
+          depends_on:
+            networking: spokenetworkingprimary
+
+# deploy core backup services solution            
+        - name: corerecoveryservicesvaultprimary
+          type: recoveryservicesvault
+          version: "*"
+          skip: true
+          provider: terraform
+          destroy: false
+          depends_on:
+            resourcegroup: resourcegroupprimary
