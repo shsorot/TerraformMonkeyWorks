@@ -72,6 +72,7 @@ variable "virtual_wan" {
     tag                 = optional(string)
   })
   description = "(Optional) The ID of a Virtual WAN within which the Virtual Hub should be created. Changing this forces a new resource to be created."
+  default = null
 }
 
 variable "virtual_wans" {

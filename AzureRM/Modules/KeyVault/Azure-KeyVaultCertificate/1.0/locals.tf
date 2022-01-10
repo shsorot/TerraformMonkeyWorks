@@ -16,12 +16,18 @@ locals {
   subscription_id = data.azurerm_subscription.current.subscription_id
 }
 
+data "azurerm_key_vault" "this" {
+  count               = var.key_vault.name == null && var.key_vault.resource_group_name == null ? 0 : 1
+  name                = var.key_vault.name
+  resource_group_name = var.key_vault.resource_group_name
+}
 
 locals {
   key_vault_id = var.key_vault.id == null ? (
-    var.key_vault.name == null ? (
-      var.key_vaults[var.key_vault.tag]
-    ) : "/subscriptions/${local.subscription_id}/resourceGroups/${var.key_vault.resource_group_name}/providers/Microsoft.KeyVault/vaults/${var.key_vault.name}"
+    var.key_vault.name == null && var.key_vault.resource_group_name == null ? (
+      var.key_vaults[var.key_vault.tag].id
+    ) : data.azurerm_key_vault.this[0].id
   ) : var.key_vault.id
 }
+
 

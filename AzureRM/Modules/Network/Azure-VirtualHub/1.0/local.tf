@@ -24,10 +24,10 @@ locals {
 }
 
 locals {
-  virtual_wan_id = var.virtual_wan.id == null ? (
-    var.virtual_wan.name == null ? (
-      var.virtual_wans[var.virtual_wan.tag].id
-    ) : "/subscriptions/${local.subscription_id}/resourceGroups/${var.virtual_wan.resource_group_name == null ? local.resource_group_name : var.virtual_wan.resource_group_name}/providers/Microsoft.Network/virtualWANs/${var.virtual_wan.name}"
-  ) : var.virtual_wan.id
-
+  virtual_wan_id = var.virtual_wan == null ? null :  ( var.virtual_wan.id == null ? (
+      var.virtual_wan.name == null ? (
+        var.virtual_wans[var.virtual_wan.tag].id
+      ) : "/subscriptions/${local.subscription_id}/resourceGroups/${var.virtual_wan.resource_group_name == null ? local.resource_group_name : var.virtual_wan.resource_group_name}/providers/Microsoft.Network/virtualWANs/${var.virtual_wan.name}"
+    ) : var.virtual_wan.id
+  )
 }

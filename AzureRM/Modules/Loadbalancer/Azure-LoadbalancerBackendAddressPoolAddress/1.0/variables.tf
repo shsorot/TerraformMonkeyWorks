@@ -1,10 +1,10 @@
 variable "backend_address_pool" {
   type = object({
-    id                        = optional(string)
-    backend_address_pool_name = optional(string)
-    loadbalancer_name         = optional(string)
-    resource_group_name       = optional(string)
-    tag                       = optional(string)
+    id                  = optional(string)
+    name                = optional(string)
+    loadbalancer_name   = optional(string)
+    resource_group_name = optional(string)
+    tag                 = optional(string)
   })
   description = "(Required) The ID of the Backend Address Pool. Changing this forces a new Backend Address Pool Address to be created."
 }

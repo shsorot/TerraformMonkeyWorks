@@ -24,7 +24,7 @@ locals {
 }
 
 data "azurerm_disk_encryption_set" "this" {
-  count               = var.disk_encryption_set.name == null ? 0 : 1
+  count               = var.disk_encryption_set == null ? 0 : (var.disk_encryption_set.name == null ? 0 : 1)
   name                = var.disk_encryption_set.name
   resource_group_name = coalesce(var.disk_encryption_set.resource_group_name, local.resource_group_name)
 }

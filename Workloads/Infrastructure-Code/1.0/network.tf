@@ -97,7 +97,7 @@ module "Landscape-Virtual-Networks" {
   for_each       = var.VirtualNetworks
   name           = each.value.name == null ? each.key : each.value.name
   resource_group = each.value.resource_group
-  location       = each.value.location
+  location       = try(each.value.location,null)
   address_space  = each.value.address_space
   dns_servers    = try(each.value.dns_servers, [])
 
@@ -154,7 +154,7 @@ module "Landscape-Public-IP-Prefixes" {
   for_each        = var.PublicIPPrefixes
   name            = each.value.name == null ? each.key : each.value.name
   resource_group  = each.value.resource_group
-  location        = each.value.location
+  location        = try(each.value.location,null)
   prefix_length   = each.value.prefix_length
   tags            = try(each.value.tags, local.tags)
   inherit_tags    = try(each.value.inherit_tags, false)
