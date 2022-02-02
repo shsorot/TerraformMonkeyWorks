@@ -35,7 +35,7 @@ locals {
 
   managed_disk_id = var.managed_disk.id == null ? (
     var.managed_disk.name == null && var.managed_disk.resource_group_name == null ? (
-      var.managed_disk[var.managed_disk.tag].id
+      var.managed_disks[var.managed_disk.tag].id
     ) : data.azurerm_managed_disk.this[0].id
   ) : var.managed_disk.id
 }

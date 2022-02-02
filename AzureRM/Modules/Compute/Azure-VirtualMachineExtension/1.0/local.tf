@@ -28,6 +28,10 @@ locals {
       var.virtual_machines[var.virtual_machine.tag].id
     ) : data.azurerm_virtual_machine.this[0].id
   ) : var.virtual_machine.id
+}
+
+# Create an extension settings and protected settings blocks
+locals {
   settings = var.settings.json == null ? (
     file(var.settings.file)
   ) : var.settings.json

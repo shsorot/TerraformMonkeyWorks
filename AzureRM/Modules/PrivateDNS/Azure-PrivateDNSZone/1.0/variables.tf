@@ -45,7 +45,7 @@ variable "soa_record" {
     refresh_time = optional(string) #   (Optional) The refresh time for the SOA record. Defaults to 3600.
     retry_time   = optional(string) #   (Optional) The retry time for the SOA record. Defaults to 300.
     ttl          = optional(string) #   (Optional) The Time To Live of the SOA Record in seconds. Defaults to 3600.
-    tags         = optional(string) #   (Optional) A mapping of tags to assign to the Record Set.
+    tags         = optional(map(string)) #   (Optional) A mapping of tags to assign to the Record Set.
   })
 }
 
