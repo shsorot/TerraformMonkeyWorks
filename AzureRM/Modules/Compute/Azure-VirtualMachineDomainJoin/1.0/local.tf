@@ -29,3 +29,21 @@ locals {
     ) : data.azurerm_virtual_machine.this[0].id
   ) : var.virtual_machine.id
 }
+
+# Create a domain join settings and protected blocks
+locals {
+  settings = <<SETTINGS
+    {
+        "Name": "${var.active_directory_domain}",
+        "OUPath": "${var.ou_path != null ? var.ou_path : ""}",
+        "User": "${var.active_directory_username}@${var.active_directory_domain}",
+        "Restart": "true",
+        "Options": "3"
+    }
+    SETTINGS
+  protected_settings         = <<SETTINGS
+        {
+            "Password": "${var.active_directory_password}"
+        }
+    SETTINGS
+}
