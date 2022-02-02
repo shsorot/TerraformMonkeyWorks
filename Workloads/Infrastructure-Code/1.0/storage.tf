@@ -64,7 +64,7 @@ variable "StorageShares" {
 module "Landscape-Storage-Shares" {
   source               = "../../../AzureRM/Modules/Storage/Azure-StorageShare/1.0"
   for_each             = var.StorageShares
-  name                 = each.key
+  name                 = each.value.name == null ? each.key : each.value.name
   storage_account_name = each.value.storage_account_name
   acl                  = try(each.value.acl, null)
   quota                = try(each.value.quota, null)

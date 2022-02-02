@@ -129,7 +129,7 @@ module "Landscape-Virtual-Subnets" {
   source                                         = "../../../AzureRM/Modules/Network/Azure-VirtualSubnet/1.0"
   for_each                                       = var.VirtualSubnets
   resource_group                                 = each.value.resource_group
-  virtual_network_name                           = each.value.virtual_network_name == null
+  virtual_network_name                           = each.value.virtual_network_name
   name                                           = each.value.name == null ? each.key : each.value.name
   address_prefixes                               = each.value.address_prefixes
   service_endpoints                              = try(each.value.service_endpoints, [])
@@ -217,7 +217,7 @@ module "Landscape-Virtual-Network-Interfaces" {
   enable_accelerated_networking = try(each.value.enable_accelerated_networking, false)
   internal_dns_name_label       = try(each.value.internal_dns_name_label, null)
   ip_configuration              = each.value.ip_configuration
-  application_security_group    = try(each.value.application_security_group, null)
+  application_security_group    = try(each.value.application_security_group,null)
   network_security_group        = try(each.value.network_security_group, null)
   virtual_networks              = module.Landscape-Virtual-Networks
   public_ip_addresses           = module.Landscape-Public-IP-Addresses

@@ -238,7 +238,7 @@ module "Landscape-Azure-Linux-Virtual-Machines" {
   size                            = try(each.value.size, "Standard_F2")
   additional_capabilities         = try(each.value.additional_capabilities, null)
   allow_extension_operations      = try(each.value.allow_Extension_operations, null)
-  availability_set                = try(each.value.availability_set_id, null)
+  availability_set                = try(each.value.availability_set, null)
   boot_diagnostics                = try(each.value.boot_diagnostics, null)
   computer_name                   = try(each.value.computer_name, null)
   custom_data                     = try(each.value.custom_data, null)
@@ -325,7 +325,7 @@ module "Landscape-Azure-Windows-Virtual-Machines" {
 
   #Outputs from modules for lookup
   dedicated_hosts                                 = module.Landscape-Azure-Dedicated-Hosts
-  azurerm_orchestrated_virtual_machine_scale_sets = {}
+  azurerm_orchestrated_virtual_machine_scale_sets = module.Landscape-Orchestrated-VirtualMachine-ScaleSets
   disk_encryption_sets                            = module.Landscape-Disk-Encryption-Sets
   network_interfaces                              = module.Landscape-Virtual-Network-Interfaces
   key_vaults                                      = module.Landscape-Key-Vaults
@@ -411,7 +411,7 @@ module "Landscape-Azure-Virtual-Machine-Managed-Disk-Attachments" {
   create_option             = try(each.value.create_option, "Attach")
   write_accelerator_enabled = try(each.value.write_accelerator_enabled, false)
   #  virtual_machines            = merge(module.Landscape-Azure-Windows-Virtual-Machines, module.Landscape-Azure-Linux-Virtual-Machines, module.Landscape-Azure-Virtual-Machines)
-  virtual_machines = module.Landscape-Azure-Windows-Virtual-Machines
+  virtual_machines = merge(module.Landscape-Azure-Windows-Virtual-Machines, module.Landscape-Azure-Linux-Virtual-Machines)
   managed_disks    = module.Landscape-Managed-Disks
 }
 
