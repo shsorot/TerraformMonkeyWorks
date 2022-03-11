@@ -45,26 +45,26 @@ variable "inherit_tags" {
 
 
 variable "sku_name" {
-  type = string
+  type        = string
   description = "(Optional) Sku name of the Firewall. Possible values are AZFW_Hub and AZFW_VNet. Changing this forces a new resource to be created."
-  default = null
+  default     = null
 }
 
 variable "sku_tier" {
-  type = string
+  type        = string
   description = "(Optional) Sku tier of the Firewall. Possible values are Premium and Standard. Changing this forces a new resource to be created."
-  default = null
+  default     = null
 }
 
 variable "firewall_policy" {
   type = object({
-    id = optional(string)
-    name = optional(string)
+    id                  = optional(string)
+    name                = optional(string)
     resource_group_name = optional(string)
-    tag = optional(string)
+    tag                 = optional(string)
   })
   description = "(Optional) The ID of the Firewall Policy applied to this Firewall."
-  default = null
+  default     = null
 }
 
 variable "firewall_policies" {
@@ -72,38 +72,38 @@ variable "firewall_policies" {
     id = optional(string)
   }))
   description = "(Optional) Output of module Azure-FirewallPolicy"
-  default = {}
+  default     = {}
 }
 
-variable "ip_configuration"{
+variable "ip_configuration" {
   type = object({
-    name = optional(string)                   # (Required) Specifies the name of the IP Configuration.
-    subnet = object({                         # (Required) Specifies the subnet of the IP Configuration.Must be /26 and named "AzureFirewallSubnet"
-      id = optional(string)
+    name = optional(string) # (Required) Specifies the name of the IP Configuration.
+    subnet = object({       # (Required) Specifies the subnet of the IP Configuration.Must be /26 and named "AzureFirewallSubnet"
+      id                   = optional(string)
       virtual_network_name = optional(string)
-      resource_group_name = optional(string)
-      virtual_network_tag = optional(string)
+      resource_group_name  = optional(string)
+      virtual_network_tag  = optional(string)
     })
     public_ip_address = object({
-      id = optional(string)
-      name = optional(string)
+      id                  = optional(string)
+      name                = optional(string)
       resource_group_name = optional(string)
-      tag = optional(string)
+      tag                 = optional(string)
     })
   })
 }
 
-variable "management_ip_configuration"{
+variable "management_ip_configuration" {
   type = object({
-    name = optional(string)                   # (Required) Specifies the name of the IP Configuration.
-    subnet = object({                         # (Required) Specifies the subnet of the IP Configuration.Must be /26 and named "AzureFirewallSubnet"
-      id = optional(string)                   # The virtual network is the same as core IP configuration, differing only in the subnet Name
+    name = optional(string) # (Required) Specifies the name of the IP Configuration.
+    subnet = object({       # (Required) Specifies the subnet of the IP Configuration.Must be /26 and named "AzureFirewallSubnet"
+      id = optional(string) # The virtual network is the same as core IP configuration, differing only in the subnet Name
     })
     public_ip_address = object({
-      id = optional(string)
-      name = optional(string)
+      id                  = optional(string)
+      name                = optional(string)
       resource_group_name = optional(string)
-      tag = optional(string)
+      tag                 = optional(string)
     })
   })
   default = null
@@ -119,7 +119,7 @@ variable "virtual_networks" {
   default = {}
 }
 
-variable "public_ip_addresses"{
+variable "public_ip_addresses" {
   type = map(object({
     id = optional(string)
   }))
@@ -128,47 +128,47 @@ variable "public_ip_addresses"{
 
 
 variable "dns_servers" {
-  type = list(string)
+  type        = list(string)
   description = "(Optional) A list of DNS servers that the Azure Firewall will direct DNS traffic to the for name resolution."
-  default = null
+  default     = null
 }
 
 variable "private_ip_ranges" {
-  type = list(string)
+  type        = list(string)
   description = "(Optional) A list of SNAT private CIDR IP ranges, or the special string IANAPrivateRanges, which indicates Azure Firewall does not SNAT when the destination IP address is a private range per IANA RFC 1918."
-  default = null
+  default     = null
 }
 
-variable "threat_intel_mode"{
-  type = string
+variable "threat_intel_mode" {
+  type        = string
   description = "(Optional) The operation mode for threat intelligence-based filtering. Possible values are: Off, Alert,Deny and ''(empty string). Defaults to Alert"
-  default = null
+  default     = null
 }
 
 
 variable "virtual_hub" {
   type = object({
-    public_ip_count = optional(number)        # (Optional) Specifies the number of public IPs to assign to the Firewall. Defaults to 1.
-    virtual_hub = object({                    # (Required) Specifies the ID of the Virtual Hub where the Firewall resides in.
-      id = optional(string)
-      name = optional(string)
+    public_ip_count = optional(number) # (Optional) Specifies the number of public IPs to assign to the Firewall. Defaults to 1.
+    virtual_hub = object({             # (Required) Specifies the ID of the Virtual Hub where the Firewall resides in.
+      id                  = optional(string)
+      name                = optional(string)
       resource_group_name = optional(string)
-      tag = optional(string)
+      tag                 = optional(string)
     })
   })
   default = null
 }
 
-variable "virtual_hubs"{
+variable "virtual_hubs" {
   type = map(object({
     id = optional(string)
   }))
   description = "(Optional)Output of module Azure-VirtualHub"
-  default = null
+  default     = null
 }
 
-variable "zones"{
-  type = list(number)
+variable "zones" {
+  type        = list(number)
   description = "(Optional) A list of availability zones where the Firewall will be created. Defaults to null."
-  default = null
+  default     = null
 }

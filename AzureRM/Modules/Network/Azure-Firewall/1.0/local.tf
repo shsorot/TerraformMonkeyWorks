@@ -36,14 +36,14 @@ data "azurerm_virtual_network" "this" {
 }
 
 data "azurerm_subnet" "this" {
-  count                = var.ip_configuration.subnet.virtual_network_name == null  ? 0 : 1
+  count                = var.ip_configuration.subnet.virtual_network_name == null ? 0 : 1
   name                 = "AzureFirewallSubnet"
   virtual_network_name = var.ip_configuration.subnet.virtual_network_name
   resource_group_name  = coalesce(var.ip_configuration.subnet.resource_group_name, local.resource_group_name)
 }
 
 data "azurerm_subnet" "management-this" {
-  count                = var.management_ip_configuration == null ? 0 : ( var.ip_configuration.subnet.virtual_network_name == null  ? 0 : 1 )
+  count                = var.management_ip_configuration == null ? 0 : (var.ip_configuration.subnet.virtual_network_name == null ? 0 : 1)
   name                 = "AzureFirewallManagementSubnet"
   virtual_network_name = var.ip_configuration.subnet.virtual_network_name
   resource_group_name  = coalesce(var.ip_configuration.subnet.resource_group_name, local.resource_group_name)
@@ -65,8 +65,6 @@ data "azurerm_public_ip" "management-this" {
   name                = var.ip_configuration.public_ip_address.name
   resource_group_name = coalesce(var.ip_configuration.public_ip_address.resource_group_name, local.resource_group_name)
 }
-
-# <TODO> add block and code for management ip configuration data objects
 
 
 data "azurerm_virtual_hub" "this" {
