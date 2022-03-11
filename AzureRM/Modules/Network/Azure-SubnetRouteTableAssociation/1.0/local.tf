@@ -3,16 +3,16 @@ data "azurerm_subscription" "current" {
 }
 
 data "azurerm_subnet" "this" {
-  count = var.subnet.name == null && var.subnet.virtual_network_name == null ? 0 : 1
-  name                  = var.subnet.name
-  resource_group_name   = var.subnet.resource_group_name
-  virtual_network_name  = var.subnet.virtual_network_name
+  count                = var.subnet.name == null && var.subnet.virtual_network_name == null ? 0 : 1
+  name                 = var.subnet.name
+  resource_group_name  = var.subnet.resource_group_name
+  virtual_network_name = var.subnet.virtual_network_name
 }
 
 data "azurerm_route_table" "this" {
-  count = var.route_table.name == null && var.route_table.resource_group_name == null ? 0 : 1
-  name                  = var.route_table.name
-  resource_group_name   = var.route_table.resource_group_name
+  count               = var.route_table.name == null && var.route_table.resource_group_name == null ? 0 : 1
+  name                = var.route_table.name
+  resource_group_name = var.route_table.resource_group_name
 }
 
 #Create the local variables
