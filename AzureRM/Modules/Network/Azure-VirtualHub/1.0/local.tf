@@ -23,11 +23,18 @@ locals {
   location                = var.location == null ? local.resource_group_location : var.location
 }
 
+
+data "azurerm_virtual_wan" "this"{
+  count = var.virtual_wan == null || var.virtual_wan == {} ? 0 : (var.virtual_wan.name == null ? 1 : 0)
+  name                = var.virtual_wan.name
+  resource_group_name = coalesce(var.virtual_wan.resource_group_name,local.resource_group_name)
+}
+
 locals {
-  virtual_wan_id = var.virtual_wan == null ? null :  ( var.virtual_wan.id == null ? (
-      var.virtual_wan.name == null ? (
+  virtual_wan_id = var.virtual_wan == null ? null : (var.virtual_wan.id == null ? (
+    var.virtual_wan.name == null ? (
         var.virtual_wans[var.virtual_wan.tag].id
-      ) : "/subscriptions/${local.subscription_id}/resourceGroups/${var.virtual_wan.resource_group_name == null ? local.resource_group_name : var.virtual_wan.resource_group_name}/providers/Microsoft.Network/virtualWANs/${var.virtual_wan.name}"
+    ) : data.azurerm_virtual_wan.this[0].id
     ) : var.virtual_wan.id
   )
 }
