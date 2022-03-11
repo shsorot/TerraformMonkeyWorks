@@ -39,12 +39,12 @@ variable "inherit_tags" {
 
 variable "soa_record" {
   type = object({
-    email        = string           #   (Required) The email contact for the SOA record.
-    expire_time  = optional(string) #   (Optional) The expire time for the SOA record. Defaults to 2419200.
-    minimum_ttl  = optional(string) #   (Optional) The minimum Time To Live for the SOA record. By convention, it is used to determine the negative caching duration. Defaults to 10
-    refresh_time = optional(string) #   (Optional) The refresh time for the SOA record. Defaults to 3600.
-    retry_time   = optional(string) #   (Optional) The retry time for the SOA record. Defaults to 300.
-    ttl          = optional(string) #   (Optional) The Time To Live of the SOA Record in seconds. Defaults to 3600.
+    email        = string                #   (Required) The email contact for the SOA record.
+    expire_time  = optional(string)      #   (Optional) The expire time for the SOA record. Defaults to 2419200.
+    minimum_ttl  = optional(string)      #   (Optional) The minimum Time To Live for the SOA record. By convention, it is used to determine the negative caching duration. Defaults to 10
+    refresh_time = optional(string)      #   (Optional) The refresh time for the SOA record. Defaults to 3600.
+    retry_time   = optional(string)      #   (Optional) The retry time for the SOA record. Defaults to 300.
+    ttl          = optional(string)      #   (Optional) The Time To Live of the SOA Record in seconds. Defaults to 3600.
     tags         = optional(map(string)) #   (Optional) A mapping of tags to assign to the Record Set.
   })
 }
