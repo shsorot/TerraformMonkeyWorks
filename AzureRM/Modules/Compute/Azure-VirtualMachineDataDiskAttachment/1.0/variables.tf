@@ -10,7 +10,7 @@ variable "virtual_machine" {
 
 variable "virtual_machines" {
   type = map(object({
-    id = optional(string)
+    id                  = optional(string)
     name                = optional(string)
     resource_group_name = optional(string)
     tag                 = optional(string)
