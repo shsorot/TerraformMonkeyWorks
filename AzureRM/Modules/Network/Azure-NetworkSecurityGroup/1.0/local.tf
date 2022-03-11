@@ -23,6 +23,7 @@ locals {
 
 }
 
+# TODO, Data block lookup for Application security groups
 
 # Specific to NSG rule assignment.
 locals {
