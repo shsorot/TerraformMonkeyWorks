@@ -17,6 +17,12 @@ resource "azurerm_storage_account" "this" {
   shared_access_key_enabled = var.shared_access_key_enabled
   is_hns_enabled            = var.is_hns_enabled
 
+  # Added encryption options post provider version 2.94.0
+  # TODO, add option to allow supplying custom certificates/keys for encryption.
+  infrastructure_encryption_enabled = var.account_kind == "StorageV2" || var.account_kind == null ? var.infrastructure_encryption_enabled : false
+  queue_encryption_key_type         = var.queue_encryption_key_type == null ? "Service" : var.queue_encryption_key_type
+  table_encryption_key_type         = var.table_encryption_key_type == null ? "Service" : var.table_encryption_key_type
+
   #New NFS v3 feature. Requries subscription onboarding
   nfsv3_enabled            = var.nfsv3_enabled
   large_file_share_enabled = var.large_file_share_enabled
