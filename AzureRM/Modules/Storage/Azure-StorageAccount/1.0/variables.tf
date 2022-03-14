@@ -292,3 +292,25 @@ variable "private_endpoints" {
 }
 
 
+
+# Added encryption variables as of 2.94.0
+variable "infrastructure_encryption_enabled" {
+  type        = bool
+  description = "(Optional) Is infrastructure encryption enabled? Changing this forces a new resource to be created. Defaults to false."
+  #NOTE:
+  #This can only be true when account_kind is StorageV2.
+  default = false
+}
+
+variable "queue_encryption_key_type" {
+  type        = string
+  description = " (Optional) The encryption type of the queue service. Possible values are Service and Account. Changing this forces a new resource to be created. Default value is Service."
+  default     = "Service"
+}
+
+variable "table_encryption_key_type" {
+  type        = string
+  description = "(Optional) The encryption type of the table service. Possible values are Service and Account. Changing this forces a new resource to be created. Default value is Service."
+  default     = "Service"
+}
+
