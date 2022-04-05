@@ -81,29 +81,29 @@ output "ProximityPlacementGroups" {
   value = module.Landscape-ProximityPlacement-Groups
 }
 
-variable "OrchestratedVirtualMachineScaleSets" {
-  default = {}
-}
+# variable "OrchestratedVirtualMachineScaleSets" {
+#   default = {}
+# }
 
-module "Landscape-Orchestrated-VirtualMachine-ScaleSets" {
-  source                      = "../../../AzureRM/Modules/Compute/Azure-OrchestratedVirtualMachineScaleSet/1.0"
-  for_each                    = var.OrchestratedVirtualMachineScaleSets
-  name                        = each.value.name == null ? each.key : each.value.name
-  resource_group              = each.value.resource_group
-  location                    = try(each.value.location, null)
-  tags                        = try(each.value.tags, local.tags)
-  inherit_tags                = try(each.value.inherit_tags, false)
-  zones                       = try(each.value.zones, null)
-  platform_fault_domain_count = each.value.platform_fault_domain_count
-  proximity_placement_group   = try(each.value.proximity_placement_group, null)
-  single_placement_group      = try(each.value.single_placement_group, false)
-  proximity_placement_groups  = module.Landscape-ProximityPlacement-Groups
-  resource_groups             = module.Landscape-Resource-Groups
-}
+# module "Landscape-Orchestrated-VirtualMachine-ScaleSets" {
+#   source                      = "../../../AzureRM/Modules/Compute/Azure-OrchestratedVirtualMachineScaleSet/1.0"
+#   for_each                    = var.OrchestratedVirtualMachineScaleSets
+#   name                        = each.value.name == null ? each.key : each.value.name
+#   resource_group              = each.value.resource_group
+#   location                    = try(each.value.location, null)
+#   tags                        = try(each.value.tags, local.tags)
+#   inherit_tags                = try(each.value.inherit_tags, false)
+#   zones                       = try(each.value.zones, null)
+#   platform_fault_domain_count = each.value.platform_fault_domain_count
+#   proximity_placement_group   = try(each.value.proximity_placement_group, null)
+#   single_placement_group      = try(each.value.single_placement_group, false)
+#   proximity_placement_groups  = module.Landscape-ProximityPlacement-Groups
+#   resource_groups             = module.Landscape-Resource-Groups
+# }
 
-output "OrchestratedVirtualMachineScaleSets" {
-  value = module.Landscape-Orchestrated-VirtualMachine-ScaleSets
-}
+# output "OrchestratedVirtualMachineScaleSets" {
+#   value = module.Landscape-Orchestrated-VirtualMachine-ScaleSets
+# }
 
 
 variable "DedicatedHosts" {
@@ -142,7 +142,7 @@ module "Landscape-Azure-Dedicated-Host-Groups" {
   location                    = try(each.value.location, null)
   tags                        = try(each.value.tags, local.tags)
   inherit_tags                = try(each.value.inherit_tags, false)
-  zones                       = try(each.value.zones, [])
+  zone                        = try(each.value.zone,null)
   platform_fault_domain_count = each.value.platform_fault_domain_count
   automatic_placement_enabled = try(each.value.automatic_placement_enabled, null)
   resource_groups             = module.Landscape-Resource-Groups
@@ -190,7 +190,7 @@ module "Landscape-Managed-Disks" {
   location              = try(each.value.location, null)
   tags                  = try(each.value.tags, local.tags)
   inherit_tags          = try(each.value.inherit_tags, false)
-  zones                 = try(each.value.zones, [])
+  zone                  = try(each.value.zone, null)
   storage_account_type  = try(each.value.storage_account_type, "Standard_LRS")
   create_option         = try(each.value.create_option, "Empty")
   disk_encryption_set   = try(each.value.disk_encryption_set_id, null)
@@ -325,7 +325,7 @@ module "Landscape-Azure-Windows-Virtual-Machines" {
 
   #Outputs from modules for lookup
   dedicated_hosts                                 = module.Landscape-Azure-Dedicated-Hosts
-  azurerm_orchestrated_virtual_machine_scale_sets = module.Landscape-Orchestrated-VirtualMachine-ScaleSets
+  azurerm_orchestrated_virtual_machine_scale_sets = {}
   disk_encryption_sets                            = module.Landscape-Disk-Encryption-Sets
   network_interfaces                              = module.Landscape-Virtual-Network-Interfaces
   key_vaults                                      = module.Landscape-Key-Vaults

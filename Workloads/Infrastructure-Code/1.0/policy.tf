@@ -10,10 +10,11 @@ module "Landscape-Policy-Definitions" {
   mode                  = each.value.mode
   display_name          = each.value.display_name
   description           = each.value.description
-  management_group_name = try(each.value.management_group_name, null)
+  management_group      = try(each.value.management_group, null)
   policy_rule           = try(each.value.policy_rule, null)
   metadata              = try(each.value.metadata, null)
   parameters            = try(each.value.parameters, null)
+  management_groups     = module.Landscape-Management-Groups
 }
 
 output "PolicyDefinitions" {
@@ -70,29 +71,30 @@ output "ManagementGroupPolicyAssignments" {
   value = module.Landscape-Management-Group-Policy-Assignment
 }
 
+# Deprecated in provider > 3.00.0
 
-variable "PolicyRemediations" {
-  default = {}
-}
-
-
-module "Landscape-Policy-Remediations" {
-  source                      = "../../../AzureRM/Modules/Policy/Azure-PolicyRemediation/1.0"
-  for_each                    = var.PolicyRemediations
-  name                        = each.key
-  scope                       = each.value.scope
-  policy_assignment           = each.value.policy_assignment
-  policy_definition_reference = each.value.policy_definition_reference
-  location_filters            = try(each.value.location_filters, [])
-  resource_discovery_mode     = try(each.value.resource_discovery_mode, null)
-  policy_definitions          = module.Landscape-Policy-Definitions
-  policy_assignments          = module.Landscape-Management-Group-Policy-Assignment
-}
+# variable "PolicyRemediations" {
+#   default = {}
+# }
 
 
-output "PolicyRemediations" {
-  value = module.Landscape-Policy-Remediations
-}
+# module "Landscape-Policy-Remediations" {
+#   source                      = "../../../AzureRM/Modules/Policy/Azure-PolicyRemediation/1.0"
+#   for_each                    = var.PolicyRemediations
+#   name                        = each.key
+#   scope                       = each.value.scope
+#   policy_assignment           = each.value.policy_assignment
+#   policy_definition_reference = each.value.policy_definition_reference
+#   location_filters            = try(each.value.location_filters, [])
+#   resource_discovery_mode     = try(each.value.resource_discovery_mode, null)
+#   policy_definitions          = module.Landscape-Policy-Definitions
+#   policy_assignments          = module.Landscape-Management-Group-Policy-Assignment
+# }
+
+
+# output "PolicyRemediations" {
+#   value = module.Landscape-Policy-Remediations
+# }
 
 
 
