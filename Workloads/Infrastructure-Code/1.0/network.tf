@@ -97,7 +97,7 @@ module "Landscape-Virtual-Networks" {
   for_each       = var.VirtualNetworks
   name           = each.value.name == null ? each.key : each.value.name
   resource_group = each.value.resource_group
-  location       = try(each.value.location,null)
+  location       = try(each.value.location, null)
   address_space  = each.value.address_space
   dns_servers    = try(each.value.dns_servers, [])
 
@@ -154,7 +154,7 @@ module "Landscape-Public-IP-Prefixes" {
   for_each        = var.PublicIPPrefixes
   name            = each.value.name == null ? each.key : each.value.name
   resource_group  = each.value.resource_group
-  location        = try(each.value.location,null)
+  location        = try(each.value.location, null)
   prefix_length   = each.value.prefix_length
   tags            = try(each.value.tags, local.tags)
   inherit_tags    = try(each.value.inherit_tags, false)
@@ -184,7 +184,9 @@ module "Landscape-Public-IP-Addresses" {
   domain_name_label       = try(each.value.domain_name_label, null)
   reverse_fqdn            = try(each.value.reverse_fqdn, null)
 
-  availability_zone = try(each.value.availability_zone, null)
+  # Deprecated from provider > 3.00.0
+  # availability_zone = try(each.value.availability_zone, null)
+  zones             = try(each.value.zones, null)
   public_ip_prefix  = try(each.value.public_ip_prefix, null)
 
   public_ip_prefixes = module.Landscape-Public-IP-Prefixes
@@ -217,7 +219,7 @@ module "Landscape-Virtual-Network-Interfaces" {
   enable_accelerated_networking = try(each.value.enable_accelerated_networking, false)
   internal_dns_name_label       = try(each.value.internal_dns_name_label, null)
   ip_configuration              = each.value.ip_configuration
-  application_security_group    = try(each.value.application_security_group,null)
+  application_security_group    = try(each.value.application_security_group, null)
   network_security_group        = try(each.value.network_security_group, null)
   virtual_networks              = module.Landscape-Virtual-Networks
   public_ip_addresses           = module.Landscape-Public-IP-Addresses

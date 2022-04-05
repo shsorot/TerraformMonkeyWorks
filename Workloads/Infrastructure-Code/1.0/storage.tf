@@ -23,11 +23,16 @@ module "Landscape-Storage-Accounts" {
   static_website             = try(each.value.static_website, null)
   network_rules              = try(each.value.network_rules, null)
   azure_files_authentication = try(each.value.azures_files_authentication, null)
-  routing                    = try(each.value.routing, null)
-  tags                       = try(each.value.tags, local.tags)
-  inherit_tags               = try(each.value.inherit_tags, false)
-  virtual_networks           = module.Landscape-Virtual-Networks
-  resource_groups            = module.Landscape-Resource-Groups
+  # Added for provider 2.94
+  queue_encryption_key_type         = try(each.value.queue_encryption_key_type, "Service")
+  table_encryption_key_type         = try(each.value.table_encryption_key_type, "Service")
+  infrastructure_encryption_enabled = try(each.value.infrastructure_encryption_enabled, false)
+
+  routing          = try(each.value.routing, null)
+  tags             = try(each.value.tags, local.tags)
+  inherit_tags     = try(each.value.inherit_tags, false)
+  virtual_networks = module.Landscape-Virtual-Networks
+  resource_groups  = module.Landscape-Resource-Groups
 }
 
 output "StorageAccounts" {

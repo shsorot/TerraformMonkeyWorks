@@ -9,7 +9,7 @@ module "Landscape-Route-Tables" {
   for_each                      = var.RouteTables
   name                          = each.value.name == null ? each.key : each.value.name
   resource_group                = each.value.resource_group
-  location                      = try(each.value.location,null)
+  location                      = try(each.value.location, null)
   disable_bgp_route_propagation = each.value.disable_bgp_route_propagation
   route                         = each.value.route
   tags                          = try(each.value.tags, local.tags)

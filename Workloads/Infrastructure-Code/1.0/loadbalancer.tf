@@ -128,9 +128,8 @@ module "Landscape-Loadbalancer-Rules" {
   source                         = "../../../AzureRM/Modules/Loadbalancer/Azure-LoadbalancerRule/1.0"
   for_each                       = var.LoadbalancerProbes
   name                           = each.value.name == null ? each.key : each.value.name
-  resource_group_name            = each.value.resource_group_name
   loadbalancer                   = each.value.loadbalancer
-  backend_address_pool           = each.value.backend_address_pool
+  backend_address_pool           = try(each.value.backend_address_pool,null)
   probe                          = try(each.value.probe, null)
   frontend_ip_configuration_name = each.value.frontend_ip_configuration_name
   protocol                       = each.value.protocol
