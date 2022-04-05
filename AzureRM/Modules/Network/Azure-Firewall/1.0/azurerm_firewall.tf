@@ -3,6 +3,7 @@ resource "azurerm_firewall" "this" {
   resource_group_name = local.resource_group_name
   location            = local.location
   sku_name            = var.sku_name
+  sku_tier            = var.sku_tier
   # Azure portal makes this mandatory, but not Terraform.  Potential Bug ?
   firewall_policy_id = local.firewall_policy_id
   # single block, Mandatory

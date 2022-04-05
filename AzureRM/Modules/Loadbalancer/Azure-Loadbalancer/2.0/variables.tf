@@ -82,7 +82,8 @@ variable "frontend_ip_configuration" {
       tag                 = optional(string)
     }))
 
-    availability_zone = optional(string) # (Optional) Refer to https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/lb#availability_zone 
+    # availability_zone = optional(string) # (Optional) Refer to https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/lb#availability_zone 
+    zones               = optional(list(string)) #(Optional) Refer to https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/lb#availability_zone 
   }))
   default = []
 }

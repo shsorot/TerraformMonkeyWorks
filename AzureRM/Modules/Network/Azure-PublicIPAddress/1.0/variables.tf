@@ -95,10 +95,16 @@ variable "inherit_tags" {
   default = false
 }
 
+# Depcrecated from provider > 3.00.0
+# variable "availability_zone" {
+#   description = "(Optional) The availability zone to allocate the Public IP in. Possible values are Zone-Redundant, 1, 2, 3, and No-Zone. Defaults to Zone-Redundant"
+#   type        = string
+#   default     = null
+# }
 
-variable "availability_zone" {
-  description = "(Optional) The availability zone to allocate the Public IP in. Possible values are Zone-Redundant, 1, 2, 3, and No-Zone. Defaults to Zone-Redundant"
-  type        = string
+variable "zones" {
+  description = "(Optional) The availability zones to allocate the Public IP in. Possible values are Zone-Redundant, 1, 2, 3, and No-Zone. Defaults to Zone-Redundant"
+  type        = list(string) 
   default     = null
 }
 

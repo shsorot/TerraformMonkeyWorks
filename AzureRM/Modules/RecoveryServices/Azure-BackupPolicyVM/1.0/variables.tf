@@ -98,14 +98,15 @@ variable "retention_yearly" {
   })
 }
 
+# Deprecated in provider < 3.00.0
 
-variable "tags" {
-  type    = map(string)
-  default = {}
-}
+# variable "tags" {
+#   type    = map(string)
+#   default = {}
+# }
 
-variable "inherit_tags" {
-  type    = bool
-  default = false
-}
+# variable "inherit_tags" {
+#   type    = bool
+#   default = false
+# }
 

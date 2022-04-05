@@ -21,7 +21,7 @@ resource "azurerm_virtual_network_gateway" "this" {
   }
 
   dynamic "ip_configuration" {
-    for_each = var.active_active == true ? [1] : [0]
+    for_each = var.active_active == true ? [1] : []
     content {
       name                          = "vnetGatewayAAConfig"
       public_ip_address_id          = local.public_ip_address_id

@@ -43,10 +43,17 @@ variable "inherit_tags" {
   default = false
 }
 
-variable "zones" {
-  type        = list(number)
-  description = "(Optional) A collection containing the availability zone to allocate the Managed Disk in."
+# variable "zones" {
+#   type        = list(number)
+#   description = "(Optional) A collection containing the availability zone to allocate the Managed Disk in."
+# }
+
+variable "zone" {
+  type        = number
+  description = "(Optional) A number containing the availability zone to allocate the Managed Disk in."
+  default     = null
 }
+
 
 variable "storage_account_type" {
   type        = string

@@ -1,6 +1,7 @@
 resource "azurerm_lb_probe" "this" {
   name                = var.name
-  resource_group_name = local.resource_group_name
+  # Deprecated from provider > 3.00.0
+  # resource_group_name = local.resource_group_name
   loadbalancer_id     = local.loadbalancer_id
   protocol            = var.protocol
   port                = var.port

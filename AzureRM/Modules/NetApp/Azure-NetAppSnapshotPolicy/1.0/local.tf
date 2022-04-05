@@ -1,10 +1,11 @@
+# Generate the Keyvault ID from userinput/output of Module Azure-KeyVault or generate from resource group and Key vault name
 # This file contains local & data blocks
 data "azurerm_subscription" "current" {
 }
 
+
 data "azurerm_client_config" "current" {
 }
-
 
 data "azurerm_resource_group" "this" {
   count = var.resource_group.name == null ? 0 : 1
@@ -19,19 +20,21 @@ locals {
   subscription_id         = data.azurerm_subscription.current.subscription_id
   resource_group_name     = var.resource_group.name == null ? var.resource_groups[var.resource_group.tag].name : data.azurerm_resource_group.this[0].name
   resource_group_tags     = var.resource_group.name == null ? var.resource_groups[var.resource_group.tag].tags : data.azurerm_resource_group.this[0].tags
-  # Deprecated in provider > 3.00.0
-  # tags                    = merge(var.tags, (var.inherit_tags == true ? local.resource_group_tags : {}))
+  tags                    = merge(var.tags, (var.inherit_tags == true ? local.resource_group_tags : {}))
   resource_group_location = var.resource_group.name == null ? var.resource_groups[var.resource_group.tag].location : data.azurerm_resource_group.this[0].location
+  location                = var.location == null ? local.resource_group_location : var.location
 }
 
-data "azurerm_recovery_services_vault" "this" {
-  count               = var.recovery_vault.name != null ? 1 : 0
-  name                = var.recovery_vault.name
+data "azurerm_netapp_account" "this" {
+  count               = var.account.name == null ? 0 : 1
   resource_group_name = local.resource_group_name
+  name                = var.account.name
 }
 
+# Local variables for NetApp Account
 locals {
-  recovery_vault_name = var.recovery_vault.name == null ? (
-    var.recovery_vaults[var.recovery_vault.tag].name
-  ) : data.azurerm_recovery_services_vault.this[0].name
+  account_name = var.account.name == null ? (
+    var.netapp_accounts[var.account.tag].name
+  ) : data.azurerm_netapp_account.this[0].name
 }
+

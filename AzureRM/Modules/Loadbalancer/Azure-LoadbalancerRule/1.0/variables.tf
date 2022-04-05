@@ -3,12 +3,6 @@ variable "name" {
   description = "(Required) Specifies the name of the LB Rule."
 }
 
-variable "resource_group_name" {
-  type        = string
-  description = "(Required) The name of the resource group in which to create the resource."
-}
-
-
 variable "loadbalancer" {
   type = object({
     id                  = optional(string)
@@ -46,11 +40,11 @@ variable "backend_port" {
 }
 
 variable "backend_address_pool" {
-  type = object({
+  type = list(object({
     id   = optional(string)
     name = optional(string)
     tag  = optional(string)
-  })
+  }))
   description = "(Optional) A list of reference to a Backend Address Pool over which this Load Balancing Rule operates."
   default     = null
 }

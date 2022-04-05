@@ -5,6 +5,7 @@ resource "azurerm_public_ip_prefix" "this" {
   location            = local.location
   sku                 = var.sku
   prefix_length       = var.prefix_length
-  availability_zone   = var.availability_zone
+  # availability_zone   = var.availability_zone
+  zones               = var.zones
   tags                = local.tags
 }

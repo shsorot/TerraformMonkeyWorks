@@ -3,11 +3,12 @@ variable "name" {
   description = "(Optional) The name or UUID for this Management Group, which needs to be unique across your tenant. A new UUID will be generated if not provided. Changing this forces a new resource to be created."
 }
 
-variable "group_id" {
-  type        = string
-  description = "(Optional) The name or UUID for this Management Group, which needs to be unique across your tenant. A new UUID will be generated if not provided. Changing this forces a new resource to be created."
-  default     = null
-}
+# Deprecated from provider > 3.0.0
+# variable "group_id" {
+#   type        = string
+#   description = "(Optional) The name or UUID for this Management Group, which needs to be unique across your tenant. A new UUID will be generated if not provided. Changing this forces a new resource to be created."
+#   default     = null
+# }
 
 variable "display_name" {
   type        = string

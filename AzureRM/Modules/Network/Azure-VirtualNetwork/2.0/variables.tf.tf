@@ -92,8 +92,8 @@ variable "subnet" {
     delegation = optional(object({
       name = optional(string) # A name for this delegation.
       service_delegation = object({
-        name   = string                 # A value from the list at :https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/subnet#name
-        action = optional(list(string)) # A list value from the list at :https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/subnet#actions
+        name    = string                 # A value from the list at :https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/subnet#name
+        actions = optional(list(string)) # A list value from the list at :https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/subnet#actions
       })
     }))
     security_group = optional(object({       # (Optional)  Custom object describing NSG details to be attached to the subnet
