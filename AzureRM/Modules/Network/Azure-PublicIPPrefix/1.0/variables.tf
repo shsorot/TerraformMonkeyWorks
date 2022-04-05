@@ -46,9 +46,15 @@ variable "prefix_length" {
   default     = 28
 }
 
-variable "availability_zone" {
-  description = "(Optional) The availability zone to allocate the Public IP in. Possible values are Zone-Redundant, 1, 2, 3, and No-Zone. Defaults to Zone-Redundant"
-  type        = string
+# variable "availability_zone" {
+#   description = "(Optional) The availability zone to allocate the Public IP in. Possible values are Zone-Redundant, 1, 2, 3, and No-Zone. Defaults to Zone-Redundant"
+#   type        = string
+#   default     = null
+# }
+
+variable "zones"{
+  description = "(Optional) List of zones to allocate the public IP in. Possible values are Zone-Redundant, 1, 2, 3, and No-Zone. Defaults to Zone-Redundant"
+  type        = list(string)
   default     = null
 }
 

@@ -3,7 +3,7 @@ resource "azurerm_managed_disk" "this" {
   location               = local.location
   resource_group_name    = local.resource_group_name
   tags                   = local.tags
-  zones                  = var.zones
+  zone                   = var.zone
   storage_account_type   = var.storage_account_type
   create_option          = var.create_option
   disk_encryption_set_id = local.disk_encryption_set_id

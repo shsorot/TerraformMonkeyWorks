@@ -32,7 +32,7 @@ locals {
 
 # Create a domain join settings and protected blocks
 locals {
-  settings = <<SETTINGS
+  settings           = <<SETTINGS
     {
         "Name": "${var.active_directory_domain}",
         "OUPath": "${var.ou_path != null ? var.ou_path : ""}",
@@ -41,7 +41,7 @@ locals {
         "Options": "3"
     }
     SETTINGS
-  protected_settings         = <<SETTINGS
+  protected_settings = <<SETTINGS
         {
             "Password": "${var.active_directory_password}"
         }

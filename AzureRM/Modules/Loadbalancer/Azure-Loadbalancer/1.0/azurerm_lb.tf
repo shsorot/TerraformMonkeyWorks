@@ -5,6 +5,7 @@ resource "azurerm_lb" "this" {
   sku                 = var.sku == null ? "Standard" : var.sku
   tags                = local.tags
 
+  # TODO : add code for edge zone
   dynamic "frontend_ip_configuration" {
     for_each = { for instance in var.frontend_ip_configuration : instance.name => instance if(var.frontend_ip_configuration != null || var.frontend_ip_configuration != []) }
     content {
@@ -39,7 +40,9 @@ resource "azurerm_lb" "this" {
         ) : frontend_ip_configuration.value.public_ip_prefix.id
       )
 
-      availability_zone = frontend_ip_configuration.value.availability_zone
+      # Deprecated from provider > 3.00.0
+      # availability_zone = frontend_ip_configuration.value.availability_zone
+      zones = frontend_ip_configuration.value.zones
     }
   }
 }

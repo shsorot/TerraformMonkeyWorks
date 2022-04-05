@@ -1,7 +1,8 @@
 resource "azurerm_lb_probe" "this" {
   for_each            = { for instance in(var.probe == null ? [] : var.probe) : instance.name => instance }
   name                = each.key
-  resource_group_name = local.resource_group_name
+  # Deprecated from provider > 3.00.0
+  # resource_group_name = local.resource_group_name
   loadbalancer_id     = azurerm_lb.this.id
   port                = each.value.probe_port
   protocol            = lookup(each.value, "probe_protocol", null)

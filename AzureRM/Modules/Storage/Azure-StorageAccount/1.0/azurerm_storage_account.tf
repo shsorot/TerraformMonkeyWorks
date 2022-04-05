@@ -13,7 +13,8 @@ resource "azurerm_storage_account" "this" {
   min_tls_version           = (var.min_tls_version == null) ? "TLS1_0" : var.min_tls_version
 
   #This should be false by default
-  allow_blob_public_access  = (var.allow_blob_public_access == null) ? false : var.allow_blob_public_access
+  # Deprecated in provider > 3.00.0
+  # allow_blob_public_access  = (var.allow_blob_public_access == null) ? false : var.allow_blob_public_access
   shared_access_key_enabled = var.shared_access_key_enabled
   is_hns_enabled            = var.is_hns_enabled
 

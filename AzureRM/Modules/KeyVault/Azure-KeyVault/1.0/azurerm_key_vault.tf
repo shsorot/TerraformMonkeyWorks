@@ -18,6 +18,7 @@ resource "azurerm_key_vault" "this" {
   # access_policy                   = var.access_policy == null || var.access_policy == [] ? [] : var.access_policy
   access_policy = var.access_policy
 
+  # single block
   dynamic "network_acls" {
     for_each = var.network_acls == null || var.network_acls == {} ? [] : [1]
     content {

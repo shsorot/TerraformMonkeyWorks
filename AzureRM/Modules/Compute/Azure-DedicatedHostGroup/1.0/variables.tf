@@ -43,10 +43,11 @@ variable "inherit_tags" {
   default = false
 }
 
-variable "zones" {
-  type        = list(number)
+variable "zone" {
+  #type        = list(number)
+  type        = number
   description = "(Optional) A list of Availability Zones in which the Dedicated Host Group should be located. Changing this forces a new resource to be created."
-  default     = []
+  default     = null
 }
 variable "platform_fault_domain_count" {
   type        = number

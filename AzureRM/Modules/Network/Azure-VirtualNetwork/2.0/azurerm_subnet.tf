@@ -1,7 +1,6 @@
 
 # Subnets
 resource "azurerm_subnet" "this" {
-
   for_each                                       = local.subnet
   name                                           = each.value.name == null ? each.key : each.value.name
   resource_group_name                            = local.resource_group_name

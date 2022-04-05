@@ -30,7 +30,8 @@ resource "azurerm_policy_set_definition" "this" {
   }
 
   description           = var.description
-  management_group_name = var.management_group_name
+  # Deprecated from provider > 3.00.0
+  # management_group_name = var.management_group_name
   metadata              = local.metadata
   parameters            = local.parameters
 }

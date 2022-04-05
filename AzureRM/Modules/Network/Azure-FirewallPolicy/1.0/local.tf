@@ -36,23 +36,23 @@ data "azurerm_user_assigned_identity" "this" {
 }
 
 data "azurerm_log_analytics_workspace" "default" {
-  count = var.insights == null ? 0 : (var.insights.default_local_analytics_workspace.name == null ? 0 : 1)
+  count               = var.insights == null ? 0 : (var.insights.default_local_analytics_workspace.name == null ? 0 : 1)
   name                = var.insights.default_local_analytics_workspace.name
-  resource_group_name = coalesce(var.insights.default_local_analytics_workspace.resource_group_name,local.resource_group_name)
+  resource_group_name = coalesce(var.insights.default_local_analytics_workspace.resource_group_name, local.resource_group_name)
 }
 
 
-data "azurerm_key_vault" "this"{
-  count = var.tls_certificate == null ? 0 : (var.tls_certificate.key_vault.key_vault_name == null ? 0 : 1)
-  name               = var.tls_certificate.key_vault.key_vault_name
-  resource_group_name= coalesce(var.tls_certificate.key_vault.resource_group_name, local.resource_group_name)
-}
+# data "azurerm_key_vault" "this" {
+#   count               = var.tls_certificate == null ? 0 : (var.tls_certificate.key_vault.key_vault_name == null ? 0 : 1)
+#   name                = var.tls_certificate.key_vault.key_vault_name
+#   resource_group_name = coalesce(var.tls_certificate.key_vault.resource_group_name, local.resource_group_name)
+# }
 
-data "azurerm_key_vault_secrets" "this"{
-  count = var.tls_certificate == null ? 0 : (var.tls_certificate.key_vault_secret.name == null && var.tls_certificate.key_vault_secret.key_vault_name == null ? 0 : 1)
-  name = var.tls_certificate.key_vault_secret.name
-  key
-}
+# data "azurerm_key_vault_secrets" "this" {
+#   count        = var.tls_certificate == null || var.tls_certificate == {} ? 0 : (var.tls_certificate.key_vault_secret.name ? 0 : 1)
+#   name         = var.tls_certificate.key_vault_secret.name
+#   key_vault_id = data.azurerm_key_vault.this[0].id
+# }
 
 
 locals {
@@ -92,11 +92,11 @@ locals {
 
   intrusion_detection = var.intrusion_detection == null ? null : (
     {
-      mode = var.intrusion_detection.mode
+      mode                = var.intrusion_detection.mode
       signature_overrides = { for instance in var.intrusion_detection.signature_overrides : instance.id => instance if instance.id != null }
-      traffic_bypass   = { for instnace in var.intrusion_detection.traffic_bypass : instnace.name => instnace if instnace.name != null }
+      traffic_bypass      = { for instnace in var.intrusion_detection.traffic_bypass : instnace.name => instnace if instnace.name != null }
     }
   )
- 
+
 }
 
