@@ -3,18 +3,18 @@ variable "PolicyDefinitions" {
 }
 
 module "Landscape-Policy-Definitions" {
-  source                = "../../../AzureRM/Modules/Policy/Azure-PolicyDefinition/1.0"
-  for_each              = var.PolicyDefinitions
-  name                  = each.key
-  policy_type           = each.value.policy_type
-  mode                  = each.value.mode
-  display_name          = each.value.display_name
-  description           = each.value.description
-  management_group      = try(each.value.management_group, null)
-  policy_rule           = try(each.value.policy_rule, null)
-  metadata              = try(each.value.metadata, null)
-  parameters            = try(each.value.parameters, null)
-  management_groups     = module.Landscape-Management-Groups
+  source            = "../../../AzureRM/Modules/Policy/Azure-PolicyDefinition/1.0"
+  for_each          = var.PolicyDefinitions
+  name              = each.key
+  policy_type       = each.value.policy_type
+  mode              = each.value.mode
+  display_name      = each.value.display_name
+  description       = each.value.description
+  management_group  = try(each.value.management_group, null)
+  policy_rule       = try(each.value.policy_rule, null)
+  metadata          = try(each.value.metadata, null)
+  parameters        = try(each.value.parameters, null)
+  management_groups = module.Landscape-Management-Groups
 }
 
 output "PolicyDefinitions" {

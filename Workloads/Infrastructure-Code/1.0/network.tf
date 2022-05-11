@@ -186,8 +186,8 @@ module "Landscape-Public-IP-Addresses" {
 
   # Deprecated from provider > 3.00.0
   # availability_zone = try(each.value.availability_zone, null)
-  zones             = try(each.value.zones, null)
-  public_ip_prefix  = try(each.value.public_ip_prefix, null)
+  zones            = try(each.value.zones, null)
+  public_ip_prefix = try(each.value.public_ip_prefix, null)
 
   public_ip_prefixes = module.Landscape-Public-IP-Prefixes
 

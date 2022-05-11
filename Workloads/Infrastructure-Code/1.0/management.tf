@@ -4,9 +4,9 @@ variable "ManagementGroups" {
 
 
 module "Landscape-Management-Groups" {
-  source                  = "../../../AzureRM/Modules/Management/Azure-ManagementGroup/1.0"
-  for_each                = var.ManagementGroups
-  name                    = each.value.name == null ? each.key : each.value.name
+  source   = "../../../AzureRM/Modules/Management/Azure-ManagementGroup/1.0"
+  for_each = var.ManagementGroups
+  name     = each.value.name == null ? each.key : each.value.name
   # Deprecated from provider > 3.0.0
   # group_id                = try(each.value.group_id, null)
   display_name            = try(each.value.display_name, null)
