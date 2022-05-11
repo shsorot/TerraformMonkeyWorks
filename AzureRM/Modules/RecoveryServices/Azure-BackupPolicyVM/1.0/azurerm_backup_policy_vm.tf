@@ -15,7 +15,7 @@ resource "azurerm_backup_policy_vm" "this" {
   instant_restore_retention_days = var.instant_restore_retention_days
 
   dynamic "retention_daily" {
-    for_each = var.retention_daily != null && var.backup.frequency == "Daily" ? [1] : []
+    for_each = var.retention_daily == null ? [] : [1]
     content {
       count = var.retention_daily.count < 7 ? 7 : (
         var.retention_daily.count > 9999 ? 9999 : var.retention_daily.count
@@ -23,7 +23,7 @@ resource "azurerm_backup_policy_vm" "this" {
     }
   }
   dynamic "retention_weekly" {
-    for_each = var.retention_weekly != null && var.backup.frequency == "Weekly" ? [1] : []
+    for_each = var.retention_weekly == null ? [] : [1]
     content {
       count = var.retention_weekly.count < 7 ? 7 : (
         var.retention_weekly.count > 9999 ? 9999 : var.retention_weekly.count
