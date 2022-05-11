@@ -9,7 +9,8 @@ resource "azurerm_lb_rule" "this" {
   backend_port                   = each.value.backend_port
   frontend_ip_configuration_name = each.value.frontend_ip_configuration_name
   # TODO : add code for dual pool ids when lb type is gateway
-  backend_address_pool_ids       = each.value.backend_address_pool_name == null ? null : azurerm_lb_backend_address_pool.this[each.value.backend_address_pool_name].id
+  
+  backend_address_pool_ids       = each.value.backend_address_pool_name == null ? null : [azurerm_lb_backend_address_pool.this[each.value.backend_address_pool_name].id]
   probe_id                       = each.value.probe_name == null ? null : azurerm_lb_probe.this[each.value.probe_name].id
   idle_timeout_in_minutes        = each.value.idle_timeout_in_minutes == null ? 4 : each.value.idle_timeout_in_minutes
   depends_on                     = [azurerm_lb.this, azurerm_lb_backend_address_pool.this, azurerm_lb_probe.this]

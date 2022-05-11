@@ -129,7 +129,7 @@ module "Landscape-Loadbalancer-Rules" {
   for_each                       = var.LoadbalancerProbes
   name                           = each.value.name == null ? each.key : each.value.name
   loadbalancer                   = each.value.loadbalancer
-  backend_address_pool           = try(each.value.backend_address_pool,null)
+  backend_address_pool           = try(each.value.backend_address_pool, null)
   probe                          = try(each.value.probe, null)
   frontend_ip_configuration_name = each.value.frontend_ip_configuration_name
   protocol                       = each.value.protocol

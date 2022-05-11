@@ -18,29 +18,29 @@ output "NetAppAccounts" {
   value = module.Landscape-NetApp-Accounts
 }
 
-variable "NetAppSnapshotPolicies"{
+variable "NetAppSnapshotPolicies" {
   default = {}
 }
 
-module "Landscape-NetApp-Snapshot-Policies"{
-  source          =  "../../../AzureRM/Modules/NetApp/Azure-NetAppSnapshotPolicy/1.0"
-  for_each        =  var.NetAppSnapshotPolicies
-  name            =  each.value.name == null ? each.key : each.value.name
+module "Landscape-NetApp-Snapshot-Policies" {
+  source           = "../../../AzureRM/Modules/NetApp/Azure-NetAppSnapshotPolicy/1.0"
+  for_each         = var.NetAppSnapshotPolicies
+  name             = each.value.name == null ? each.key : each.value.name
   resource_group   = each.value.resource_group
   location         = try(each.value.location, null)
   account          = each.value.account
   tags             = try(each.value.tags, local.tags)
   inherit_tags     = try(each.value.inherit_tags, false)
   enabled          = try(each.value.enabled, false)
-  daily_schedule  = try(each.value.daily_schedule, null)
-  hourly_schedule = try(each.value.hourly_schedule, null)
-  weekly_schedule = try(each.value.weekly_schedule, null)
+  daily_schedule   = try(each.value.daily_schedule, null)
+  hourly_schedule  = try(each.value.hourly_schedule, null)
+  weekly_schedule  = try(each.value.weekly_schedule, null)
   monthly_schedule = try(each.value.monthly_schedule, null)
-  netapp_accounts = module.Landscape-NetApp-Accounts
-  resource_groups = module.Landscape-Resource-Groups
+  netapp_accounts  = module.Landscape-NetApp-Accounts
+  resource_groups  = module.Landscape-Resource-Groups
 }
 
-output "NetAppSnapshotPolicies"{
+output "NetAppSnapshotPolicies" {
   value = module.Landscape-NetApp-Snapshot-Policies
 }
 
@@ -75,32 +75,32 @@ variable "NetAppVolumes" {
 
 # TODO: add snapshot policy and snapshot module output for volume creation
 module "Landscape-Netapp-Volumes" {
-  source                           = "../../../AzureRM/Modules/NetApp/Azure-NetAppVolume/1.0"
-  for_each                         = var.NetAppVolumes
-  name                             = each.value.name == null ? each.key : each.value.name
-  resource_group                   = each.value.resource_group
-  location                         = try(each.value.location, null)
-  tags                             = try(each.value.tags, local.tags)
-  inherit_tags                     = try(each.value.inherit_tags, false)
-  account                          = each.value.account
-  pool                             = each.value.pool
-  volume_path                      = each.value.volume_path
-  protocols                        = try(each.value.protocols, ["NFSv4.1"])
-  security_style                   = try(each.value.security_style, "Unix")
-  subnet                           = each.value.subnet
-  storage_quota_in_gb              = each.value.storage_quota_in_gb
-  snapshot_directory_visible       = try(each.value.snapshot_directory_visible, false)
-  create_from_snapshot_resource    = try(each.value.create_from_snapshot_resource_id, {})
-  data_protection_replication      = try(each.value.data_protection_replication, {})
-  data_protection_snapshot_policy  = try(each.value.data_protection_snapshot_policy, {})
-  export_policy_rule               = try(each.value.export_policy_rule,null)
-  throughput_in_mibps              = try(each.value.throughput_in_mibps, null)
-  virtual_networks                 = module.Landscape-Virtual-Networks
-  resource_groups                  = module.Landscape-Resource-Groups
-  netapp_accounts                  = module.Landscape-NetApp-Accounts
-  netapp_pools                     = module.Landscape-NetApp-Pools
-  snapshot_policies                = module.Landscape-NetApp-Snapshot-Policies
-  netapp_snapshots                 = {}
+  source                          = "../../../AzureRM/Modules/NetApp/Azure-NetAppVolume/1.0"
+  for_each                        = var.NetAppVolumes
+  name                            = each.value.name == null ? each.key : each.value.name
+  resource_group                  = each.value.resource_group
+  location                        = try(each.value.location, null)
+  tags                            = try(each.value.tags, local.tags)
+  inherit_tags                    = try(each.value.inherit_tags, false)
+  account                         = each.value.account
+  pool                            = each.value.pool
+  volume_path                     = each.value.volume_path
+  protocols                       = try(each.value.protocols, ["NFSv4.1"])
+  security_style                  = try(each.value.security_style, "Unix")
+  subnet                          = each.value.subnet
+  storage_quota_in_gb             = each.value.storage_quota_in_gb
+  snapshot_directory_visible      = try(each.value.snapshot_directory_visible, false)
+  create_from_snapshot_resource   = try(each.value.create_from_snapshot_resource_id, {})
+  data_protection_replication     = try(each.value.data_protection_replication, {})
+  data_protection_snapshot_policy = try(each.value.data_protection_snapshot_policy, {})
+  export_policy_rule              = try(each.value.export_policy_rule, null)
+  throughput_in_mibps             = try(each.value.throughput_in_mibps, null)
+  virtual_networks                = module.Landscape-Virtual-Networks
+  resource_groups                 = module.Landscape-Resource-Groups
+  netapp_accounts                 = module.Landscape-NetApp-Accounts
+  netapp_pools                    = module.Landscape-NetApp-Pools
+  snapshot_policies               = module.Landscape-NetApp-Snapshot-Policies
+  netapp_snapshots                = {}
 }
 
 output "NetAppVolumes" {

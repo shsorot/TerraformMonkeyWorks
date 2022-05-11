@@ -26,7 +26,6 @@ locals {
 }
 
 
-locals {
-  # Atleast 1 container block is required
-  container = var.os_type == "Windows" ? var.container[0] : var.container
-}
+# TODO : convert string based lookup for subnet ID to data block based lookup
+
+# TODO : convert network_rule_set-->virtual_network-->subnet_id to lookup based model.

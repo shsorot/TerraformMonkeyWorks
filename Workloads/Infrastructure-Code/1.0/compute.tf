@@ -142,7 +142,7 @@ module "Landscape-Azure-Dedicated-Host-Groups" {
   location                    = try(each.value.location, null)
   tags                        = try(each.value.tags, local.tags)
   inherit_tags                = try(each.value.inherit_tags, false)
-  zone                        = try(each.value.zone,null)
+  zone                        = try(each.value.zone, null)
   platform_fault_domain_count = each.value.platform_fault_domain_count
   automatic_placement_enabled = try(each.value.automatic_placement_enabled, null)
   resource_groups             = module.Landscape-Resource-Groups
