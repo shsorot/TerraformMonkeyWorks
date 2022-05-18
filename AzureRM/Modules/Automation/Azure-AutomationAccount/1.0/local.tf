@@ -22,3 +22,28 @@ locals {
   resource_group_location = var.resource_group.name == null ? var.resource_groups[var.resource_group.tag].location : data.azurerm_resource_group.this[0].location
   location                = var.location == null ? local.resource_group_location : var.location
 }
+
+# Data block for User assigned identity
+data "azurerm_user_assigned_identity" "this" {
+  for_each            = var.identity == null ? null : ( var.identity.type == "UserAssignedIdentity" || var.identity.type == "SystemAssigned, UserAssigned" ? {
+                          for instance in var.identity.identity : instance.name => instance if instance.name != null
+                        } : null )
+  name                = each.value.name
+  resource_group_name = coalesce(each.value.resource_group_name,local.resource_group_name)
+}
+
+locals {
+  identity = var.identity == null || var.identity == {} ? null : {
+    type = var.identity.type
+    # Create a list of managed identities.
+    identity_ids = var.identity.type == "UserAssigned" || var.identity.type == "SystemAssigned, UserAssigned" ? (
+        [for instance in var.identity.identity :(
+          instance.id == null ? (
+            instance.name == null ? (
+              var.user_assigned_identities[instance.tag].id
+            ) : data.azurerm_user_assigned_identity.this[instance.name].id
+          ) : instance.id
+        )]
+    ) : null
+  }
+}

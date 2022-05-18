@@ -49,3 +49,22 @@ variable "inherit_tags" {
   default = false
 }
 
+variable "identity"{
+  type = object({
+    type = string  # (Required) The type of identity used for this Automation Account. Possible values are SystemAssigned, UserAssigned and SystemAssigned, UserAssigned.
+    identity = optional(list(object({
+      id = optional(string)
+      name = optional(string)
+      resource_group_name = optional(string)
+      tag  = optional(string)
+    })))
+  })
+  default = null
+}
+
+variable "user_assigned_identities"{
+  type = map(object({
+    id = optional(string)
+  }))
+  default = {}
+}
