@@ -96,8 +96,11 @@ variable "ip_configuration" {
 variable "management_ip_configuration" {
   type = object({
     name = optional(string) # (Required) Specifies the name of the IP Configuration.
-    subnet = object({       # (Required) Specifies the subnet of the IP Configuration.Must be /26 and named "AzureFirewallSubnet"
-      id = optional(string) # The virtual network is the same as core IP configuration, differing only in the subnet Name
+    subnet = object({       # (Required) The Management Subnet used for the Firewall must have the name AzureFirewallManagementSubnet and the subnet mask must be at least a /26.
+      id                   = optional(string)
+      virtual_network_name = optional(string)
+      resource_group_name  = optional(string)
+      virtual_network_tag  = optional(string)
     })
     public_ip_address = object({
       id                  = optional(string)

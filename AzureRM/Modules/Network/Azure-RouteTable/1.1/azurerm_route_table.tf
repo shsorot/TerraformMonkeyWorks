@@ -5,5 +5,5 @@ resource "azurerm_route_table" "this" {
   resource_group_name           = local.resource_group_name
   location                      = local.location
   disable_bgp_route_propagation = var.disable_bgp_route_propagation
-  route                         = var.route
+  route                         = var.route == null ? [] : var.route
 }

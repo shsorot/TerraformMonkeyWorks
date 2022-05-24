@@ -75,7 +75,12 @@ variable "dns_zones" {
 variable "private_dns_zone_group" {
   type = object({
     name                 = string       # (Required) Specifies the Name of the Private DNS Zone Group. Changing this forces a new private_dns_zone_group resource to be created.
-    private_dns_zone_ids = list(string) # (Required) Specifies the list of Private DNS Zones to include within the private_dns_zone_group.
+    private_dns_zone     = list(object({  # (Required) Specifies the list of Private DNS Zones to include within the private_dns_zone_group.
+      id = optional(string)
+      name = optional(string)
+      resource_group_name = optional(string)
+      tag = optional(string)
+    })) 
   })
   default = null
 }

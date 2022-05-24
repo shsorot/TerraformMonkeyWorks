@@ -31,7 +31,7 @@ data "azurerm_subnet" "this" {
 }
 
 data "azurerm_dns_zone" "this" {
-  for_each            = var.private_dns_zone_group == null ? {} : { for instance in var.private_dns_zone_group.private_dns_zone_ids : instance.name => instance if instance.name != null }
+  for_each            = var.private_dns_zone_group == null ? {} : { for instance in var.private_dns_zone_group.private_dns_zone : instance.name => instance if instance.name != null }
   name                = each.value.name
   resource_group_name = coalesce(each.value.resource_group_name, local.resource_group_name)
 }
@@ -45,7 +45,7 @@ locals {
 
   private_dns_zone_group = var.private_dns_zone_group == null ? null : {
     name = var.private_dns_zone_group.name
-    private_dns_zone_ids = [for instance in var.private_dns_zone_group.private_dns_zone_ids : (
+    private_dns_zone_ids = [for instance in var.private_dns_zone_group.private_dns_zone : (
       instance.id == null ? (
         instance.name == null ? (
           var.dns_zones[instance.tag].id
@@ -53,6 +53,7 @@ locals {
       ) : instance.id
     )]
   }
+  
   # TODO , add lookup for private connection resource id
   # Currently using hardcoded resource type to generate resource ID strings.
   private_service_connection = var.private_service_connection == null ? null : {
