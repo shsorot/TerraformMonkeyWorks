@@ -11,7 +11,7 @@ module "Landscape-Route-Tables" {
   resource_group                = each.value.resource_group
   location                      = try(each.value.location, null)
   disable_bgp_route_propagation = each.value.disable_bgp_route_propagation
-  route                         = each.value.route
+  route                         = coalesce(each.value.route,[])
   tags                          = try(each.value.tags, local.tags)
   inherit_tags                  = try(each.value.inherit_tags, false)
   resource_groups               = module.Landscape-Resource-Groups

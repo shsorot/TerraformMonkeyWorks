@@ -8,6 +8,14 @@ output "name" {
   value       = azurerm_automation_account.this.name
 }
 
+output "location"{
+  value = local.location
+}
+
+output "resource_group_name"{
+  value = local.resource_group_name
+}
+
 output "dsc_server_endpoint" {
   value = azurerm_automation_account.this.dsc_server_endpoint
 }

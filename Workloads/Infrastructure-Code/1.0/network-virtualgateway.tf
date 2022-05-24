@@ -34,14 +34,14 @@ module "Landscape-VPN-Gateways" {
   location                      = try(each.value.location, null)
   tags                          = try(each.value.tags, {})
   inherit_tags                  = try(each.value.inherit_tags, false)
-  type                          = each.value.type
+  type                          = try(each.value.type,"Vpn")
   vpn_type                      = try(each.value.vpn_type, "RouteBases")
   enable_bgp                    = try(each.value.enable_bgp, false)
   active_active                 = try(each.value.active_active, false)
   private_ip_address_enabled    = try(each.value.private_ip_address_enabled, false)
   default_local_network_gateway = try(each.value.virtual_network_gateway, null)
-  sku                           = each.value.sku
-  generation                    = each.value.generation
+  sku                           = try(each.value.sku,"Basic")
+  generation                    = try(each.value.generation,"None")
   ip_configuration              = each.value.ip_configuration
   vpn_client_configuration      = try(each.value.vpn_client_configuration, null)
   bgp_settings                  = try(each.value.bgp_settings, null)
