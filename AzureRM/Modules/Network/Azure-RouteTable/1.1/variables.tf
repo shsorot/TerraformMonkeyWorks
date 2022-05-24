@@ -49,7 +49,7 @@ variable "route" {
     name                   = string
     address_prefix         = string # Destination CIDR range
     next_hop_type          = string # Type of the next hop. Can be one of "VirtualNetworkGateway", "VnetLocal", "Internet", "VirtualAppliance" and "None".
-    next_hop_in_ip_address = string # IP address of the next hop. Only applicable if next_hop_type is set to "VirtualAppliance" (otherwise must be set to null).
+    next_hop_in_ip_address = optional(string) # IP address of the next hop. Only applicable if next_hop_type is set to "VirtualAppliance" (otherwise must be set to null).
   }))
   default     = []
   description = "(Optional) List of objects representing routes. Each object accepts the arguments. Set to [] to remove routes."

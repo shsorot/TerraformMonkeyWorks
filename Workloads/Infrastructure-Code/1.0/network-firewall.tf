@@ -4,7 +4,7 @@ variable "AzureFirewalls" {
 
 
 module "Landscape-Azure-Firewalls" {
-  source              = "../../../AzureRM/Modules/Network/Azure-Firewall/1.0"
+  source              = "../../../AzureRM/Modules/Network-Firewall/Azure-Firewall/1.0"
   for_each            = var.AzureFirewalls
   name                = each.value.name == null ? each.key : each.value.name
   resource_group      = each.value.resource_group

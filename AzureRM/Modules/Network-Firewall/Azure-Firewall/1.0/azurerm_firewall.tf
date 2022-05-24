@@ -7,6 +7,8 @@ resource "azurerm_firewall" "this" {
   # Azure portal makes this mandatory, but not Terraform.  Potential Bug ?
   firewall_policy_id = local.firewall_policy_id
   # single block, Mandatory
+  # TODO: Azure API is returning resource ID in different case, causing resource replacment.connection {
+  # https://github.com/hashicorp/terraform-provider-azurerm/issues/8289,13819, 12184
   ip_configuration {
     name                 = local.ip_configuration.name
     public_ip_address_id = local.ip_configuration.public_ip_address_id
@@ -15,6 +17,8 @@ resource "azurerm_firewall" "this" {
   dns_servers       = var.dns_servers
   private_ip_ranges = var.private_ip_ranges
   # single block
+  # TODO: Azure API is returning resource ID in different case, causing resource replacment.connection {
+  # https://github.com/hashicorp/terraform-provider-azurerm/issues/8289,13819, 12184
   dynamic "management_ip_configuration" {
     for_each = local.management_ip_configuration == null ? [] : [1]
     content {
@@ -23,7 +27,7 @@ resource "azurerm_firewall" "this" {
       subnet_id            = local.management_ip_configuration.subnet_id
     }
   }
-  threat_intel_mode = var.threat_intel_mode == null ? "" : var.threat_intel_mode
+  threat_intel_mode = var.threat_intel_mode == null ? "Alert" : var.threat_intel_mode
   # single block
   dynamic "virtual_hub" {
     for_each = local.virtual_hub == null ? [] : [1]

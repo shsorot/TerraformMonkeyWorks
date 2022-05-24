@@ -102,6 +102,7 @@ variable "sku" {
 variable "generation" {
   type        = string
   description = "(Optional) The Generation of the Virtual Network gateway. Possible values include Generation1, Generation2 or None."
+  default = "None"
 }
 
 variable "ip_configuration" {

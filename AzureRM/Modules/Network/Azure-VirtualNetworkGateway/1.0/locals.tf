@@ -38,7 +38,7 @@ data "azurerm_public_ip" "this" {
 }
 
 data "azurerm_local_network_gateway" "this" {
-  count               = var.default_local_network_gateway.name == null ? 0 : 1
+  count               = var.default_local_network_gateway == null ? 0 : (var.default_local_network_gateway.name == null ? 0 : 1)
   name                = var.default_local_network_gateway.name
   resource_group_name = coalesce(var.default_local_network_gateway.resource_group_name, local.resource_group_name)
 }
@@ -46,7 +46,7 @@ data "azurerm_local_network_gateway" "this" {
 
 locals {
   subnet_id = var.ip_configuration.subnet.id == null ? (
-    var.ip_configuration.subnet.name == null ? (
+    var.ip_configuration.subnet.virtual_network_name == null ? (
       "${var.virtual_networks[var.ip_configuration.subnet.virtual_network_tag].id}/subnets/GatewaySubnet"
     ) : data.azurerm_subnet.this[0].id
   ) : "${var.ip_configuration.subnet.id}/subnets/GatewaySubnet"
@@ -58,9 +58,11 @@ locals {
   ) : var.ip_configuration.public_ip_address.id
 
 
-  default_local_network_gateway_id = var.default_local_network_gateway.id == null ? (
-    var.default_local_network_gateway.name == null ? (
-      var.local_network_gateways[var.default_local_network_gateway.tag].id
-    ) : data.azurerm_local_network_gateway.this[0].id
-  ) : var.default_local_network_gateway.id
+  default_local_network_gateway_id = var.default_local_network_gateway == null ? null : (
+    var.default_local_network_gateway.id == null ? (
+      var.default_local_network_gateway.name == null ? (
+        var.local_network_gateways[var.default_local_network_gateway.tag].id
+      ) : data.azurerm_local_network_gateway.this[0].id
+    ) : var.default_local_network_gateway.id
+  )
 }

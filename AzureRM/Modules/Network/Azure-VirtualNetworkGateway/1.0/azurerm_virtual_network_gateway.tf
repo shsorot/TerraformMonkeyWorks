@@ -10,7 +10,7 @@ resource "azurerm_virtual_network_gateway" "this" {
   private_ip_address_enabled       = var.private_ip_address_enabled
   default_local_network_gateway_id = local.default_local_network_gateway_id
   sku                              = var.sku
-  generation                       = var.generation
+  generation                       = var.generation == null ? "None" : var.generation
 
   # As an exception to our naming convention and code schema, virtual network information will be pulled seperately as a gateway cannot exist in two different virtual networks in active-active configuration.
   ip_configuration {
@@ -60,11 +60,11 @@ resource "azurerm_virtual_network_gateway" "this" {
   }
 
   dynamic "bgp_settings" {
-    for_each = var.bgp_settings
+    for_each = var.bgp_settings == null || var.bgp_settings == {} ? [] : { for idx, instance in var.bgp_settings : idx => instance }
     content {
       asn = bgp_settings.value.asn
       dynamic "peering_addresses" {
-        for_each = bgp_settings.value.peering_addresses
+        for_each = { for idx, instance in bgp_settings.value.peering_addresses : idx => instance }
         content {
           ip_configuration_name = peering_addresses.value.ip_configuration_name
           apipa_addresses       = peering_addresses.value.apipa_addresses
