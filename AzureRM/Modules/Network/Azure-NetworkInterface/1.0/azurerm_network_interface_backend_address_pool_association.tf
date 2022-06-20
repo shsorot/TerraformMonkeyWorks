@@ -1,3 +1,4 @@
+# TODO : Add data block based lookup
 resource "azurerm_network_interface_backend_address_pool_association" "this" {
   for_each              = local.load_balanced_ip_configuration
   network_interface_id  = azurerm_network_interface.this.id

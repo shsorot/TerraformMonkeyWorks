@@ -8,7 +8,7 @@ variable "virtual_hub" {
     id                  = optional(string)
     name                = optional(string)
     resource_group_name = optional(string)
-    tag                 = optional(string)
+    key                 = optional(string)
   })
   description = "(Required) The ID of the Virtual Hub within which this ip configuration should be created. Changing this forces a new resource to be created."
 }

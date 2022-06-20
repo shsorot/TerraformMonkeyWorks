@@ -29,13 +29,13 @@ data "azurerm_managed_disk" "this" {
 locals {
   virtual_machine_id = var.virtual_machine.id == null ? (
     var.virtual_machine.name == null && var.virtual_machine.resource_group_name == null ? (
-      var.virtual_machines[var.virtual_machine.tag].id
+      var.virtual_machines[var.virtual_machine.key].id
     ) : data.azurerm_virtual_machine.this[0].id
   ) : var.virtual_machine.id
 
   managed_disk_id = var.managed_disk.id == null ? (
     var.managed_disk.name == null && var.managed_disk.resource_group_name == null ? (
-      var.managed_disks[var.managed_disk.tag].id
+      var.managed_disks[var.managed_disk.key].id
     ) : data.azurerm_managed_disk.this[0].id
   ) : var.managed_disk.id
 }

@@ -1,11 +1,13 @@
 variable "tags" {
   type    = map(string)
+  description = " (Optional) A mapping of tags to assign to the resource."
   default = {}
 }
 
 variable "inherit_tags" {
-  type    = bool
-  default = false
+  type        = bool
+  default     = false
+  description = "If true, the tags from the resource group will be applied to the resource in addition to tags in the variable 'tags'."
 }
 
 # variable "resource_group_name" {
@@ -14,8 +16,8 @@ variable "inherit_tags" {
 
 variable "resource_group" {
   type = object({
-    name = optional(string)
-    tag  = optional(string)
+    name = optional(string) # Name of the resource group
+    key  = optional(string) # Terraform Object Key to use to find the resource group from output of module Azure-ResourceGroup supplied to variable "resource_groups"
   })
   description = "(Required) The name of the resource group where to create the resource. Specify either the actual name or the Tag value that can be used to look up Resource group properties from output of module Azure-ResourceGroup."
 }
@@ -27,7 +29,13 @@ variable "resource_groups" {
     tags     = optional(map(string))
     name     = optional(string)
   }))
-  description = "(Optional) Output of Module Azure-ResourceGroup. Used to lookup RG properties using Tags"
+  description = <<EOF
+   (Optional) Output of Module Azure-ResourceGroup. Used to lookup RG properties using Terraform Object Keys"
+    id       = # ID of the resource group
+    location = # Location of the resource group
+    tags     = # List of Azure tags applied to resource group
+    name     = # Name of the resource group
+  EOF
   default     = {}
 }
 
@@ -54,7 +62,7 @@ variable "nsg_rule" {
       id                  = optional(string)
       name                = optional(string)
       resource_group_name = optional(string)
-      tag                 = optional(string)
+      key                 = optional(string)
     })))
     source_port_range            = optional(string)       # Can be a number (e.g. "445"), a range (e.g. "1024-2048") or "*" (null defaults to "*"). Ignored if <source_port_ranges> is set.
     source_port_ranges           = optional(list(string)) # An array of numbers or ranges ("*" cannot be used)
@@ -64,7 +72,7 @@ variable "nsg_rule" {
       id                  = optional(string)
       name                = optional(string)
       resource_group_name = optional(string)
-      tag                 = optional(string)
+      key                 = optional(string)
     })))
     destination_port_range  = optional(string)       # Can be a number (e.g. "445"), a range (e.g. "1024-2048") or "*" (null defaults to "*"). Ignored if <destination_port_ranges> is set.
     destination_port_ranges = optional(list(string)) # An array of numbers or ranges ("*" cannot be used)

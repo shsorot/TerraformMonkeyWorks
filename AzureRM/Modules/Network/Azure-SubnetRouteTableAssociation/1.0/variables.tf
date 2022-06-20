@@ -5,7 +5,7 @@ variable "subnet" {
     virtual_network_name = optional(string)
     resource_group_name  = optional(string)
     tag                  = optional(string)
-    virtual_network_tag  = optional(string)
+    virtual_network_key  = optional(string)
   })
 }
 
@@ -26,7 +26,7 @@ variable "route_table" {
     id                  = optional(string)
     name                = optional(string)
     resource_group_name = optional(string)
-    tag                 = optional(string)
+    key                 = optional(string)
   })
 }
 

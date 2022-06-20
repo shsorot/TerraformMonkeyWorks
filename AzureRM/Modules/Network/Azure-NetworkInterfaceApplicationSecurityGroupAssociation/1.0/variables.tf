@@ -3,7 +3,7 @@ variable "network_interface" {
     id                  = optional(string)
     name                = optional(string)
     resource_group_name = optional(string)
-    tag                 = optional(string)
+    key                 = optional(string)
   })
 }
 
@@ -12,7 +12,7 @@ variable "application_security_group" {
     id                  = optional(string)
     name                = optional(string)
     resource_group_name = optional(string)
-    tag                 = optional(string)
+    key                 = optional(string)
   })
 }
 

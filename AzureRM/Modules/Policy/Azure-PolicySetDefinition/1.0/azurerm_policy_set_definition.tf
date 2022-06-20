@@ -6,7 +6,7 @@ resource "azurerm_policy_set_definition" "this" {
     for_each = var.policy_definition_reference == null || var.policy_definition_reference == [] ? [] : var.policy_definition_reference
     content {
       policy_definition_id = policy_definition_reference.value.policy_definition.id == null ? (
-        var.policy_definitions[policy_definition_reference.value.policy_definition.tag].id
+        var.policy_definitions[policy_definition_reference.value.policy_definition.key].id
       ) : policy_definition_reference.value.policy_definition.id
       parameter_values = policy_definition_reference.value.parameter_values == null ? null : (
         policy_definition_reference.value.parameter_values.json == null ? (
@@ -29,9 +29,9 @@ resource "azurerm_policy_set_definition" "this" {
     }
   }
 
-  description           = var.description
+  description = var.description
   # Deprecated from provider > 3.00.0
   # management_group_name = var.management_group_name
-  metadata              = local.metadata
-  parameters            = local.parameters
+  metadata   = local.metadata
+  parameters = local.parameters
 }

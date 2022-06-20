@@ -23,17 +23,17 @@ locals {
   )
 }
 
-data "azurerm_management_group" "this"{
+data "azurerm_management_group" "this" {
   count = var.management_group.name != null ? 0 : 1
-  name = var.management_group.name
+  name  = var.management_group.name
 }
 
 locals {
   management_group_id = var.management_group == null || var.management_group == {} ? null : (
     var.management_group.id == null ? (
       var.management_group.name == null ? (
-        var.management_groups[var.management_group.tag].id
-       ) : data.azurerm_management_group.this[0].id
+        var.management_groups[var.management_group.key].id
+      ) : data.azurerm_management_group.this[0].id
     ) : var.management_group.id
   )
 }

@@ -20,13 +20,13 @@ locals {
   subscription_id = data.azurerm_subscription.current.subscription_id
   subnet_id = var.subnet.id == null ? (
     var.subnet.name == null && var.subnet.virtual_network_name == null ? (
-      var.virtual_networks[var.subnet.virtual_network_tag].subnet[var.subnet.tag].id
+      var.virtual_networks[var.subnet.virtual_network_tag].subnet[var.subnet.key].id
     ) : data.azurerm_subnet.this[0].id
   ) : var.subnet.id
 
   route_table_id = var.route_table.id == null ? (
     var.route_table.name == null && var.route_table.resource_group_name == null ? (
-      var.route_tables[var.route_table.tag].id
+      var.route_tables[var.route_table.key].id
     ) : data.azurerm_route_table.this[0].id
   ) : var.route_table.id
 }

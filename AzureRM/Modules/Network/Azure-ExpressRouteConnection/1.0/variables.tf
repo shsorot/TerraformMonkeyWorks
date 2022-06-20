@@ -26,7 +26,7 @@ variable "express_route_gateway" {
     id                  = optional(string)
     name                = optional(string)
     resource_group_name = optional(string)
-    tag                 = optional(string)
+    key                 = optional(string)
   })
   description = "(Required) The ID of the Express Route Gateway that this Express Route Connection connects with. Changing this forces a new resource to be created."
 }
@@ -55,7 +55,7 @@ variable "routing" {
       id                  = optional(string)
       name                = optional(string)
       resource_group_name = optional(string)
-      tag                 = optional(string)
+      key                 = optional(string)
     })
     propagated_route_table = object({
       labels = optional(string)                # (Optional) The list of labels to logically group route tables.
@@ -63,7 +63,7 @@ variable "routing" {
         id                  = optional(string)
         name                = optional(string)
         resource_group_name = optional(string)
-        tag                 = optional(string)
+        key                 = optional(string)
       })))
     })
   })

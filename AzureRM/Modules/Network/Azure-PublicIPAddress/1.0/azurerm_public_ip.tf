@@ -16,6 +16,6 @@ resource "azurerm_public_ip" "this" {
 
   # Depcrecated from provider > 3.00.0
   # availability_zone = var.availability_zone
-  zones             = var.zones
-  tags              = local.tags
+  zones = var.zones
+  tags  = local.tags
 }

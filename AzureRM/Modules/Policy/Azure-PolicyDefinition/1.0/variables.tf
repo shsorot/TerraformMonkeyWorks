@@ -30,21 +30,21 @@ variable "description" {
   default     = null
 }
 variable "management_group" {
-  type        = object({
-    id      = optional(string)
-    tags     = optional(string)
-    name     = optional(string)
+  type = object({
+    id   = optional(string)
+    tags = optional(string)
+    name = optional(string)
   })
   description = "(Optional) The name of the Management Group where this policy should be defined. Changing this forces a new resource to be created."
   default     = null
 }
 
-variable "management_groups"{
-  type        = map(object({
-    id       = optional(string)
+variable "management_groups" {
+  type = map(object({
+    id = optional(string)
   }))
   description = "(Optional) Output of module Azure-ManagementGroup. Used to lookup MG properties using Tags"
-  default = {}
+  default     = {}
 }
 
 variable "policy_rule" {

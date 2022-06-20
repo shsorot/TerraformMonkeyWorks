@@ -1,3 +1,4 @@
+# TODO : Add data block based lookup
 resource "azurerm_virtual_network" "this" {
   resource_group_name = local.resource_group_name
   name                = var.name
@@ -22,7 +23,7 @@ resource "azurerm_virtual_network" "this" {
       security_group = subnet.value.security_group == null ? null : (
         subnet.value.security_group.id == null ? (
           subnet.value.security_group.name == null ? (
-            var.network_security_groups == null && subnet.value.security_group.tag == null ? null : var.network_security_groups[subnet.value.security_group.tag].id
+            var.network_security_groups == null && subnet.value.security_group.tag == null ? null : var.network_security_groups[subnet.value.security_group.key].id
           ) : "/subscriptions/${local.subscription_id}/resourceGroups/${subnet.value.security_group.resource_group_name == null ? local.resource_group_name : subnet.value.security_group.resource_group_name}/providers/Microsoft.Network/networkSecurityGroups/${subnet.value.security_group.name}"
         ) : subnet.value.security_group.id
       )

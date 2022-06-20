@@ -13,7 +13,7 @@ locals {
   policy_definition_id = var.policy_definition.id == null ? (
     var.policy_definition.definition_tag == null ? (
       var.policy_definition_sets[var.policy_definition.definition_set_tag].id
-    ) : var.policy_definitions[var.policy_definition.tag].id
+    ) : var.policy_definitions[var.policy_definition.key].id
   ) : var.policy_definition.id
   metadata = var.metadata == null ? null : (
     var.metadata.json == null ? (

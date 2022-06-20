@@ -25,7 +25,7 @@ data "azurerm_lb" "this" {
 locals {
   loadbalancer_id = var.loadbalancer.id == null ? (
     var.loadbalancer.name == null && var.loadbalancer.resource_group_name == null ? (
-      var.loadbalancers[var.loadbalancer.tag].id
+      var.loadbalancers[var.loadbalancer.key].id
     ) : data.azurerm_lb.this[0].id
   ) : var.loadbalancer.id
 }

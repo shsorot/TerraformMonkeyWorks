@@ -1,9 +1,9 @@
 resource "azurerm_lb_outbound_rule" "this" {
   for_each = { for instance in(var.loadbalancer_outbound_rule == null ? [] : var.loadbalancer_outbound_rule) : instance.name => instance }
 
-  name                = each.key
+  name = each.key
   # resource_group_name = local.resource_group_name
-  loadbalancer_id     = azurerm_lb.this.id
+  loadbalancer_id = azurerm_lb.this.id
   dynamic "frontend_ip_configuration" {
     #count     = each.value.frontend_ip_configuration_name == null ? [] : each.value.frontend_ip_configuration_name
     for_each = { for entry in each.value.frontend_ip_configuration_name : entry => entry }

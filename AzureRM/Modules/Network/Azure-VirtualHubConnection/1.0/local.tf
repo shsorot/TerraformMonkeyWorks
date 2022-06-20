@@ -23,13 +23,13 @@ data "azurerm_virtual_hub" "this" {
 locals {
   virtual_hub_id = var.virtual_hub.id == null ? (
     var.virtual_hub.name == null ? (
-      var.virtual_hubs[var.virtual_hub.tag].id
+      var.virtual_hubs[var.virtual_hub.key].id
     ) : data.azurerm_virtual_hub.this[0].id
   ) : var.virtual_hub.id
 
   remote_virtual_network_id = var.remote_virtual_network.id == null ? (
     var.remote_virtual_network.name == null && var.remote_virtual_network.resource_group_name == null ? (
-      var.remote_virtual_networks[var.remote_virtual_network.tag].id
+      var.remote_virtual_networks[var.remote_virtual_network.key].id
     ) : "/subscriptions/${coalesce(var.remote_virtual_network.subscription_id, local.subscription_id)}/resourceGroups/${var.remote_virtual_network.resource_group_name}/providers/Microsoft.Network/virtualNetworks/${var.remote_virtual_network.name}"
   ) : var.remote_virtual_network.id
 

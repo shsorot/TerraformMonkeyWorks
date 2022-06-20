@@ -23,7 +23,7 @@ data "azurerm_virtual_hub" "this" {
 locals {
   virtual_hub_id = var.virtual_hub.id == null ? (
     var.virtual_hub.name == null && var.virtual_hub.resource_group_name == null ? (
-      var.virtual_hubs[var.virtual_hub.tag].id
+      var.virtual_hubs[var.virtual_hub.key].id
     ) : data.azurerm_virtual_hub.this[0].id
   ) : var.virtual_hub.id
 }

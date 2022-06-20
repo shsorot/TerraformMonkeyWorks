@@ -20,7 +20,7 @@ locals {
 locals {
   remote_virtual_network_id = var.remote_virtual_network.id == null ? (
     var.remote_virtual_network.name == null && var.remote_virtual_network.resource_group_name == null ? (
-      var.virtual_networks[var.remote_virtual_network.tag].id
+      var.virtual_networks[var.remote_virtual_network.key].id
     ) : "/subscriptions/${var.remote_virtual_network.subscription_id == null ? local.subscription_id : var.remote_virtual_network.subscription_id}/resourceGroups/${var.remote_virtual_network.resource_group_name}/providers/Microsoft.Network/virtualNetworks/${var.remote_virtual_network.name}"
   ) : var.remote_virtual_network.id
 }

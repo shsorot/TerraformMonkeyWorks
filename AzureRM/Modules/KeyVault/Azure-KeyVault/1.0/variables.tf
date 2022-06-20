@@ -1,11 +1,13 @@
 variable "tags" {
   type    = map(string)
+  description = " (Optional) A mapping of tags to assign to the resource."
   default = {}
 }
 
 variable "inherit_tags" {
-  type    = bool
-  default = false
+  type        = bool
+  default     = false
+  description = "If true, the tags from the resource group will be applied to the resource in addition to tags in the variable 'tags'."
 }
 
 # variable "resource_group_name" {
@@ -15,8 +17,8 @@ variable "inherit_tags" {
 
 variable "resource_group" {
   type = object({
-    name = optional(string)
-    tag  = optional(string)
+    name = optional(string) # Name of the resource group
+    key  = optional(string) # Terraform Object Key to use to find the resource group from output of module Azure-ResourceGroup supplied to variable "resource_groups"
   })
   description = "(Required) The name of the resource group where to create the resource. Specify either the actual name or the Tag value that can be used to look up Resource group properties from output of module Azure-ResourceGroup."
 }
@@ -28,7 +30,13 @@ variable "resource_groups" {
     tags     = optional(map(string))
     name     = optional(string)
   }))
-  description = "(Optional) Output of Module Azure-ResourceGroup. Used to lookup RG properties using Tags"
+  description = <<EOF
+   (Optional) Output of Module Azure-ResourceGroup. Used to lookup RG properties using Terraform Object Keys"
+    id       = # ID of the resource group
+    location = # Location of the resource group
+    tags     = # List of Azure tags applied to resource group
+    name     = # Name of the resource group
+  EOF
   default     = {}
 }
 
@@ -130,7 +138,7 @@ variable "network_acls" {
       virtual_network_name = optional(string)
       resource_group_name  = optional(string)
       tag                  = optional(string)
-      virtual_network_tag  = optional(string)
+      virtual_network_key  = optional(string)
     }))) # Full subnet resource Ids. Note: if only one value is specified it should be embraced in the square brackets.
 
   })

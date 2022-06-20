@@ -8,7 +8,7 @@ variable "virtual_hub" {
     id                  = optional(string)
     name                = optional(string)
     resource_group_name = optional(string)
-    tag                 = optional(string)
+    key                 = optional(string)
   })
   description = "(Required) The ID of the Virtual Hub within which this connection should be created. Changing this forces a new resource to be created."
 }
@@ -26,7 +26,7 @@ variable "remote_virtual_network" {
     name                = optional(string)
     resource_group_name = optional(string)
     subscription_id     = optional(string)
-    tag                 = optional(string)
+    key                 = optional(string)
   })
   description = "(Required) The ID of the Virtual Network which the Virtual Hub should be connected to. Changing this forces a new resource to be created."
 }
@@ -49,14 +49,14 @@ variable "routing" {
     associated_route_table = object({
       id   = optional(string)
       name = optional(string)
-      tag  = optional(string)
+      key  = optional(string)
     })
     propagated_route_table = object({
       labels = optional(string)
       route_table = list(object({
         id   = optional(string)
         name = optional(string)
-        tag  = optional(string)
+        key  = optional(string)
       }))
     })
     static_vnet_route = object({

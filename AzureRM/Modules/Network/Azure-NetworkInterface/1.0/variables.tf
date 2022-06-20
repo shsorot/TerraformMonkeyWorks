@@ -5,8 +5,8 @@
 
 variable "resource_group" {
   type = object({
-    name = optional(string)
-    tag  = optional(string)
+    name = optional(string) # Name of the resource group
+    key  = optional(string) # Terraform Object Key to use to find the resource group from output of module Azure-ResourceGroup supplied to variable "resource_groups"
   })
   description = "(Required) The name of the resource group where to create the resource. Specify either the actual name or the Tag value that can be used to look up Resource group properties from output of module Azure-ResourceGroup."
 }
@@ -18,7 +18,13 @@ variable "resource_groups" {
     tags     = optional(map(string))
     name     = optional(string)
   }))
-  description = "(Optional) Output of Module Azure-ResourceGroup. Used to lookup RG properties using Tags"
+  description = <<EOF
+   (Optional) Output of Module Azure-ResourceGroup. Used to lookup RG properties using Terraform Object Keys"
+    id       = # ID of the resource group
+    location = # Location of the resource group
+    tags     = # List of Azure tags applied to resource group
+    name     = # Name of the resource group
+  EOF
   default     = {}
 }
 
@@ -35,6 +41,7 @@ variable "name" {
 
 variable "tags" {
   type    = map(string)
+  description = " (Optional) A mapping of tags to assign to the resource."
   default = {}
 }
 
@@ -77,7 +84,7 @@ variable "ip_configuration" {
       virtual_network_name = optional(string)
       resource_group_name  = optional(string)
       tag                  = optional(string)
-      virtual_network_tag  = optional(string)
+      virtual_network_key  = optional(string)
     })
     private_ip_address         = optional(string) # Private IP Address. If left null, dynamic allocation is used.
     private_ip_address_version = optional(string) # (Optional) The IP Version to use. Possible values are IPv4 or IPv6. Defaults to IPv4
@@ -87,7 +94,7 @@ variable "ip_configuration" {
       id                  = optional(string)
       name                = optional(string)
       resource_group_name = optional(string)
-      tag                 = optional(string)
+      key                 = optional(string)
     }))
     backend_address_pool = optional(object({
       id                  = optional(string)
@@ -105,7 +112,7 @@ variable "application_security_group" {
     id                  = optional(string) # Name of the ASG. This will be used to lookup ASG resource in Azure for NIC association.
     name                = optional(string)
     resource_group_name = optional(string) # Resource group where ASG is located. If null, local.resource_group_name will be used.
-    tag                 = optional(string) # Tag to be used to lookup ASG from the output of module Azure-ApplicationSecurityGroup
+    key                 = optional(string) # Tag to be used to lookup ASG from the output of module Azure-ApplicationSecurityGroup
   })
   default = null
 }
@@ -115,7 +122,7 @@ variable "network_security_group" {
     id                  = optional(string) # Name of the NSG. This will be used to lookup NSG resource in Azure for NIC association.
     name                = optional(string)
     resource_group_name = optional(string) # Resource group where NSG is located. If null, local.resource_group_name will be used.
-    tag                 = optional(string) # Tag to be used to lookup NSG from the output of module Azure-NetworkSecurityGroup
+    key                 = optional(string) # Tag to be used to lookup NSG from the output of module Azure-NetworkSecurityGroup
   })
   default = null
 }

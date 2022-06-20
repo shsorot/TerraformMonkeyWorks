@@ -3,7 +3,7 @@ variable "virtual_machine" {
     id                  = optional(string),
     name                = optional(string)
     resource_group_name = optional(string)
-    tag                 = optional(string)
+    key                 = optional(string)
   })
   description = "(Required) The ID of the Virtual Machine. Changing this forces a new resource to be created"
 }

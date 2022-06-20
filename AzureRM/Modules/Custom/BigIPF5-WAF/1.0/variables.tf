@@ -1,5 +1,6 @@
 variable "tags" {
   type    = map(string)
+  description = " (Optional) A mapping of tags to assign to the resource."
   default = {}
 }
 
@@ -36,7 +37,7 @@ variable "mgmt-subnet-name" {
 variable "resource-group" {
   type = object({
     name = optional(string)
-    tag  = optional(string)
+    key  = optional(string)
   })
 }
 
@@ -126,7 +127,7 @@ variable "keyvaults" {
 variable "resource_groups" {
   type = map(object({
     location = optional(string)
-    tags     = optional(map(string))
+    key      = optional(map(string))
     name     = optional(string)
   }))
 }

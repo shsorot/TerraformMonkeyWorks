@@ -10,7 +10,7 @@ resource "azurerm_virtual_hub_connection" "this" {
     content {
       associated_route_table_id = var.routing.associated_route_table.id == null ? (
         var.routing.associated_route_table.name ? (
-          var.route_tables[var.routing.associated_route_table.tag].id
+          var.route_tables[var.routing.associated_route_table.key].id
         ) :
         "${local.virtual_hub_id}/hubRouteTables/${var.routing.associated_route_table.name}"
       ) : var.routing.associated_route_table.id
@@ -21,7 +21,7 @@ resource "azurerm_virtual_hub_connection" "this" {
           labels = var.routing.propagated_route_table.labels
           route_table_ids = [for instance in var.routing.propagated_route_table.route_table_ids : instance.id == null ? (
             instance.name == null ? (
-              var.route_tables[instance.tag].id
+              var.route_tables[instance.key].id
             ) :
             "${local.virtual_hub_id}/hubRouteTables/${instance.name}"
           ) : instance.id]

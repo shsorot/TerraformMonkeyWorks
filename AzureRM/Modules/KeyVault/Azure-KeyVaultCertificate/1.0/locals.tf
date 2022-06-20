@@ -25,7 +25,7 @@ data "azurerm_key_vault" "this" {
 locals {
   key_vault_id = var.key_vault.id == null ? (
     var.key_vault.name == null && var.key_vault.resource_group_name == null ? (
-      var.key_vaults[var.key_vault.tag].id
+      var.key_vaults[var.key_vault.key].id
     ) : data.azurerm_key_vault.this[0].id
   ) : var.key_vault.id
 }

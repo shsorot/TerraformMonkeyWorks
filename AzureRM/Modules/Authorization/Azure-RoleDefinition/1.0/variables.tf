@@ -27,7 +27,7 @@ variable "permissions" {
     not_actions      = optional(list(string)) # (Optional) One or more Disallowed Actions, such as *, Microsoft.Resources/subscriptions/resourceGroups/read
     not_data_actions = optional(list(string)) # (Optional) One or more Disallowed Data Actions, such as *, Microsoft.Resources/subscriptions/resourceGroups/read
   })
-  description = "value"
+  description = "(Optional) A permissions block as defined in type."
 }
 
 variable "assignable_scopes" {

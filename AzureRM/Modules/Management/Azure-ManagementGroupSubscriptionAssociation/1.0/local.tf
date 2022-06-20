@@ -16,7 +16,7 @@ locals {
   management_group_id = var.management_group == null || var.management_group == {} ? null : (
     var.management_group.id == null ? (
       var.management_group.name == null ? (
-        var.management_groups[var.management_group.tag].id
+        var.management_groups[var.management_group.key].id
       ) : "/providers/Microsoft.Management/managementGroups/${var.management_group.name}"
     ) : var.management_group.id
   )

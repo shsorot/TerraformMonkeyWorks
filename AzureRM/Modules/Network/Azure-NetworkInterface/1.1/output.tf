@@ -30,7 +30,7 @@ output "virtual_machine_id" {
 #     value   =   var.application_security_group == null ? null : (
 #                     var.application_security_group.id == null ? (
 #                         var.application_security_group.name == null ? (
-#                             var.application_security_groups[var.application_security_group.tag].id
+#                             var.application_security_groups[var.application_security_group.key].id
 #                         ) : "/subscriptions/${local.subscription_id}/resourceGroups/${try(var.application_security_group.resource_group_name,local.resource_group_name)}/providers/Microsoft.Network/applicationSecurityGroups/${var.application_security_group.name}"
 #                     ) : var.application_security_group.id 
 #                 )
@@ -40,22 +40,14 @@ output "virtual_machine_id" {
 #     value   =    try(var.application_security_group,null) == null ? null : azurerm_network_interface_application_security_group_association.this[0].id 
 # }
 
-
+# TODO : Add data block based lookup
 output "network_security_group_id" {
-  value = var.network_security_group == null ? null : (
-    var.network_security_group.id == null ? (
-      var.network_security_group.name == null ? (
-        var.network_security_groups[var.network_security_group.tag].id
-      ) : "/subscriptions/${local.subscription_id}/resourceGroups/${try(var.network_security_group.resource_group_name, local.resource_group_name)}/providers/Microsoft.Network/applicationSecurityGroups/${var.network_security_group.name}"
-    ) : var.network_security_group.id
-  )
+  value = var.network_security_group == null || var.network_security_group == {} ? null : local.network_security_group_id
 }
 
 output "network_security_group_association_id" {
   value = try(var.network_security_group, null) == null ? null : azurerm_network_interface_security_group_association.this[0].id
 }
-
-
 
 # output "backend_address_pool_association_id" {
 #     value   =   [ for k,v in azurerm_network_interface_backend_address_pool_association.this :  {

@@ -28,7 +28,7 @@ variable "resource" {
     resource_group_name = optional(string)
     subscription_id     = optional(string)
     provider            = optional(string)
-    tag                 = optional(string)
+    key                 = optional(string)
   })
   description = "(Required) The ID of the Management Group. Changing this forces a new Policy Assignment to be created."
 }

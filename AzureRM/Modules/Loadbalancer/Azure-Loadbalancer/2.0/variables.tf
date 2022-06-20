@@ -12,8 +12,8 @@ variable "location" {
 
 variable "resource_group" {
   type = object({
-    name = optional(string)
-    tag  = optional(string)
+    name = optional(string) # Name of the resource group
+    key  = optional(string) # Terraform Object Key to use to find the resource group from output of module Azure-ResourceGroup supplied to variable "resource_groups"
   })
   description = "(Required) The name of the resource group where to create the resource. Specify either the actual name or the Tag value that can be used to look up Resource group properties from output of module Azure-ResourceGroup."
 }
@@ -25,7 +25,13 @@ variable "resource_groups" {
     tags     = optional(map(string))
     name     = optional(string)
   }))
-  description = "(Optional) Output of Module Azure-ResourceGroup. Used to lookup RG properties using Tags"
+  description = <<EOF
+   (Optional) Output of Module Azure-ResourceGroup. Used to lookup RG properties using Terraform Object Keys"
+    id       = # ID of the resource group
+    location = # Location of the resource group
+    tags     = # List of Azure tags applied to resource group
+    name     = # Name of the resource group
+  EOF
   default     = {}
 }
 
@@ -47,8 +53,9 @@ variable "tags" {
 }
 
 variable "inherit_tags" {
-  type    = bool
-  default = false
+  type        = bool
+  default     = false
+  description = "If true, the tags from the resource group will be applied to the resource in addition to tags in the variable 'tags'."
 }
 
 variable "frontend_ip_configuration" {
@@ -61,7 +68,7 @@ variable "frontend_ip_configuration" {
       virtual_network_name = optional(string)
       resource_group_name  = optional(string)
       tag                  = optional(string)
-      virtual_network_tag  = optional(string)
+      virtual_network_key  = optional(string)
     }))
 
     private_ip_address            = optional(any)    # (Optional) Private IP Address to assign to the Load Balancer. The last one and first four IPs in any range are reserved and cannot be manually assigned.
@@ -72,18 +79,18 @@ variable "frontend_ip_configuration" {
       id                  = optional(string)
       name                = optional(string)
       resource_group_name = optional(string)
-      tag                 = optional(string)
+      key                 = optional(string)
     }))
 
     public_ip_prefix = optional(object({
       id                  = optional(string)
       name                = optional(string)
       resource_group_name = optional(string)
-      tag                 = optional(string)
+      key                 = optional(string)
     }))
 
     # availability_zone = optional(string) # (Optional) Refer to https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/lb#availability_zone 
-    zones               = optional(list(string)) #(Optional) Refer to https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/lb#availability_zone 
+    zones = optional(list(string)) #(Optional) Refer to https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/lb#availability_zone 
   }))
   default = []
 }
@@ -101,7 +108,7 @@ variable "backend_address_pool_address" {
     virtual_network = object({
       name                = optional(string)
       resource_group_name = optional(string)
-      tag                 = optional(string)
+      key                 = optional(string)
     })
     ip_address = string # (Required) The Static IP Address which should be allocated to this Backend Address Pool.
   }))

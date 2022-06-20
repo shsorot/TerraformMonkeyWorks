@@ -16,9 +16,9 @@ locals {
   tenant_id               = data.azurerm_client_config.current.tenant_id
   object_id               = data.azurerm_client_config.current.object_id
   subscription_id         = data.azurerm_subscription.current.subscription_id
-  resource_group_name     = var.resource_group.name == null ? var.resource_groups[var.resource_group.tag].name : data.azurerm_resource_group.this[0].name
-  resource_group_tags     = var.resource_group.name == null ? var.resource_groups[var.resource_group.tag].tags : data.azurerm_resource_group.this[0].tags
-  resource_group_location = var.resource_group.name == null ? var.resource_groups[var.resource_group.tag].location : data.azurerm_resource_group.this[0].location
+  resource_group_name     = var.resource_group.name == null ? var.resource_groups[var.resource_group.key].name : data.azurerm_resource_group.this[0].name
+  resource_group_tags     = var.resource_group.name == null ? var.resource_groups[var.resource_group.key].tags : data.azurerm_resource_group.this[0].tags
+  resource_group_location = var.resource_group.name == null ? var.resource_groups[var.resource_group.key].location : data.azurerm_resource_group.this[0].location
 }
 
 data "azurerm_express_route_circuit" "this" {
@@ -29,7 +29,7 @@ data "azurerm_express_route_circuit" "this" {
 
 locals {
   express_route_circuit_name = var.express_route_circuit.name == null ? (
-    var.express_route_circuits[var.express_route_circuit.tag].name
+    var.express_route_circuits[var.express_route_circuit.key].name
   ) : data.azurerm_express_route_circuit.this[0].name
 
 }

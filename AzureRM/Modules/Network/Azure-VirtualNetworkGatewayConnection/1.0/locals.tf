@@ -16,10 +16,10 @@ locals {
   tenant_id               = data.azurerm_client_config.current.tenant_id
   object_id               = data.azurerm_client_config.current.object_id
   subscription_id         = data.azurerm_subscription.current.subscription_id
-  resource_group_name     = var.resource_group.name == null ? var.resource_groups[var.resource_group.tag].name : data.azurerm_resource_group.this[0].name
-  resource_group_tags     = var.resource_group.name == null ? var.resource_groups[var.resource_group.tag].tags : data.azurerm_resource_group.this[0].tags
+  resource_group_name     = var.resource_group.name == null ? var.resource_groups[var.resource_group.key].name : data.azurerm_resource_group.this[0].name
+  resource_group_tags     = var.resource_group.name == null ? var.resource_groups[var.resource_group.key].tags : data.azurerm_resource_group.this[0].tags
   tags                    = merge(var.tags, (var.inherit_tags == true ? local.resource_group_tags : {}))
-  resource_group_location = var.resource_group.name == null ? var.resource_groups[var.resource_group.tag].location : data.azurerm_resource_group.this[0].location
+  resource_group_location = var.resource_group.name == null ? var.resource_groups[var.resource_group.key].location : data.azurerm_resource_group.this[0].location
   location                = var.location == null ? local.resource_group_location : var.location
 }
 
@@ -51,14 +51,14 @@ data "azurerm_local_network_gateway" "this" {
 locals {
   virtual_network_gateway_id = var.virtual_network_gateway.id == null ? (
     var.virtual_network_gateway.name == null ? (
-      var.virtual_network_gateways[var.virtual_network_gateway.tag].id
+      var.virtual_network_gateways[var.virtual_network_gateway.key].id
     ) : data.azurerm_virtual_network_gateway.this[0].id
   ) : var.virtual_network_gateway.id
 
   express_route_circuit_id = var.express_route_circuit == null ? null : (
     var.express_route_circuit.id == null ? (
       var.express_route_circuit.name == null ? (
-        var.express_route_circuits[var.express_route_circuit.tag].id
+        var.express_route_circuits[var.express_route_circuit.key].id
       ) : data.azurerm_express_route_circuit.this[0].id
     ) : var.express_route_circuit.id
   )
@@ -66,7 +66,7 @@ locals {
   local_network_gateway_id = var.local_network_gateway == null ? null : (
     var.local_network_gateway.id == null ? (
       var.local_network_gateway.name == null ? (
-        var.local_network_gateways[var.local_network_gateway.tag].id
+        var.local_network_gateways[var.local_network_gateway.key].id
       ) : data.azurerm_local_network_gateway.this[0].id
     ) : var.local_network_gateway.id
   )
@@ -74,7 +74,7 @@ locals {
   peer_virtual_network_gateway_id = var.peer_virtual_network_gateway == null ? null : (
     var.peer_virtual_network_gateway.id == null ? (
       var.peer_virtual_network_gateway.name == null ? (
-        var.virtual_network_gateways[var.peer_virtual_network_gateway.tag].id
+        var.virtual_network_gateways[var.peer_virtual_network_gateway.key].id
       ) : data.azurerm_virtual_network_gateway.peer[0].id
     ) : var.peer_virtual_network_gateway.id
   )

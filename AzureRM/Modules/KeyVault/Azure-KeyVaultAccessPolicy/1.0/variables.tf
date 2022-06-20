@@ -3,7 +3,7 @@ variable "key_vault" {
     id                  = optional(string)
     name                = optional(string)
     resource_group_name = optional(string)
-    tag                 = optional(string)
+    key                 = optional(string)
   })
   description = "(Optional) Tag of the key vault, used to lookup resource ID from output of module Azure-KeyVault"
 }

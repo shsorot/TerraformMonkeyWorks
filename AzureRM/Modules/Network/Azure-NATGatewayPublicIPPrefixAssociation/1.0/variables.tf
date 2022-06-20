@@ -3,7 +3,7 @@ variable "nat_gateway" {
     id                  = optional(string)
     name                = optional(string)
     resource_group_name = optional(string)
-    tag                 = optional(string)
+    key                 = optional(string)
   })
   description = "(Required) The ID of the Nat Gateway. Changing this forces a new resource to be created."
 }
@@ -20,7 +20,7 @@ variable "public_ip_prefix" {
     id                  = optional(string)
     name                = optional(string)
     resource_group_name = optional(string)
-    tag                 = optional(string)
+    key                 = optional(string)
   })
   description = " (Required) The ID of the Public IP which this Nat Gateway which should be connected to. Changing this forces a new resource to be created."
 }

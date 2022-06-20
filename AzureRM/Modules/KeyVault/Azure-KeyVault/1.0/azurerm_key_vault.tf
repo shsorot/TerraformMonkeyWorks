@@ -19,6 +19,7 @@ resource "azurerm_key_vault" "this" {
   access_policy = var.access_policy
 
   # single block
+  # TODO : Add data block based lookup
   dynamic "network_acls" {
     for_each = var.network_acls == null || var.network_acls == {} ? [] : [1]
     content {
@@ -30,7 +31,7 @@ resource "azurerm_key_vault" "this" {
         [for instance in(var.network_acls.virtual_network_subnet == null || var.network_acls.virtual_network_subnet == [] ? [] : var.network_acls.virtual_network_subnet) : (
           instance.id == null ? (
             instance.name == null && instance.virtual_network_name == null ? (
-              var.virtual_networks[instance.virtual_network_tag].subnet[instance.tag].id
+              var.virtual_networks[instance.virtual_network_tag].subnet[instance.key].id
             ) : "/subscriptions/${local.subscription_id}/resourceGroups/${instance.resource_group_name == null ? local.resource_group_name : instance.resource_group_name}/providers/Microsoft.Network/virtualNetworks/${instance.virtual_network_name}/subnets/${instance.name}"
           ) : instance.id
           )

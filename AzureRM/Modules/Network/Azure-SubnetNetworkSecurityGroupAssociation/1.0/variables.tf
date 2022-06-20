@@ -3,7 +3,7 @@ variable "network_security_group" {
     id                  = optional(string)
     name                = optional(string)
     resource_group_name = optional(string)
-    tag                 = optional(string)
+    key                 = optional(string)
   })
   description = "(Required) The ID of the Network Security Group which should be associated with the Subnet. Changing this forces a new resource to be created."
 }
@@ -15,7 +15,7 @@ variable "subnet" {
     virtual_network_name = optional(string)
     resource_group_name  = optional(string)
     tag                  = optional(string)
-    virtual_network_tag  = optional(string)
+    virtual_network_key  = optional(string)
   })
 }
 

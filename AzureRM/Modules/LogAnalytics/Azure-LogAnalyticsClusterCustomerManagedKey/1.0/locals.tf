@@ -31,13 +31,13 @@ data "azurerm_key_vault_key" "this" {
 locals {
   key_vault_key_id = var.key_vault_key.id == null ? (
     var.key_vault_key.name == null && var.key_vault_key.key_vault_name && var.key_vault_key.resource_group_name == null ? (
-      var.key_vault_keys[var.key_vault_key.tag].id
+      var.key_vault_keys[var.key_vault_key.key].id
     ) : data.azurerm_key_vault_key.this[0].id
   ) : var.key_vault_key.id
-  # <TODO> enable data block lookup for LA cluster when enabled by terraform azureRM provider
+# TODO : Add data block based lookup
   log_analytics_cluster_id = var.log_analytics_cluster.id == null ? (
     var.log_analytics_cluster.name == null && var.log_analytics_cluster.resource_group_name == null ? (
-      var.log_analytics_clusters[var.log_analytics_cluster.tag].id
+      var.log_analytics_clusters[var.log_analytics_cluster.key].id
     ) : "/subscriptions/${local.subscription_id}/resourcegroups/${var.log_analytics_cluster.resource_group_name}/providers/Microsoft.OperationalInsights/clusters/${var.log_analytics_cluster.name}"
   ) : var.log_analytics_cluster.id
 }

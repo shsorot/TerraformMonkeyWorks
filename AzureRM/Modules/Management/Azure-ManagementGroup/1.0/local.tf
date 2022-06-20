@@ -13,7 +13,7 @@ locals {
   parent_management_group_id = var.parent_management_group == null || var.parent_management_group == {} ? null : (
     var.parent_management_group.id == null ? (
       var.parent_management_group.name == null ? (
-        var.management_groups[var.parent_management_group.tag].id
+        var.management_groups[var.parent_management_group.key].id
       ) : "/providers/Microsoft.Management/managementGroups/${var.parent_management_group.name}"
     ) : var.parent_management_group.id
   )

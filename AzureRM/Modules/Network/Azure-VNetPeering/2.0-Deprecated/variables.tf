@@ -9,7 +9,7 @@ variable "local_virtual_network" {
     name                = optional(string)
     resource_group_name = optional(string)
     subscription_id     = optional(string)
-    tag                 = optional(string)
+    key                 = optional(string)
   })
   description = "(Required) The name of the virtual network. Changing this forces a new resource to be created."
 }
@@ -19,7 +19,7 @@ variable "remote_virtual_network" {
     name                = optional(string)
     resource_group_name = optional(string)
     subscription_id     = optional(string)
-    tag                 = optional(string)
+    key                 = optional(string)
   })
   description = "(Required) The full Azure resource ID of the remote virtual network. Changing this forces a new resource to be created."
   default     = null

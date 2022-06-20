@@ -28,12 +28,14 @@ module "Landscape-Private-DNS-Zones-Virtual-Network-Links" {
   resource_group        = each.value.resource_group
   tags                  = try(each.value.tags, local.tags)
   inherit_tags          = try(each.value.inherit_tags, false)
-  private_dns_zone      = each.value.private_dns_zone
+  private_dns_zone_name = each.value.private_dns_zone_name
   virtual_network       = each.value.virtual_network
   registration_enabled  = try(each.value.registration_enabled, null)
   virtual_networks      = module.Landscape-Virtual-Networks
   resource_groups       = module.Landscape-Resource-Groups
-  private_dns_zones     = module.Landscape-Private-DNS-Zones
+  depends_on = [
+    module.Landscape-Private-DNS-Zones
+  ]
 }
 
 output "PrivateDNSZonesVirtualNetworkLinks" {

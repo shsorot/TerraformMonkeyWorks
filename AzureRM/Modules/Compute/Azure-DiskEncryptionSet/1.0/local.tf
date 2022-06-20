@@ -16,10 +16,10 @@ locals {
   tenant_id               = data.azurerm_client_config.current.tenant_id
   object_id               = data.azurerm_client_config.current.object_id
   subscription_id         = data.azurerm_subscription.current.subscription_id
-  resource_group_name     = var.resource_group.name == null ? var.resource_groups[var.resource_group.tag].name : data.azurerm_resource_group.this[0].name
-  resource_group_tags     = var.resource_group.name == null ? var.resource_groups[var.resource_group.tag].tags : data.azurerm_resource_group.this[0].tags
+  resource_group_name     = var.resource_group.name == null ? var.resource_groups[var.resource_group.key].name : data.azurerm_resource_group.this[0].name
+  resource_group_tags     = var.resource_group.name == null ? var.resource_groups[var.resource_group.key].tags : data.azurerm_resource_group.this[0].tags
   tags                    = merge(var.tags, (var.inherit_tags == true ? local.resource_group_tags : {}))
-  resource_group_location = var.resource_group.name == null ? var.resource_groups[var.resource_group.tag].location : data.azurerm_resource_group.this[0].location
+  resource_group_location = var.resource_group.name == null ? var.resource_groups[var.resource_group.key].location : data.azurerm_resource_group.this[0].location
   location                = var.location == null ? local.resource_group_location : var.location
 }
 
@@ -37,6 +37,6 @@ data "azurerm_key_vault_key" "this" {
 
 locals {
   key_vault_key_id = var.key_vault_key.id == null ? (
-    var.key_vault_key.name == null && var.key_vault_key.resource_group_name == null ? (var.key_vault_keys[var.key_vault_key.tag].id) : data.azurerm_key_vault_key.this[0].id
+    var.key_vault_key.name == null && var.key_vault_key.resource_group_name == null ? (var.key_vault_keys[var.key_vault_key.key].id) : data.azurerm_key_vault_key.this[0].id
   ) : var.key_vault_key.id
 }

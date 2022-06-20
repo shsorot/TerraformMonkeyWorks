@@ -4,7 +4,7 @@ variable "key_vault_key" {
     name                = optional(string)
     key_vault_name      = optional(string)
     resource_group_name = optional(string)
-    tag                 = optional(string)
+    key                 = optional(string)
   })
 }
 
@@ -20,7 +20,7 @@ variable "log_analytics_cluster" {
     id                  = optional(string)
     resource_group_name = optional(string)
     name                = optional(string)
-    tag                 = optional(string)
+    key                 = optional(string)
   })
 }
 

@@ -16,13 +16,13 @@ locals {
 locals {
   peering_id = var.peering.id == null ? (
     var.peering.name == null && var.peering.resource_group_name == null && var.peering.express_route_circuit_name == null ? (
-      var.express_route_circuit_peerings[var.peering.tag].id
+      var.express_route_circuit_peerings[var.peering.key].id
     ) : "/subscriptions/${coalesce(var.peering.subscription_id, local.subscription_id)}/resourceGroups/${var.peering.resource_group_name}/providers/Microsoft.Network/expressRouteCircuits/${var.peering.express_route_circuit_name}/peerings/${var.peering.name}"
   ) : var.peering.id
 
   peer_peering_id = var.peer_peering.id == null ? (
     var.peer_peering.name == null && var.peer_peering.resource_group_name == null && var.peer_peering.express_route_circuit_name == null ? (
-      var.express_route_circuit_peerings[var.peer_peering.tag].id
+      var.express_route_circuit_peerings[var.peer_peering.key].id
     ) : "/subscriptions/${coalesce(var.peer_peering.subscription_id, local.subscription_id)}/resourceGroups/${var.peer_peering.resource_group_name}/providers/Microsoft.Network/expressRouteCircuits/${var.peering.express_route_circuit_name}/peerings/${var.peer_peering.name}"
   ) : var.peer_peering.id
 

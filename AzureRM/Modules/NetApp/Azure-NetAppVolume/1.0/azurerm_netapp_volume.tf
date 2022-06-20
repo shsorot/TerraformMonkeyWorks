@@ -9,7 +9,7 @@ resource "azurerm_netapp_volume" "this" {
   service_level                    = local.service_level # Inherited from Pool properties. Do not specify from parameters.
   protocols                        = var.protocols == null || var.protocols == [] ? ["NFSv3"] : var.protocols
   security_style                   = var.security_style
-  subnet_id                        = local.subnet_id     # Mandatory, if changed, forces re-creation of resource
+  subnet_id                        = local.subnet_id # Mandatory, if changed, forces re-creation of resource
   storage_quota_in_gb              = var.storage_quota_in_gb
   snapshot_directory_visible       = var.snapshot_directory_visible
   create_from_snapshot_resource_id = local.create_from_snapshot_resource_id
@@ -30,7 +30,7 @@ resource "azurerm_netapp_volume" "this" {
   # Single Block
   # TODO : fix issue post Hashicorp update to provider
   dynamic "data_protection_snapshot_policy" {
-    for_each = local.data_protection_snapshot_policy_id == null  ? [] : [1]
+    for_each = local.data_protection_snapshot_policy_id == null ? [] : [1]
     content {
       snapshot_policy_id = local.data_protection_snapshot_policy_id
     }
@@ -43,8 +43,8 @@ resource "azurerm_netapp_volume" "this" {
       rule_index          = export_policy_rule.key
       allowed_clients     = export_policy_rule.value.allowed_clients
       protocols_enabled   = coalesce(export_policy_rule.value.protocols_enabled, var.protocols)
-      unix_read_only      = try(export_policy_rule.value.unix_read_only,null)
-      unix_read_write     = try(export_policy_rule.value.unix_read_write,null)
+      unix_read_only      = try(export_policy_rule.value.unix_read_only, null)
+      unix_read_write     = try(export_policy_rule.value.unix_read_write, null)
       root_access_enabled = try(export_policy_rule.value.root_access_enabled)
     }
   }

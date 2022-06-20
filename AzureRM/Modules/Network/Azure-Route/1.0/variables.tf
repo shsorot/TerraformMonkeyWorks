@@ -27,7 +27,7 @@ variable "next_hop_in_ip_address" {
 variable "route_table" {
   type = object({
     name = optional(string)
-    tag  = optional(string)
+    key  = optional(string)
   })
   description = "(Required) The name of the route table within which create the route. Changing this forces a new resource to be created."
 }
@@ -37,6 +37,6 @@ variable "route_tables" {
   type = map(object({
     id   = optional(string)
     name = optional(string)
-    tag  = optional(string)
+    key  = optional(string)
   }))
 }

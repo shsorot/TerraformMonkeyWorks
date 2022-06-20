@@ -1,3 +1,4 @@
+# TODO : Add data block based lookup
 resource "azurerm_express_route_circuit_peering" "this" {
   peering_type                  = var.peering_type
   express_route_circuit_name    = local.express_route_circuit_name
@@ -28,7 +29,7 @@ resource "azurerm_express_route_circuit_peering" "this" {
       route_filter_id = var.peering_type == "MicrosoftPeering" ? (
         var.ipv6.route_filter.id == null ? (
           var.ipv6.route_filter.name == null && var.ipv6.route_filter.resource_group_name == null ? (
-            var.route_filters[var.ipv6.route.tag].id
+            var.route_filters[var.ipv6.route.key].id
           ) : "/subscriptions/${local.subscription_id}/resourceGroups/${var.ipv6.route_filter.resource_group_name}/providers/Microsoft.Network/routeFilters/${var.ipv6.route_filter.name}"
         ) : var.ipv6.route_filter.id
       ) : null
@@ -37,7 +38,7 @@ resource "azurerm_express_route_circuit_peering" "this" {
   route_filter_id = var.peering_type != "MicrosoftPeering" ? null : (
     var.route_filter.id == null ? (
       var.route_filter.name == null && var.route_filter.resource_group_name == null ? (
-        var.route_filters[var.route_filter.tag].id
+        var.route_filters[var.route_filter.key].id
       ) : "/subscriptions/${local.subscription_id}/resourceGroups/${var.route_filter.resource_group_name}/providers/Microsoft.Network/routeFilters/${var.route_filter.name}"
     ) : var.route_filter.id
   )

@@ -56,7 +56,7 @@ variable "policy_definition" {
   type = object({
     id   = optional(string) # Resource ID of the Policy or Set 
     name = optional(string) # Display name of the policy definition.
-    tag  = optional(string) # Tag of the policy definition, used to fetch ID from the output of module Azure-PolicyDefinition.Cannot be used in combination with definition_set_tag
+    key  = optional(string) # Tag of the policy definition, used to fetch ID from the output of module Azure-PolicyDefinition.Cannot be used in combination with definition_set_tag
   })
   description = " (Required) The ID of the Policy Definition or Policy Definition Set. Changing this forces a new Policy Assignment to be created."
   default     = null
@@ -73,7 +73,7 @@ variable "policy_definition_set" {
   type = object({
     id   = optional(string) # Resource ID of the Policy set
     name = optional(string) # Display name of the policy definition set.  Cannot be used in combination with tag
-    tag  = optional(string) # Tag of the policy definition set, used to fetch ID from the output of module Azure-PolicyDefinitionSet. Cannot be used in combination with name
+    key  = optional(string) # Tag of the policy definition set, used to fetch ID from the output of module Azure-PolicyDefinitionSet. Cannot be used in combination with name
   })
   description = " (Required) The ID of the Policy Definition or Policy Definition Set. Changing this forces a new Policy Assignment to be created."
   default     = {}

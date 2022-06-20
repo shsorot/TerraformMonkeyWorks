@@ -1,3 +1,4 @@
+# TODO : Add data block based lookup
 resource "azurerm_network_interface" "this" {
   name                          = var.name
   resource_group_name           = local.resource_group_name
@@ -13,7 +14,7 @@ resource "azurerm_network_interface" "this" {
       name = ip_configuration.value.name
       subnet_id = ip_configuration.value.subnet.id == null ? (
         ip_configuration.value.subnet.name == null && ip_configuration.value.subnet.virtual_network_name == null ? (
-          var.virtual_networks[ip_configuration.value.subnet.virtual_network_tag].subnet[ip_configuration.value.subnet.tag].id
+          var.virtual_networks[ip_configuration.value.subnet.virtual_network_tag].subnet[ip_configuration.value.subnet.key].id
         ) : "/subscriptions/${local.subscription_id}/resourceGroups/${ip_configuration.value.subnet.resource_group_name == null ? local.resource_group_name : ip_configuration.value.subnet.resource_group_name}/providers/Microsoft.Network/virtualNetworks/${ip_configuration.value.subnet.virtual_network_name}/subnets/${ip_configuration.value.subnet.name}"
       ) : ip_configuration.value.subnet.id
 
@@ -24,7 +25,7 @@ resource "azurerm_network_interface" "this" {
       public_ip_address_id = ip_configuration.value.public_ip_address == null ? null : (
         ip_configuration.value.public_ip_address.id == null ? (
           ip_configuration.value.public_ip_address.name == null ? (
-            var.public_ip_addresses[ip_configuration.value.public_ip_address.tag].id
+            var.public_ip_addresses[ip_configuration.value.public_ip_address.key].id
           ) : "/subscriptions/${local.subscription_id}/resourceGroups/${ip_configuration.value.public_ip_address.resource_group_name == null ? local.resource_group_name : ip_configuration.value.public_ip_address.resource_group_name}/providers/Microsoft.Network/publicIPAddresses/${ip_configuration.value.public_ip_address.name}"
         ) : ip_configuration.value.public_ip_address.id
       )

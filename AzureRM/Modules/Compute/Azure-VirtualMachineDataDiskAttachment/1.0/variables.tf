@@ -3,7 +3,7 @@ variable "virtual_machine" {
     id                  = optional(string)
     name                = optional(string)
     resource_group_name = optional(string)
-    tag                 = optional(string)
+    key                 = optional(string)
   })
   description = "(Required) The ID of the Virtual machine to which the managed disk will be assigned."
 }
@@ -13,7 +13,7 @@ variable "virtual_machines" {
     id                  = optional(string)
     name                = optional(string)
     resource_group_name = optional(string)
-    tag                 = optional(string)
+    key                 = optional(string)
   }))
   default     = {}
   description = "(Optional) Output of module Azure-VirtualMachine or Azure-WindowsVirtualMachine or Azure-LinuxVirtualMachine"
@@ -24,7 +24,7 @@ variable "managed_disk" {
     id                  = optional(string)
     name                = optional(string)
     resource_group_name = optional(string)
-    tag                 = optional(string)
+    key                 = optional(string)
   })
   description = "(Required) The ID of an existing Managed Disk which should be attached. Changing this forces a new resource to be created."
 }

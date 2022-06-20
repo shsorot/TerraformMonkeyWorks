@@ -5,8 +5,8 @@ variable "name" {
 
 variable "resource_group" {
   type = object({
-    name = optional(string)
-    tag  = optional(string)
+    name = optional(string) # Name of the resource group
+    key  = optional(string) # Terraform Object Key to use to find the resource group from output of module Azure-ResourceGroup supplied to variable "resource_groups"
   })
   description = "(Required) The name of the resource group where to create the resource. Specify either the actual name or the Tag value that can be used to look up Resource group properties from output of module Azure-ResourceGroup."
 }
@@ -18,7 +18,13 @@ variable "resource_groups" {
     tags     = optional(map(string))
     name     = optional(string)
   }))
-  description = "(Optional) Output of Module Azure-ResourceGroup. Used to lookup RG properties using Tags"
+  description = <<EOF
+   (Optional) Output of Module Azure-ResourceGroup. Used to lookup RG properties using Terraform Object Keys"
+    id       = # ID of the resource group
+    location = # Location of the resource group
+    tags     = # List of Azure tags applied to resource group
+    name     = # Name of the resource group
+  EOF
   default     = {}
 }
 
@@ -34,8 +40,9 @@ variable "tags" {
 }
 
 variable "inherit_tags" {
-  type    = bool
-  default = false
+  type        = bool
+  default     = false
+  description = "If true, the tags from the resource group will be applied to the resource in addition to tags in the variable 'tags'."
 }
 
 
@@ -44,7 +51,7 @@ variable "base_policy" {
     id                  = optional(string)
     name                = optional(string)
     resource_group_name = optional(string)
-    tag                 = optional(string)
+    key                 = optional(string)
   })
   description = "(Optional) The ID of the base Firewall Policy."
   default     = null
@@ -55,7 +62,7 @@ variable "base_policy" {
 #     id                  = optional(string)
 #     name                = optional(string)
 #     resource_group_name = optional(string)
-#     tag                 = optional(string)
+#     key                 = optional(string)
 #   }))
 #   description = "(Optional) The output of module Azure-FirewallPolicy, used for lookup of Policy ID for base_policy_id property."
 #   default     = {}
@@ -64,8 +71,8 @@ variable "base_policy" {
 variable "dns" {
   type = object({
     # network_rule_fqdn_enabled = optional(bool)         # (Optional) Should the network rule fqdn be enabled?. Deprecated in provider version > 3.xx.x
-    proxy_enabled             = optional(bool)         #  (Optional) Whether to enable DNS proxy on Firewalls attached to this Firewall Policy? Defaults to false.
-    servers                   = optional(list(string)) #  (Optional) Whether to enable DNS proxy on Firewalls attached to this Firewall Policy? Defaults to false.
+    proxy_enabled = optional(bool)         #  (Optional) Whether to enable DNS proxy on Firewalls attached to this Firewall Policy? Defaults to false.
+    servers       = optional(list(string)) #  (Optional) Whether to enable DNS proxy on Firewalls attached to this Firewall Policy? Defaults to false.
   })
   default = null
 }
@@ -78,7 +85,7 @@ variable "identity" {
       id                  = optional(string)
       name                = optional(string)
       resource_group_name = optional(string)
-      tag                 = optional(string)
+      key                 = optional(string)
     })))
   })
   description = "(Required) Specifies the type of Managed Service Identity that should be configured on this Firewall Policy. Only possible value is UserAssigned."
@@ -101,14 +108,14 @@ variable "insights" {
       id                  = optional(string)
       name                = optional(string)
       resource_group_name = optional(string)
-      tag                 = optional(string)
+      key                 = optional(string)
     }))
-    retention_in_days = optional(number)                # (Optional) The number of days to retain the firewall logs.
+    retention_in_days = optional(number)             # (Optional) The number of days to retain the firewall logs.
     log_analytics_workspace = optional(list(object({ # (Optional) A list of log_analytics_workspace block as defined below.
       id                  = optional(string)
       name                = optional(string)
       resource_group_name = optional(string)
-      tag                 = optional(string)
+      key                 = optional(string)
     })))
   })
   default = null
@@ -157,7 +164,7 @@ variable "sku" {
 
 variable "threat_intelligence_allowlist" {
   type = object({
-    fqdns = optional(list(string)) # (Optional) A list of FQDNs that will be skipped for threat detection.
+    fqdns        = optional(list(string)) # (Optional) A list of FQDNs that will be skipped for threat detection.
     ip_addresses = optional(list(string)) # (Optional) A list of IP addresses or CIDR ranges that will be skipped for threat detection.
   })
   default = null
@@ -169,13 +176,13 @@ variable "threat_intelligence_mode" {
   default     = "Alert"
 }
 
-variable "tls_certificate"{
+variable "tls_certificate" {
   type = object({
     name = string # (Required) The name of the certificate.
     key_vault_secret = object({
-      id = optional(string) # (Required) The ID of the Key Vault Secret
-      name = optional(string) # (Required) The name of the Key Vault Secret 
-      key_vault_name = optional(string) # (Required) The name of the Key Vault
+      id                  = optional(string) # (Required) The ID of the Key Vault Secret
+      name                = optional(string) # (Required) The name of the Key Vault Secret 
+      key_vault_name      = optional(string) # (Required) The name of the Key Vault
       resource_group_name = optional(string) # (Required) The name of the resource group
     })
   })
@@ -183,10 +190,10 @@ variable "tls_certificate"{
 }
 
 
-variable "keyvault_certificates"{
+variable "keyvault_certificates" {
   type = map(object({
-    id = optional(string)
-    version = optional(string)
+    id         = optional(string)
+    version    = optional(string)
     thumbprint = optional(string)
   }))
   description = "(Optional) The output of module Azure-KeyVaultCertificate, used for lookup of certificate ID for tls_certificate property."

@@ -11,7 +11,7 @@ resource "azurerm_virtual_hub_route_table" "this" {
       next_hop_type     = var.route.next_hop_type == null ? "ResourceId" : var.route.next_hop_type
       next_hop = var.route.next_hop.id == null ? (
         var.route.next_hop.name == null ? (
-          var.virtual_hub_connections[var.route.next_hop.tag].id
+          var.virtual_hub_connections[var.route.next_hop.key].id
         ) : "${local.virtual_hub_id}/hubVirtualNetworkConnections/${var.route.next_hop.name}"
       ) : var.route.next_hop.id
     }
