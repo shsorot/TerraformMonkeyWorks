@@ -6,7 +6,7 @@ variable "peering_type" {
 variable "express_route_circuit" {
   type = object({
     name = optional(string)
-    tag  = optional(string)
+    key  = optional(string)
   })
   description = "(Required) The name of the ExpressRoute Circuit in which to create the Peering."
 }
@@ -21,7 +21,7 @@ variable "express_route_circuits" {
 variable "resource_group" {
   type = object({
     name = optional(string)
-    tag  = optional(string)
+    key  = optional(string)
   })
   description = "(Required) The name of the resource group in which to create the Express Route Circuit Peering. Changing this forces a new resource to be created."
 }
@@ -33,7 +33,13 @@ variable "resource_groups" {
     tags     = optional(map(string))
     name     = optional(string)
   }))
-  description = "(Optional) Output of Module Azure-ResourceGroup. Used to lookup RG properties using Tags"
+  description = <<EOF
+   (Optional) Output of Module Azure-ResourceGroup. Used to lookup RG properties using Terraform Object Keys"
+    id       = # ID of the resource group
+    location = # Location of the resource group
+    tags     = # List of Azure tags applied to resource group
+    name     = # Name of the resource group
+  EOF
   default     = {}
 }
 
@@ -89,7 +95,7 @@ variable "route_filter" {
     id                  = optional(string)
     name                = optional(string)
     resource_group_name = optional(string)
-    tag                 = optional(string)
+    key                 = optional(string)
   })
   description = "(Optional) The ID of the Route Filter. Only available when peering_type is set to MicrosoftPeering."
   default     = null

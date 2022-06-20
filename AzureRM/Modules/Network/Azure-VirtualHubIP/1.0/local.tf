@@ -36,20 +36,20 @@ data "azurerm_public_ip" "this" {
 locals {
   virtual_hub_id = var.virtual_hub.id == null ? (
     var.virtual_hub.name == null ? (
-      var.virtual_hubs[var.virtual_hub.tag].id
+      var.virtual_hubs[var.virtual_hub.key].id
     ) : data.azurerm_virtual_hub.this[0].id
   ) : var.virtual_hub.id
 
   subnet_id = var.subnet.id == null ? (
     var.subnet.name == null && var.subnet.virtual_network_name == null ? (
-      var.virtual_networks[var.subnet.virtual_network_tag].subnet[var.subnet.tag].id
+      var.virtual_networks[var.subnet.virtual_network_tag].subnet[var.subnet.key].id
     ) : data.azurerm_subnet.this[0].id
   ) : var.subnet.id
 
   public_ip_address_id = var.public_ip_address == null ? null : (
     var.public_ip_address.id == null ? (
       var.public_ip_address.name == null ? (
-        var.public_ip_addresses[var.public_ip_address.tag].id
+        var.public_ip_addresses[var.public_ip_address.key].id
       ) : data.azurerm_public_ip.this[0].id
     ) : var.public_ip_address.id
   )

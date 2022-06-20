@@ -16,10 +16,10 @@ locals {
   tenant_id               = data.azurerm_client_config.current.tenant_id
   object_id               = data.azurerm_client_config.current.object_id
   subscription_id         = data.azurerm_subscription.current.subscription_id
-  resource_group_name     = var.resource_group.name == null ? var.resource_groups[var.resource_group.tag].name : data.azurerm_resource_group.this[0].name
-  resource_group_tags     = var.resource_group.name == null ? var.resource_groups[var.resource_group.tag].tags : data.azurerm_resource_group.this[0].tags
+  resource_group_name     = var.resource_group.name == null ? var.resource_groups[var.resource_group.key].name : data.azurerm_resource_group.this[0].name
+  resource_group_tags     = var.resource_group.name == null ? var.resource_groups[var.resource_group.key].tags : data.azurerm_resource_group.this[0].tags
   tags                    = merge(var.tags, (var.inherit_tags == true ? local.resource_group_tags : {}))
-  resource_group_location = var.resource_group.name == null ? var.resource_groups[var.resource_group.tag].location : data.azurerm_resource_group.this[0].location
+  resource_group_location = var.resource_group.name == null ? var.resource_groups[var.resource_group.key].location : data.azurerm_resource_group.this[0].location
   location                = var.location == null ? local.resource_group_location : var.location
 }
 
@@ -81,7 +81,7 @@ locals {
   dedicated_host_id = var.dedicated_host == null ? null : (
     var.dedicated_host.id == null ? (
       var.dedicated_host.name == null && var.dedicated_host.dedicated_host_group_name == null ? (
-        var.dedicated_hosts[var.dedicated_host.tag].id
+        var.dedicated_hosts[var.dedicated_host.key].id
       ) : data.azurerm_dedicated_host.this[0].id
     ) : var.dedicated_host.id
   )
@@ -89,7 +89,7 @@ locals {
   availability_set_id = var.availability_set == null ? null : (
     var.availability_set.id == null ? (
       var.availability_set.name == null ? (
-        var.availability_sets[var.availability_set.tag].id
+        var.availability_sets[var.availability_set.key].id
       ) : data.azurerm_availability_set.this[0].id
     ) : var.availability_set.id
   )
@@ -97,7 +97,7 @@ locals {
   proximity_placement_group_id = var.proximity_placement_group == null ? null : (
     var.proximity_placement_group.id == null ? (
       var.proximity_placement_group.name == null ? (
-        var.proximity_placement_group[var.proximity_placement_group.tag].id
+        var.proximity_placement_group[var.proximity_placement_group.key].id
       ) : data.azurerm_proximity_placement_group.this[0].id
     ) : var.proximity_placement_group.id
   )
@@ -106,7 +106,7 @@ locals {
   disk_encryption_set_id = var.os_disk.disk_encryption_set == null ? null : (
     var.os_disk.disk_encryption_set.id == null ? (
       var.os_disk.disk_encryption_set.name == null ? (
-        var.disk_encryption_sets[var.os_disk.disk_encryption_set.tag].id
+        var.disk_encryption_sets[var.os_disk.disk_encryption_set.key].id
       ) : data.azurerm_disk_encryption_set.this[0].id
     ) : var.os_disk.disk_encryption_set_id
   )
@@ -115,7 +115,7 @@ locals {
     certificate = instance.value.certificate
     keyvault_id = instance.value.keyvault.id == null ? (
       instance.value.keyvault.name == null ? (
-        var.key_vaults[instance.value.keyvault.tag].id
+        var.key_vaults[instance.value.keyvault.key].id
       ) : data.azurerm_key_vault.this[instance.value.keyvault.name].id
     ) : instance.value.keyvault.id
   }]
@@ -123,7 +123,7 @@ locals {
   # key_vault_id = var.secret == null ? null : (
   #   var.secret.key_vault.id == null ? (
   #     var.secret.key_vault.name == null ? (
-  #       var.key_vaults[var.secret.key_vault.tag].id
+  #       var.key_vaults[var.secret.key_vault.key].id
   #     ) : "/subscriptions/${local.subscription_id}/resourceGroups/${var.secret.key_vault.resource_group_name == null ? local.resource_group_name : var.secret.key_vault.resource_group_name}/providers/Microsoft.KeyVault/vaults/${var.secret.key_vault.name}"
   #   ) : var.secret.key_vault_id
   # )
@@ -131,7 +131,7 @@ locals {
   virtual_machine_scale_set_id = var.virtual_machine_scale_set == null ? null : (
     var.virtual_machine_scale_set.id == null ? (
       var.virtual_machine_scale_set.name == null ? (
-        var.azurerm_orchestrated_virtual_machine_scale_sets[var.virtual_machine_scale_set.tag].id
+        var.azurerm_orchestrated_virtual_machine_scale_sets[var.virtual_machine_scale_set.key].id
       ) : data.azurerm_virtual_machine_scale_set.this[0].id
     ) : var.virtual_machine_scale_set.id
   )
@@ -139,7 +139,7 @@ locals {
   network_interface_ids = [for instance in var.network_interface : (
     instance.id == null ? (
       instance.name == null ? (
-        var.network_interfaces[instance.tag].id
+        var.network_interfaces[instance.key].id
       ) : data.azurerm_network_interface.this[instance.name].id
     ) : instance.id
   )]
@@ -160,7 +160,7 @@ locals {
         [for instance in var.identity.identity : (
           instance.id == null ? (
             instance.name == null ? (
-              var.user_assigned_identities[instance.tag].id
+              var.user_assigned_identities[instance.key].id
             ) : data.azurerm_user_assigned_identity.this[instance.name].id
           ) : instance.id
         )]

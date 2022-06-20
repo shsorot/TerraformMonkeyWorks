@@ -16,10 +16,10 @@ locals {
   tenant_id               = data.azurerm_client_config.current.tenant_id
   object_id               = data.azurerm_client_config.current.object_id
   subscription_id         = data.azurerm_subscription.current.subscription_id
-  resource_group_name     = var.resource_group.name == null ? var.resource_groups[var.resource_group.tag].name : data.azurerm_resource_group.this[0].name
-  resource_group_tags     = var.resource_group.name == null ? var.resource_groups[var.resource_group.tag].tags : data.azurerm_resource_group.this[0].tags
+  resource_group_name     = var.resource_group.name == null ? var.resource_groups[var.resource_group.key].name : data.azurerm_resource_group.this[0].name
+  resource_group_tags     = var.resource_group.name == null ? var.resource_groups[var.resource_group.key].tags : data.azurerm_resource_group.this[0].tags
   tags                    = merge(var.tags, (var.inherit_tags == true ? local.resource_group_tags : {}))
-  resource_group_location = var.resource_group.name == null ? var.resource_groups[var.resource_group.tag].location : data.azurerm_resource_group.this[0].location
+  resource_group_location = var.resource_group.name == null ? var.resource_groups[var.resource_group.key].location : data.azurerm_resource_group.this[0].location
   location                = var.location == null ? local.resource_group_location : var.location
 }
 
@@ -44,7 +44,7 @@ data "azurerm_log_analytics_workspace" "default" {
 
 # this is for the secondary list of insights -> log_analytics_workspace -> id
 data "azurerm_log_analytics_workspace" "this" {
-  for_each            = var.insights == null || var.insights == {} ? {} : ( var.insights.log_analytics_workspace == null ? {} : { for instance in var.insights.log_analytics_workspace: instance.name=>instance if instance.name != null} )
+  for_each            = var.insights == null || var.insights == {} ? {} : (var.insights.log_analytics_workspace == null ? {} : { for instance in var.insights.log_analytics_workspace : instance.name => instance if instance.name != null })
   name                = each.value.name
   resource_group_name = coalesce(each.value.resource_group_name, local.resource_group_name)
 }
@@ -57,7 +57,7 @@ data "azurerm_key_vault" "this" {
 }
 
 data "azurerm_key_vault_certificate" "this" {
-  count        = var.tls_certificate == null || var.tls_certificate == {} ? 0 : ( var.tls_certificate.key_vault_secret.name == null && var.tls_certificate.key_vault_secret.key_vault_name == null ? 0 : 1)
+  count        = var.tls_certificate == null || var.tls_certificate == {} ? 0 : (var.tls_certificate.key_vault_secret.name == null && var.tls_certificate.key_vault_secret.key_vault_name == null ? 0 : 1)
   name         = var.tls_certificate.key_vault_secret.name
   key_vault_id = data.azurerm_key_vault.this[0].id
 }
@@ -73,16 +73,16 @@ locals {
     ) : var.base_policy.id
   )
 
-  
 
- identity = var.identity == null ? null : (
+
+  identity = var.identity == null ? null : (
     {
       type = var.identity.type
       identity_ids = var.identity.type == "UserAssigned" ? (
         [for instance in var.identity.identity : (
           instance.id == null ? (
             instance.name == null ? (
-              var.user_assigned_identities[instance.tag].id
+              var.user_assigned_identities[instance.key].id
             ) : data.azurerm_user_assigned_identity.this[instance.name].id
           ) : instance.id
         )]
@@ -95,19 +95,19 @@ locals {
       enabled = var.insights.enabled
       default_log_analytics_workspace_id = var.insights.default_local_analytics_workspace.id == null ? (
         var.insights.default_local_analytics_workspace.name == null ? (
-          var.log_analytics_workspaces[var.insights.default_local_analytics_workspace.tag].id
+          var.log_analytics_workspaces[var.insights.default_local_analytics_workspace.key].id
         ) : data.azurerm_log_analytics_workspace.default[0].id
       ) : var.insights.default_local_analytics_workspace.id
       retention_in_days = var.insights.retention_in_days
       log_analytics_workspace = var.insights.log_analytics_workspace == null || var.insights.log_analytics_workspace == [] ? null : (
-        [for instance in var.insights.log_analytics_workspace: {
+        [for instance in var.insights.log_analytics_workspace : {
           id = instance.id == null ? (
             instance.name == null ? (
-              var.log_analytics_workspaces[instance.tag].id
+              var.log_analytics_workspaces[instance.key].id
             ) : data.azurerm_log_analytics_workspace.this[instance.name].id
           ) : instance.id
           firewall_location = instance.firewall_location
-        } ]
+        }]
       )
     }
   )
@@ -121,10 +121,10 @@ locals {
   )
 
   tls_certificate = var.tls_certificate == null || var.tls_certificate == {} ? null : {
-    name         = var.tls_certificate.name
+    name = var.tls_certificate.name
     key_vault_secret_id = var.tls_certificate.key_vault_secret.id == null ? (
       var.tls_certificate.key_vault_secret.name == null ? (
-        var.keyvault_certificates[var.tls_certificate.key_vault_secret.tag].id
+        var.keyvault_certificates[var.tls_certificate.key_vault_secret.key].id
       ) : data.azurerm_key_vault_certificate.this[0].id
     ) : var.tls_certificate.key_vault_secret.id
   }

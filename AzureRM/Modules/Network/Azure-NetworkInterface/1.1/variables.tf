@@ -5,8 +5,8 @@
 
 variable "resource_group" {
   type = object({
-    name = optional(string)
-    tag  = optional(string)
+    name = optional(string) # Name of the resource group
+    key  = optional(string) # Terraform Object Key to use to find the resource group from output of module Azure-ResourceGroup supplied to variable "resource_groups"
   })
   description = "(Required) The name of the resource group where to create the resource. Specify either the actual name or the Tag value that can be used to look up Resource group properties from output of module Azure-ResourceGroup."
 }
@@ -18,7 +18,13 @@ variable "resource_groups" {
     tags     = optional(map(string))
     name     = optional(string)
   }))
-  description = "(Optional) Output of Module Azure-ResourceGroup. Used to lookup RG properties using Tags"
+  description = <<EOF
+   (Optional) Output of Module Azure-ResourceGroup. Used to lookup RG properties using Terraform Object Keys"
+    id       = # ID of the resource group
+    location = # Location of the resource group
+    tags     = # List of Azure tags applied to resource group
+    name     = # Name of the resource group
+  EOF
   default     = {}
 }
 
@@ -35,6 +41,7 @@ variable "name" {
 
 variable "tags" {
   type    = map(string)
+  description = " (Optional) A mapping of tags to assign to the resource."
   default = {}
 }
 
@@ -76,28 +83,43 @@ variable "ip_configuration" {
       name                 = optional(string)
       virtual_network_name = optional(string)
       resource_group_name  = optional(string)
-      tag                  = optional(string)
-      virtual_network_tag  = optional(string)
+      key                  = optional(string)
+      virtual_network_key  = optional(string)
     })
     private_ip_address         = optional(string) # Private IP Address. If left null, dynamic allocation is used.
+    private_ip_address_allocation = optional(string) # Private IP Address allocation method. Possible values: Dynamic, Static. Default: Dynamic.
     private_ip_address_version = optional(string) # (Optional) The IP Version to use. Possible values are IPv4 or IPv6. Defaults to IPv4
-    primary                    = optional(bool)
+    primary                    = bool             # (Required) Specified if the IP configuration is the primary one. Atleast one must be primary
 
+    # (Optional) The public IP address to associate with this IP configuration. Only one public ip can be attached to an IP configuration
     public_ip_address = optional(object({
       id                  = optional(string)
       name                = optional(string)
       resource_group_name = optional(string)
-      tag                 = optional(string)
+      key                 = optional(string)
     }))
+    # (Optional) The backend address pool to attach this Ip configuation to. Only one backend address pool can be attached to an IP configuration.
     backend_address_pool = optional(list(object({
       id                  = optional(string)
       name                = optional(string)
       load_balancer_name  = optional(string)
       resource_group_name = optional(string)
-      backend_pool_tag    = optional(string)
-      loadbalancer_tag    = optional(string)
+      key                 = optional(string)
+      key                 = optional(string)
+      load_balancer_key   = optional(string)
     })))
+    # Introduced in provider > 3.xx.x
+    # (Optional) The Frontend IP Configuration ID of a Gateway SKU Load Balancer. this is different from Backend Address pool attached to the ip configuration
+    gateway_load_balancer_frontend_ip_configuration = optional(object({
+      id                  = optional(string)
+      name                = optional(string)
+      load_balancer_name  = optional(string)
+      resource_group_name = optional(string)
+      key                 = optional(string)
+      load_balancer_key   = optional(string)
+    }))
   }))
+  default = []
 }
 
 variable "application_security_group" {
@@ -105,8 +127,9 @@ variable "application_security_group" {
     id                  = optional(string) # Name of the ASG. This will be used to lookup ASG resource in Azure for NIC association.
     name                = optional(string)
     resource_group_name = optional(string) # Resource group where ASG is located. If null, local.resource_group_name will be used.
-    tag                 = optional(string) # Tag to be used to lookup ASG from the output of module Azure-ApplicationSecurityGroup
+    key                 = optional(string) # Tag to be used to lookup ASG from the output of module Azure-ApplicationSecurityGroup
   }))
+  description = "(Optional) List of Application Security Groups to associate with the NIC. Applies to all ip_configurations"
   default = null
 }
 
@@ -115,8 +138,9 @@ variable "network_security_group" {
     id                  = optional(string) # Name of the NSG. This will be used to lookup NSG resource in Azure for NIC association.
     name                = optional(string)
     resource_group_name = optional(string) # Resource group where NSG is located. If null, local.resource_group_name will be used.
-    tag                 = optional(string) # Tag to be used to lookup NSG from the output of module Azure-NetworkSecurityGroup
+    key                 = optional(string) # Tag to be used to lookup NSG from the output of module Azure-NetworkSecurityGroup
   })
+  description = "(Optional) Network Security Group to associate with the NIC. Only one NSG can be associated at this time to the NIC"
   default = null
 }
 
@@ -193,3 +217,10 @@ variable "loadbalancers" {
   default = {}
 }
 
+
+
+variable "edge_zone"{
+  type = string
+  description = " (Optional) Specifies the Edge Zone within the Azure Region where this Network Interface should exist. Changing this forces a new Network Interface to be created."
+  default = null
+}

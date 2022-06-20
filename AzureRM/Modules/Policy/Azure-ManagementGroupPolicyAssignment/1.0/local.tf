@@ -26,14 +26,14 @@ data "azurerm_policy_set_definition" "this" {
 locals {
   management_group_id = var.management_group.id == null ? (
     var.management_group.name == null ? (
-      var.management_groups[var.management_group.tag].id
+      var.management_groups[var.management_group.key].id
     ) : data.azurerm_management_group.this[0].id
   ) : var.management_group.id
 
   policy_definition_id = var.policy_definition == null ? null : (
     var.policy_definition.id == null ? (
       var.policy_definition.name == null ? (
-        var.policy_definitions[var.policy_definition.tag].id
+        var.policy_definitions[var.policy_definition.key].id
       ) : data.azurerm_policy_definition.this[0].id
     ) : var.policy_definition.id
   )
@@ -42,7 +42,7 @@ locals {
   policy_definition_set_id = var.policy_definition_set == null ? null : (
     var.policy_definition_set.id == null ? (
       var.policy_definition_set.name == null ? (
-        var.policy_definition_sets[var.policy_definition_set.tag].id
+        var.policy_definition_sets[var.policy_definition_set.key].id
       ) : data.azurerm_policy_set_definition.this[0].id
     ) : var.policy_definition_set.id
   )

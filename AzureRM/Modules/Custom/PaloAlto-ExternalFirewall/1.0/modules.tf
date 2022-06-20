@@ -103,8 +103,8 @@ module "PaloAlto-Firewall-VMs" {
   }
   network_interface = [
     {
-      #id = module.PaloAlto-mgmt-Network-Interfaces[each.key].id
-      name = "${each.value.name}_nic03"
+      id = module.PaloAlto-mgmt-Network-Interfaces[each.key].id
+      # name = "${each.value.name}_nic03"
     },
     {
       id = module.PaloAlto-trusted-Network-Interfaces[each.key].id

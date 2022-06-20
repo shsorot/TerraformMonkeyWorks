@@ -6,8 +6,8 @@ variable "name" {
 
 variable "resource_group" {
   type = object({
-    name = optional(string)
-    tag  = optional(string)
+    name = optional(string) # Name of the resource group
+    key  = optional(string) # Terraform Object Key to use to find the resource group from output of module Azure-ResourceGroup supplied to variable "resource_groups"
   })
   description = "(Required) The name of the resource group where to create the resource. Specify either the actual name or the Tag value that can be used to look up Resource group properties from output of module Azure-ResourceGroup."
 }
@@ -19,7 +19,13 @@ variable "resource_groups" {
     tags     = optional(map(string))
     name     = optional(string)
   }))
-  description = "(Optional) Output of Module Azure-ResourceGroup. Used to lookup RG properties using Tags"
+  description = <<EOF
+   (Optional) Output of Module Azure-ResourceGroup. Used to lookup RG properties using Terraform Object Keys"
+    id       = # ID of the resource group
+    location = # Location of the resource group
+    tags     = # List of Azure tags applied to resource group
+    name     = # Name of the resource group
+  EOF
   default     = {}
 }
 
@@ -79,7 +85,7 @@ variable "default_local_network_gateway" {
     id                  = optional(string)
     name                = optional(string)
     resource_group_name = optional(string)
-    tag                 = optional(string)
+    key                 = optional(string)
   })
   description = "(Optional) The ID of the local network gateway through which outbound Internet traffic from the virtual network in which the gateway is created will be routed (forced tunnelling). Refer to the Azure documentation on forced tunnelling. If not specified, forced tunnelling is disabled."
   default     = null
@@ -102,7 +108,7 @@ variable "sku" {
 variable "generation" {
   type        = string
   description = "(Optional) The Generation of the Virtual Network gateway. Possible values include Generation1, Generation2 or None."
-  default = "None"
+  default     = "None"
 }
 
 variable "ip_configuration" {
@@ -112,13 +118,13 @@ variable "ip_configuration" {
       id                   = optional(string)
       virtual_network_name = optional(string)
       resource_group_name  = optional(string)
-      virtual_network_tag  = optional(string)
+      virtual_network_key  = optional(string)
     })
     public_ip_address = object({ # (Required) The ID of the public ip address to associate with the Virtual Network Gateway.
       id                  = optional(string)
       name                = optional(string)
       resource_group_name = optional(string)
-      tag                 = optional(string)
+      key                 = optional(string)
     })
   })
 }

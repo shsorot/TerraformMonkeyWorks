@@ -8,63 +8,52 @@ variable "name" {
   type        = string
 }
 
-# variable "resource_group_name" {
-#     description = "(Required) The name of the resource group where to create the resource."
-#     type        = string
-# }
-
-# variable "resource_group" {
-#   type = object({
-#     name = optional(string)
-#     tag  = optional(string)
-#   })
-#   description = "(Required) The name of the resource group where to create the resource. Specify either the actual name or the Tag value that can be used to look up Resource group properties from output of module Azure-ResourceGroup."
-# }
-
-# variable "resource_groups" {
-#   type = map(object({
-#     id       = optional(string)
-#     location = optional(string)
-#     tags     = optional(map(string))
-#     name     = optional(string)
-#   }))
-#   description = "(Optional) Output of Module Azure-ResourceGroup. Used to lookup RG properties using Tags"
-#   default     = {}
-# }
-
-variable "automation_account"{
+variable "automation_account" {
   type = object({
-    id   = optional(string)                # Resource ID of existing automation account
-    name = optional(string)                # Required if id and tag are null
-    resource_group_name = optional(string) # Required if Name is specified
-    tag  = optional(string)                # Tag to lookup automation account details from output of module azure-automationaccount
+    id                  = optional(string) # (Optional)Resource ID of existing automation account. 
+    name                = optional(string) # (Optional)Name of the automation account to be used for fetching resource ID using data blocks, when property'id' is not available.
+    resource_group_name = optional(string) # (Optional)Resource group name to be used by data block to lookup automation account when 'name' is used.  Mandatory when using 'name'
+    key                 = optional(string) # (Optional)Terraform Object Key to lookup automation account details from output of module Azure-AutomationAccount
   })
+  description = <<EOF
+  (Required) The name of the automation account in which the Certificate is created. Changing this forces a new resource to be created.
+    id                  = # (Optional)Resource ID of existing automation account. 
+    name                = # (Optional)Name of the automation account to be used for fetching resource ID using data blocks, when property'id' is not available.
+    resource_group_name = # (Optional)Resource group name to be used by data block to lookup automation account when 'name' is used.  Mandatory when using 'name'
+    key                 = # (Optional)Terraform Object Key to lookup automation account details from output of module Azure-AutomationAccount
+  EOF
 }
 
-variable "automation_accounts"{
+variable "automation_accounts" {
   type = map(object({
-    id  = string
-    name = string
-    location = string
+    id       = string # (Optional)Resource ID of existing automation account from output of module Azure-AutomationAccount
+    name     = string # (Optional)Name of the automation account existing automation account from output of module Azure-AutomationAccount
+    location = string # (Optional)Location of existing automation account from output of module Azure-AutomationAccount
   }))
-  default = {}
+  description = "(Optional)Output of module Azure-AutomationAccount. Used to lookup automation account details using Terraform Object Keys"
+  default     = {}
 }
 
-variable "base64"{
+variable "base64" {
   type = object({
-    raw = optional(string) # Base64 encoded certificate content
-    file = optional(string)# relative file path to the Terraform root code calling this module. File must be a PFX format certificate.
+    raw  = optional(string) # Base64 encoded certificate content
+    file = optional(string) # relative file path to the Terraform root code calling this module. File must be a PFX format certificate.
   })
+  description = <<EOF
+    (Required) Base64 encoded value of the certificate. Changing this forces a new resource to be created.
+    raw  = # Base64 encoded certificate content
+    file = # relative file path to the Terraform root code calling this module. File must be a PFX format certificate.
+  EOF
 }
 
-variable "description"{
-  type = string
+variable "description" {
+  type        = string
   description = "(Optional) The description of this Automation Certificate."
-  default = null
+  default     = null
 }
 
-variable "exportable"{
-  type = bool
+variable "exportable" {
+  type        = bool
   description = "(Optional) The is exportable flag of the certificate.Defaults to false."
-  default = false
+  default     = false
 }

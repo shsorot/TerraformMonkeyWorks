@@ -10,8 +10,8 @@ variable "name" {
 
 variable "resource_group" {
   type = object({
-    name = optional(string)
-    tag  = optional(string)
+    name = optional(string) # Name of the resource group
+    key  = optional(string) # Terraform Object Key to use to find the resource group from output of module Azure-ResourceGroup supplied to variable "resource_groups"
   })
   description = "(Required) The name of the resource group where to create the resource. Specify either the actual name or the Tag value that can be used to look up Resource group properties from output of module Azure-ResourceGroup."
 }
@@ -23,7 +23,13 @@ variable "resource_groups" {
     tags     = optional(map(string))
     name     = optional(string)
   }))
-  description = "(Optional) Output of Module Azure-ResourceGroup. Used to lookup RG properties using Tags"
+  description = <<EOF
+   (Optional) Output of Module Azure-ResourceGroup. Used to lookup RG properties using Terraform Object Keys"
+    id       = # ID of the resource group
+    location = # Location of the resource group
+    tags     = # List of Azure tags applied to resource group
+    name     = # Name of the resource group
+  EOF
   default     = {}
 }
 
@@ -39,10 +45,12 @@ variable "tags" {
 }
 
 variable "inherit_tags" {
-  type    = bool
-  default = false
+  type        = bool
+  default     = false
+  description = "If true, the tags from the resource group will be applied to the resource in addition to tags in the variable 'tags'."
 }
 
+# Deprecated in provider version > 3.xx.x
 # variable "zones" {
 #   type        = list(number)
 #   description = "(Optional) A collection containing the availability zone to allocate the Managed Disk in."
@@ -80,7 +88,7 @@ variable "disk_encryption_set" {
     id                  = optional(string)
     name                = optional(string)
     resource_group_name = optional(string)
-    tag                 = optional(string)
+    key                 = optional(string)
   })
   description = "(Optional) The ID of a Disk Encryption Set which should be used to encrypt this Managed Disk."
   default     = null
@@ -106,27 +114,58 @@ variable "disk_mbps_read_write" {
   default     = null
 }
 
+
+variable "disk_iops_read_only" {
+  type        = number
+  description = " (Optional) The number of IOPS allowed across all VMs mounting the shared disk as read-only; only settable for UltraSSD disks with shared disk enabled. One operation can transfer between 4k and 256k bytes."
+  default     = null
+}
+
+variable "disk_mbps_read_only" {
+  type        = number
+  description = "(Optional) The bandwidth allowed across all VMs mounting the shared disk as read-only; only settable for UltraSSD disks with shared disk enabled. MBps means millions of bytes per second."
+  default     = null
+}
+
+
 variable "disk_size_gb" {
   type        = number
   description = "(Optional, Required for a new managed disk) Specifies the size of the managed disk to create in gigabytes. If create_option is Copy or FromImage, then the value must be equal to or greater than the source's size. The size can only be increased."
   default     = 32
 }
 
-variable "disk_encryption_key" {
-  type = object({
-    secret_url      = string #   (Required) The URL to the Key Vault Secret used as the Disk Encryption Key. This can be found as id on the azurerm_key_vault_secret resource.
-    source_vault_id = string #    (Required) The URL of the Key Vault. This can be found as vault_uri on the azurerm_key_vault resource.
-  })
-  description = "(Optional) A disk_encryption_key block for encryption_settings block"
+variable "edge_zone" {
+  type        = string
+  description = " (Optional) Specifies the Edge Zone within the Azure Region where this Managed Disk should exist. Changing this forces a new Managed Disk to be created."
   default     = null
 }
 
-variable "key_encryption_key" {
+# Added in provider > 3.xx.x
+variable "encryption_settings" {
   type = object({
-    key_url         = string #   (Required) The URL to the Key Vault Key used as the Key Encryption Key. This can be found as id on the azurerm_key_vault_key resource.
-    source_vault_id = string #   (Required) The ID of the source Key Vault.
+    enabled = bool
+    disk_encryption_key = object({
+      secret_url      = string #   (Required) The URL to the Key Vault Secret used as the Disk Encryption Key. This can be found as id on the azurerm_key_vault_secret resource.
+      source_vault_id = string #    (Required) The URL of the Key Vault. This can be found as vault_uri on the azurerm_key_vault resource.
+    })
+    key_encryption_key = object({
+      secret_url      = string #   (Required) The URL to the Key Vault Secret used as the Disk Encryption Key. This can be found as id on the azurerm_key_vault_secret resource.
+      source_vault_id = string #    (Required) The URL of the Key Vault. This can be found as vault_uri on the azurerm_key_vault resource.
+    })
   })
   default = null
+}
+
+variable "hyper_v_generation" {
+  type        = string
+  description = "(Optional) The HyperV Generation of the Disk when the source of an Import or Copy operation targets a source that contains an operating system. Possible values are V1 and V2. Changing this forces a new resource to be created."
+  default     = null
+}
+
+variable "gallery_image_reference_id" {
+  type        = string
+  description = "(Optional) ID of a Gallery Image Version to copy when create_option is FromImage. This field cannot be specified if image_reference_id is specified."
+  default     = null
 }
 
 variable "image_reference_id" {
@@ -135,11 +174,34 @@ variable "image_reference_id" {
   default     = null
 }
 
+variable "logical_sector_size" {
+  type        = number
+  description = "(Optional) Logical Sector Size. Possible values are: 512 and 4096. Defaults to 4096. Changing this forces a new resource to be created."
+  default     = 4096
+}
+
+variable "max_shares" {
+  type        = number
+  description = "(Optional) The maximum number of VMs that can attach to the disk at the same time. Value greater than one indicates a disk that can be mounted on multiple VMs at the same time."
+  default     = null
+}
+
+variable "public_network_access_enabled" {
+  type        = bool
+  description = "(Optional) Whether it is allowed to access the disk via public network. Defaults to true."
+  default     = true
+}
 
 variable "os_type" {
   type        = string
   description = "(Optional) Specify a value when the source of an Import or Copy operation targets a source that contains an operating system. Valid values are Linux or Windows."
   default     = null
+}
+
+variable "on_demand_bursting_enabled" {
+  type        = bool
+  description = "(Optional) Specifies if On-Demand Bursting is enabled for the Managed Disk. Defaults to false"
+  default     = false
 }
 
 variable "source_resource_id" {
@@ -158,6 +220,12 @@ variable "storage_account_id" {
   type        = string
   description = "(Optional) The ID of the Storage Account where the source_uri is located. Required when create_option is set to Import. Changing this forces a new resource to be created."
   default     = null
+}
+
+variable "trusted_launch_enabled" {
+  type        = bool
+  description = " (Optional) Specifies if Trusted Launch is enabled for the Managed Disk. Defaults to false."
+  default     = false
 }
 
 variable "tier" {

@@ -1,3 +1,4 @@
+# TODO : Add data block based lookup
 resource "azurerm_eventhub" "this" {
   name                = var.name
   namespace_name      = var.name
@@ -21,7 +22,7 @@ resource "azurerm_eventhub" "this" {
         blob_container_name = var.capture_description.dynamic.blob_container_name
         storage_account_id = var.capture_description.dynamic.storage_account.id == null ? (
           var.capture_description.dynamic.storage_account.name == null ? (
-            var.storage_accounts[var.capture_description.dynamic.storage_account.tag].id
+            var.storage_accounts[var.capture_description.dynamic.storage_account.key].id
           ) : "/subscriptions/${local.subscription_id}/resourceGroups/${var.capture_description.dynamic.storage_account.resource_group_name == null ? local.resource_group_name : var.capture_description.dynamic.storage_account.resource_group_name}/providers/Microsoft.Storage/storageAccounts/${var.capture_description.dynamic.storage_account.name}"
         ) : var.capture_description.dynamic.storage_account.id
       }

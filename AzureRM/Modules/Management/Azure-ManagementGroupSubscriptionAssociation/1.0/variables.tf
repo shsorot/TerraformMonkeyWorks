@@ -2,7 +2,7 @@ variable "management_group" {
   type = object({
     id   = optional(string)
     name = optional(string)
-    tag  = optional(string)
+    key  = optional(string)
   })
   description = "(Optional) The ID of the Parent Management Group. Changing this forces a new resource to be created."
   default     = null

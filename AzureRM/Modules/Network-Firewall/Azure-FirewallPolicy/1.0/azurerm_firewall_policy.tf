@@ -5,22 +5,22 @@ resource "azurerm_firewall_policy" "this" {
   tags                = local.tags
   # Currently this can only be looked up when either policy ID or a policy name/resource group is excplicitly provided
   # Cannot be looked up using output of module Azure-FirewallPolicy as it would cause a circular link in Terrafrom dependency graph.
-  base_policy_id      = local.base_policy_id
+  base_policy_id = local.base_policy_id
 
   # Single block, Optional
   dynamic "dns" {
     for_each = var.dns == null ? [] : [1]
     content {
-      proxy_enabled             = var.dns.proxy_enabled
-      servers                   = var.dns.servers
+      proxy_enabled = var.dns.proxy_enabled
+      servers       = var.dns.servers
     }
   }
   # Single block, Optional
   dynamic "identity" {
     for_each = local.identity == null ? [] : [1]
     content {
-      type                     = local.identity.type
-      identity_ids             = local.identity.identity_ids
+      type         = local.identity.type
+      identity_ids = local.identity.identity_ids
     }
   }
 
@@ -28,9 +28,9 @@ resource "azurerm_firewall_policy" "this" {
   dynamic "insights" {
     for_each = local.insights == null ? [] : [1]
     content {
-      enabled                              = local.insights.enabled
+      enabled                            = local.insights.enabled
       default_log_analytics_workspace_id = local.insights.default_log_analytics_workspace_id
-      retention_in_days                       = local.insights.retention_in_days
+      retention_in_days                  = local.insights.retention_in_days
       # This is classified as List of blocks, investigate.
       dynamic "log_analytics_workspace" {
         for_each = local.insights.log_analytics_workspace
@@ -89,11 +89,11 @@ resource "azurerm_firewall_policy" "this" {
   threat_intelligence_mode = var.threat_intelligence_mode == null ? "Alert" : var.threat_intelligence_mode
 
   # Single block, Optional
-  dynamic "tls_certificate"{
+  dynamic "tls_certificate" {
     for_each = local.tls_certificate == null ? [] : [1]
     content {
       key_vault_secret_id = local.tls_certificate.key_vault_secret_id
-      name = local.tls_certificate.name
+      name                = local.tls_certificate.name
     }
   }
 

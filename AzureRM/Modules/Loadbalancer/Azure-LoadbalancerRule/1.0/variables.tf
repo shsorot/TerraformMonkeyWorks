@@ -8,7 +8,7 @@ variable "loadbalancer" {
     id                  = optional(string)
     name                = optional(string)
     resource_group_name = optional(string)
-    tag                 = optional(string)
+    key                 = optional(string)
   })
   description = "(Required) The ID of the Load Balancer in which to create the Rule."
 }
@@ -43,7 +43,7 @@ variable "backend_address_pool" {
   type = list(object({
     id   = optional(string)
     name = optional(string)
-    tag  = optional(string)
+    key  = optional(string)
   }))
   description = "(Optional) A list of reference to a Backend Address Pool over which this Load Balancing Rule operates."
   default     = null
@@ -59,7 +59,7 @@ variable "probe" {
   type = object({
     id   = optional(string)
     name = optional(string)
-    tag  = optional(string)
+    key  = optional(string)
   })
   default     = null
   description = "Optional) A reference to a Probe used by this Load Balancing Rule."

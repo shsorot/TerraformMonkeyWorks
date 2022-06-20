@@ -1,10 +1,13 @@
-# <TODO> assign data block and list based lookup for scope and resource types when scope is < subscription
 resource "azurerm_role_definition" "this" {
   role_definition_id = var.role_definition_id
   name               = var.name
-  scope              = var.scope
-  description        = var.description
-  assignable_scopes  = var.assignable_scopes
+  # Currently this must be explicitly specified.
+  # TODO : investigate possible discovery using data block
+  scope       = local.scope
+  description = var.description
+  # Currently this must be explicitly specified.
+  # TODO : investigate possible discovery using data block
+  assignable_scopes = local.assignable_scopes
   dynamic "permissions" {
     for_each = var.permissions == null ? [] : [1]
     content {

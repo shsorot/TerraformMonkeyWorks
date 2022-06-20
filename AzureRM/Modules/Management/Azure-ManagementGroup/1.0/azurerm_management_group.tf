@@ -1,5 +1,5 @@
 resource "azurerm_management_group" "this" {
-  name                       = var.name
+  name = var.name
   # Deprecated from provider > 3.00.0
   # group_id                   = var.group_id
   display_name               = var.display_name

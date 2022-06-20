@@ -1,3 +1,4 @@
+# TODO : Add data block based lookup
 resource "azurerm_eventhub_namespace" "this" {
   name                 = var.name
   resource_group_name  = local.resource_group_name
@@ -9,7 +10,7 @@ resource "azurerm_eventhub_namespace" "this" {
   dedicated_cluster_id = var.dedicated_cluster == null ? null : (
     var.dedicated_cluster.id == null ? (
       var.dedicated_cluster.name == null ? (
-        var.dedicated_clusters[var.dedicated_cluster.tag].id
+        var.dedicated_clusters[var.dedicated_cluster.key].id
       ) : "/subscriptions/${local.subscription_id}/resourceGroups/${var.dedicated_cluster.resource_group_name == null ? local.resource_group_name : var.dedicated_cluster.resource_group_name}/providers/Microsoft.EventHub/clusters/${var.dedicated_cluster.name}"
     ) : var.dedicated_cluster.id
   )
@@ -31,7 +32,7 @@ resource "azurerm_eventhub_namespace" "this" {
         content {
           subnet_id = virtual_network_rule.subnet.id == null ? (
             virtual_network_rule.subnet.name == null && virtual_network_rule.subnet.virtual_network_name == null ? (
-              var.virtual_networks[virtual_network_rule.subnet.tag].subnets[virtual_network_rule.subnet.virtual_network_tag].id
+              var.virtual_networks[virtual_network_rule.subnet.key].subnets[virtual_network_rule.subnet.virtual_network_tag].id
             ) : "/subscriptions/${local.subscription_id}/resourceGroups/${virtual_network_rule.subnet.resource_group_name == null ? local.resource_group_name : virtual_network_rule.subnet.resource_group_name}/providers/Microsoft.Network/virtualNetworks/${virtual_network_rule.subnet.virtual_network_name}/subnets/${virtual_network_rule.subnet.name}"
           ) : virtual_network_rule.subnet.id
         }

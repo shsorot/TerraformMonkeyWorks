@@ -24,7 +24,7 @@ locals {
   dedicated_host_group_id = var.dedicated_host_group == null ? null : (
     var.dedicated_host_group.id == null ? (
       var.dedicated_host_group.name == null && var.dedicated_host_group.resource_group_name == null ? (
-        var.dedicated_host_groups[var.dedicated_host_group.tag].id
+        var.dedicated_host_groups[var.dedicated_host_group.key].id
       ) : data.azurerm_dedicated_host_group.this[0].id
     ) : var.dedicated_host_group.id
   )

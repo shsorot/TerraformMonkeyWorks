@@ -6,8 +6,8 @@ variable "name" {
 
 variable "resource_group" {
   type = object({
-    name = optional(string)
-    tag  = optional(string)
+    name = optional(string) # Name of the resource group
+    key  = optional(string) # Terraform Object Key to use to find the resource group from output of module Azure-ResourceGroup supplied to variable "resource_groups"
   })
   description = "(Required) The name of the resource group where to create the resource. Specify either the actual name or the Tag value that can be used to look up Resource group properties from output of module Azure-ResourceGroup."
 }
@@ -19,7 +19,13 @@ variable "resource_groups" {
     tags     = optional(map(string))
     name     = optional(string)
   }))
-  description = "(Optional) Output of Module Azure-ResourceGroup. Used to lookup RG properties using Tags"
+  description = <<EOF
+   (Optional) Output of Module Azure-ResourceGroup. Used to lookup RG properties using Terraform Object Keys"
+    id       = # ID of the resource group
+    location = # Location of the resource group
+    tags     = # List of Azure tags applied to resource group
+    name     = # Name of the resource group
+  EOF
   default     = {}
 }
 
@@ -31,18 +37,20 @@ variable "location" {
 
 variable "tags" {
   type    = map(string)
+  description = " (Optional) A mapping of tags to assign to the resource."
   default = {}
 }
 
 variable "inherit_tags" {
-  type    = bool
-  default = false
+  type        = bool
+  default     = false
+  description = "If true, the tags from the resource group will be applied to the resource in addition to tags in the variable 'tags'."
 }
 
 variable "account" {
   type = object({
     name = optional(string) # Name of the NetApp Account 
-    tag  = optional(string) # alternatively, the tag specifying the NetApp Account from the output of module Azure-NetAppAccount
+    key  = optional(string) # alternatively, the tag specifying the NetApp Account from the output of module Azure-NetAppAccount
   })
   description = "(Required) The name of the NetApp Account. Specify either the actual name or the Tag value that can be used to look up NetApp Account properties from output of module Azure-NetAppAccount."
 }
@@ -59,7 +67,7 @@ variable "netapp_accounts" {
 variable "pool" {
   type = object({
     name = optional(string) # Name of the NetApp Capacity pool located in the NetApp Account specified in variable "account"
-    tag  = optional(string) # alternatively, the tag specifying the NetApp Pool from the output of module Azure-NetAppPool
+    key  = optional(string) # alternatively, the tag specifying the NetApp Pool from the output of module Azure-NetAppPool
   })
   description = "(Required) The name of the NetApp Pool. Specify either the actual name or the Tag value that can be used to look up NetApp Account properties from output of module Azure-NetAppPool."
 }
@@ -106,7 +114,7 @@ variable "subnet" {
     virtual_network_name = optional(string)
     resource_group_name  = optional(string)
     tag                  = optional(string)
-    virtual_network_tag  = optional(string)
+    virtual_network_key  = optional(string)
   })
 }
 
@@ -141,25 +149,25 @@ variable "snapshot_directory_visible" {
 #   default     = null
 # }
 variable "create_from_snapshot_resource" {
-  type        = object({
+  type = object({
     id                  = optional(string)
     name                = optional(string)
     resource_group_name = optional(string)
     account_name        = optional(string)
     pool_name           = optional(string)
     volume_name         = optional(string)
-    tag                 = optional(string)
+    key                 = optional(string)
   })
   description = "(Optional) Creates volume from snapshot. Following properties must be the same as the original volume where the snapshot was taken from: protocols, subnet_id, location, service_level, resource_group_name, account_name and pool_name."
   default     = null
 }
 
-variable "netapp_snapshots"{
+variable "netapp_snapshots" {
   type = map(object({
-    id                  = string
+    id = string
   }))
   description = "(Optional) Output of module Azure-NetAppSnapshot. Used to lookup NetApp Snapshot properties using Tags"
-  default = {}
+  default     = {}
 }
 
 variable "data_protection_replication" {
@@ -175,9 +183,9 @@ variable "data_protection_replication" {
 # TODO : add remote subscription lookup capability 
 variable "data_protection_snapshot_policy" {
   type = object({
-      id   = optional(string) # Resource ID of the Snapshot policy
-      name = optional(string) # Name of the Snapshot policy existing within the NetApp Account
-      tag  = optional(string) # Name of the Snapshot policy Tag available in the output of Azure-NetAppSnapshotPolicy
+    id   = optional(string) # Resource ID of the Snapshot policy
+    name = optional(string) # Name of the Snapshot policy existing within the NetApp Account
+    key  = optional(string) # Name of the Snapshot policy Tag available in the output of Azure-NetAppSnapshotPolicy
   })
   default = null
 }
@@ -192,12 +200,12 @@ variable "snapshot_policies" {
 
 variable "export_policy_rule" {
   type = list(object({
-    rule_index          = number         # (Required) The index number of the rule.
-    allowed_clients     = list(string)   # (Required) The list of clients allowed to access the volume.
-    protocols_enabled   = optional(list(string))   # (Required) A list of allowed protocols. Valid values include CIFS, NFSv3, or NFSv4.1. Only one value is supported at this time. This replaces the previous arguments: cifs_enabled, nfsv3_enabled and nfsv4_enabled.
-    unix_read_only      = optional(bool) #  (Optional) Is the file system on unix read only?
-    unix_read_write     = optional(bool) #  (Optional) Is the file system on unix read write?
-    root_access_enabled = optional(bool) # (Optional) Is root access permitted to this volume?
+    rule_index          = number                 # (Required) The index number of the rule.
+    allowed_clients     = list(string)           # (Required) The list of clients allowed to access the volume.
+    protocols_enabled   = optional(list(string)) # (Required) A list of allowed protocols. Valid values include CIFS, NFSv3, or NFSv4.1. Only one value is supported at this time. This replaces the previous arguments: cifs_enabled, nfsv3_enabled and nfsv4_enabled.
+    unix_read_only      = optional(bool)         #  (Optional) Is the file system on unix read only?
+    unix_read_write     = optional(bool)         #  (Optional) Is the file system on unix read write?
+    root_access_enabled = optional(bool)         # (Optional) Is root access permitted to this volume?
   }))
   description = "(Required) Export policy block for the given volume."
 }

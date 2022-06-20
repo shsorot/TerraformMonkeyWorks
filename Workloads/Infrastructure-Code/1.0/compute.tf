@@ -160,18 +160,16 @@ variable "DiskEncryptionSets" {
 }
 
 module "Landscape-Disk-Encryption-Sets" {
-  source                    = "../../../AzureRM/Modules/Compute/Azure-DiskEncryptionSet/1.0"
-  for_each                  = var.DiskEncryptionSets
-  name                      = each.value.name == null ? each.key : each.value.name
-  resource_group            = each.value.resource_group
-  location                  = try(each.value.location, null)
-  tags                      = try(each.value.tags, local.tags)
-  inherit_tags              = try(each.value.inherit_tags, false)
-  key_vault_key             = each.value.key_vault_key
-  identity                  = try(each.value.identity, null)
-  auto_key_rotation_enabled = try(each.value.auto_key_rotation_enabled, false)
-  encryption_type           = try(each.value.encryption_type, "EncryptionAtRestWithCustomerKey")
-  resource_groups           = module.Landscape-Resource-Groups
+  source          = "../../../AzureRM/Modules/Compute/Azure-DiskEncryptionSet/1.0"
+  for_each        = var.DiskEncryptionSets
+  name            = each.value.name == null ? each.key : each.value.name
+  resource_group  = each.value.resource_group
+  location        = try(each.value.location, null)
+  tags            = try(each.value.tags, local.tags)
+  inherit_tags    = try(each.value.inherit_tags, false)
+  key_vault_key   = each.value.key_vault_key
+  identity        = try(each.value.identity, null)
+  resource_groups = module.Landscape-Resource-Groups
 }
 
 output "DiskEncryptionSets" {
@@ -185,62 +183,36 @@ variable "ManagedDisks" {
 }
 
 module "Landscape-Managed-Disks" {
-  source                        = "../../../AzureRM/Modules/Compute/Azure-ManagedDisk/1.0"
-  for_each                      = var.ManagedDisks
-  name                          = each.value.name == null ? each.key : each.value.name
-  resource_group                = each.value.resource_group
-  location                      = try(each.value.location, null)
-  tags                          = try(each.value.tags, local.tags)
-  inherit_tags                  = try(each.value.inherit_tags, false)
-  zone                          = try(each.value.zone, null)
-  storage_account_type          = try(each.value.storage_account_type, "Standard_LRS")
-  create_option                 = try(each.value.create_option, "Empty")
-  disk_encryption_set           = try(each.value.disk_encryption_set_id, null)
-  disk_iops_read_write          = try(each.value.disk_iops_read_write, null)
-  disk_mbps_read_write          = try(each.value.disk_mbps_read_write, null)
-  disk_iops_read_only           = try(each.value.disk_iops_read_only, null)
-  disk_mbps_read_only           = try(each.value.disk_mbps_read_only, null)
-  disk_size_gb                  = try(each.value.disk_size_gb, 32)
-  edge_zone                     = try(each.value.edge_zone, null)
-  encryption_settings           = try(each.value.encryption_settings, null)
-  hyper_v_generation            = try(each.value.hyper_v_generation, null)
-  image_reference_id            = try(each.value.image_reference_id, null)
-  gallery_image_reference_id    = try(each.value.gallery_image_reference_id, null)
-  logical_sector_size           = try(each.value.logical_sector_size, 4096)
-  max_shares                    = try(each.value.max_shares, null)
-  public_network_access_enabled = try(each.value.public_network_access_enabled, true)
-  os_type                       = try(each.value.os_type, null)
-  on_demand_bursting_enabled    = try(each.value.on_demand_bursting_enabled, false)
-  source_resource_id            = try(each.value.source_resource_id, null)
-  source_uri                    = try(each.value.source_uri, null)
-  storage_account_id            = try(each.value.storage_account_id, null)
-  tier                          = try(each.value.tier, null)
-  trusted_launch_enabled        = try(each.value.trusted_launch_enabled, false)
-  network_access_policy         = try(each.value.network_access_policy, "AllowAll")
-  disk_access_id                = try(each.value.disk_access_id, null)
-  resource_groups               = module.Landscape-Resource-Groups
+  source                = "../../../AzureRM/Modules/Compute/Azure-ManagedDisk/1.0"
+  for_each              = var.ManagedDisks
+  name                  = each.value.name == null ? each.key : each.value.name
+  resource_group        = each.value.resource_group
+  location              = try(each.value.location, null)
+  tags                  = try(each.value.tags, local.tags)
+  inherit_tags          = try(each.value.inherit_tags, false)
+  zone                  = try(each.value.zone, null)
+  storage_account_type  = try(each.value.storage_account_type, "Standard_LRS")
+  create_option         = try(each.value.create_option, "Empty")
+  disk_encryption_set   = try(each.value.disk_encryption_set_id, null)
+  disk_iops_read_write  = try(each.value.disk_iops_read_write, null)
+  disk_mbps_read_write  = try(each.value.disk_mbps_read_write, null)
+  disk_size_gb          = try(each.value.disk_size_gb, 32)
+  disk_encryption_key   = try(each.value.disk_encryption_key, null)
+  key_encryption_key    = try(each.value.key_encryption_key, null)
+  image_reference_id    = try(each.value.image_reference_id, null)
+  os_type               = try(each.value.os_type, null)
+  source_resource_id    = try(each.value.source_resource_id, null)
+  source_uri            = try(each.value.source_uri, null)
+  storage_account_id    = try(each.value.storage_account_id, null)
+  tier                  = try(each.value.tier, null)
+  network_access_policy = try(each.value.network_access_policy, "AllowAll")
+  disk_access_id        = try(each.value.disk_access_id, null)
+  resource_groups       = module.Landscape-Resource-Groups
 }
 
 
 output "ManagedDisks" {
   value = module.Landscape-Managed-Disks
-}
-
-variable "ManagedDiskSASTokens"{
-  default = {}
-}
-
-module "Landscape-Disk-SASToken" {
-  source = "../../../AzureRM/Modules/Compute/Azure-DiskSASToken/1.0"
-  for_each = var.ManagedDiskSASTokens
-  managed_disk = each.value.managed_disk
-  duration_in_seconds = each.value.duration_in_seconds
-  access_level = each.value.access_level
-  managed_disks = module.Landscape-Managed-Disks
-}
-
-output "ManagedDiskSASTokens"{
-  value = module.Landscape-Disk-SASToken
 }
 
 variable "LinuxVirtualMachines" {
@@ -270,42 +242,33 @@ module "Landscape-Azure-Linux-Virtual-Machines" {
   boot_diagnostics                = try(each.value.boot_diagnostics, null)
   computer_name                   = try(each.value.computer_name, null)
   custom_data                     = try(each.value.custom_data, null)
-  dedicated_host                  = try(each.value.dedicated_host, null)
-  dedicated_host_group            = try(each.value.dedicated_host_group, null)
-  edge_zone                       = try(each.value.edge_zone, null)
+  dedicated_host                  = try(each.value.dedicated_host_id, null)
   encryption_at_host_enabled      = try(each.value.encryption_at_host_enabled, false)
   eviction_policy                 = try(each.value.eviction_policy, null)
   extensions_time_budget          = try(each.value.extensions_time_budget, "PT1H30M")
   identity                        = try(each.value.identity, null)
   license_type                    = try(each.value.license_type, null)
   max_bid_price                   = try(each.value.max_bid_price, null)
-  patch_mode                      = try(each.value.patch_mode, "ImageDefault")
   plan                            = try(each.value.plan, null)
   platform_fault_domain           = try(each.value.platform_fault_domain, null)
   priority                        = try(each.value.priority, "Regular")
   provision_vm_agent              = try(each.value.provision_vm_agent, true)
   proximity_placement_group       = try(each.value.proximity_placement_group, null)
   secret                          = try(each.value.secret, null)
-  secure_boot_enabled             = try(each.value.secure_boot_enabled, false)
-  source_image                    = try(each.value.source_image_id, null)
+  source_image_id                 = try(each.value.source_image_id, null)
   source_image_reference          = try(each.value.source_image_reference, null)
-  termination_notification        = try(each.value.termination_notification, null)
-  user_data                       = try(each.value.user_data, null)
   virtual_machine_scale_set       = try(each.value.virtual_machine_scale_set_id, null)
-  vtpm_enabled                    = try(each.value.vtpm_enabled, false)
 
   #Outputs from modules for lookup
-  azure_images               = module.Landscape-Azure-Images
-  dedicated_hosts            = module.Landscape-Azure-Dedicated-Hosts
-  dedicated_host_groups      = module.Landscape-Azure-Dedicated-Host-Groups
-  virtual_machine_scale_sets = {}
-  disk_encryption_sets       = module.Landscape-Disk-Encryption-Sets
-  network_interfaces         = module.Landscape-Virtual-Network-Interfaces
-  key_vaults                 = module.Landscape-Key-Vaults
-  availability_sets          = module.Landscape-Availability-Sets
-  proximity_placement_groups = module.Landscape-ProximityPlacement-Groups
-  resource_groups            = module.Landscape-Resource-Groups
-  user_assigned_identities   = module.Landscape-User-Assigned-Identities
+  dedicated_hosts                                 = module.Landscape-Azure-Dedicated-Hosts
+  azurerm_orchestrated_virtual_machine_scale_sets = {}
+  disk_encryption_sets                            = module.Landscape-Disk-Encryption-Sets
+  network_interfaces                              = module.Landscape-Virtual-Network-Interfaces
+  key_vaults                                      = module.Landscape-Key-Vaults
+  availability_sets                               = module.Landscape-Availability-Sets
+  proximity_placement_groups                      = module.Landscape-ProximityPlacement-Groups
+  resource_groups                                 = module.Landscape-Resource-Groups
+  user_assigned_identities                        = module.Landscape-User-Assigned-Identities
 }
 
 output "LinuxVirtualMachines" {
@@ -375,6 +338,62 @@ module "Landscape-Azure-Windows-Virtual-Machines" {
 output "WindowsVirtualMachines" {
   value = module.Landscape-Azure-Windows-Virtual-Machines
 }
+
+
+
+# variable "VirtualMachines" {
+#   default = {}
+# }
+
+# module "Landscape-Azure-Virtual-Machines"{
+#   source      = "../../../AzureRM/Modules/Compute/Azure-VirtualMachine/1.0"
+#   for_each    = var.VirtualMachines
+#     name                            =   each.value.name == null ? each.key : each.value.name
+#     resource_group             = try(each.value.resource_group,null)
+#     location                        = try(try(each.value.location,null),null)
+#     tags                            = try(each.value.tags,local.tags)
+#     zones                           = try(each.value.zones,null)
+#     network_interface_ids           = try(each.value.network_interface_ids,null)
+#     network_interface_tags          = try(each.value.network_interface_tags,null)
+#     is_windows                      = try(each.value.is_windows,null)
+#     os_profile_secrets              = try(each.value.os_profile_secrets,null)
+#     disable_password_authentication = try(each.value.disable_password_authentication,false)
+#     ssh_keys                        = try(each.value.ssh_keys,null)
+#     provision_vm_agent              = try(each.value.provision_vm_agent,null)
+#     enable_automatic_upgrades       = try(each.value.enable_automatic_upgrades,null)
+#     timezone                        = try(each.value.timezone,null)
+#     winrm_listener                  = try(each.value.winrm_listener,null)
+#     additional_unattend_config      = try(each.value.additional_unattend_config,null)
+#     vm_size                         = try(each.value.size,"Standard_DS1_v2")
+#     availability_set_id             = try(each.value.availability_set_id,null)
+#     availability_set_tag            = try(each.value.availability_set_tag,null)
+#     boot_diagnostic_storage_account = try(each.value.boot_diagnostic_storage_account,null)
+#     ultra_ssd_enabled               = try(each.value.ultra_ssd_enabled,null)
+#     delete_os_disk_on_termination  = try(each.value.delete_os_disk_on_termination,false)
+#     delete_data_disks_on_termination= try(each.value.delete_data_disk_on_termination,false)
+#     identity                        = try(each.value.identity,null)
+#     license_type                    = try(each.value.license_type,null)
+#     computer_name                   = try(each.value.computer_name,null)
+#     admin_username                  = try(each.value.admin_username,null)
+#     admin_password                  = try(each.value.admin_password,null)
+#     os_profile_custom_data          = try(each.value.os_profile_custom_data,null)
+#     plan                            = try(each.value.plan,null)
+#     proximity_placement_group_id    = try(each.value.proximity_placement_group_id,null)
+#     proximity_placement_group_tag   = try(each.value.proximity_placement_group_tag,null)
+#     storage_data_disk               = try(each.value.storage_data_disk,[])
+#     storage_os_disk                 = try(each.value.storage_os_disk,{})
+#     storage_image_reference         = try(each.value.storage_image_reference,null)
+#   network_interfaces                = module.Landscape-Virtual-Network-Interfaces
+#   availability_sets                 = module.Landscape-Availability-Sets
+#   proximity_placement_groups        = module.Landscape-ProximityPlacement-Groups
+#   depends_on                     =   [module.Landscape-Resource-Groups,module.Landscape-Availability-Sets,module.Landscape-Virtual-Network-Interfaces,module.Landscape-ProximityPlacement-Groups]
+# }
+
+
+# output "VirtualMachines" {
+#   value = module.Landscape-Azure-Virtual-Machines
+# }
+
 
 
 
@@ -450,30 +469,4 @@ module "Landscape-ADDS-DomainJoin" {
 
 output "ADDS-DomainJoin" {
   value = module.Landscape-ADDS-DomainJoin
-}
-
-# TODO : add code for Azure-Image once VM functions are completed.
-variable "AzureImages"{
-  default = {}
-}
-
-module "Landscape-Azure-Images"{
-  source                         = "../../../AzureRM/Modules/Compute/Azure-Image/1.0"
-  for_each                       = var.AzureImages
-  name                           = each.value.name == null ? each.key : each.value.name
-  resource_group                 = each.value.resource_group
-  location                       = each.value.location
-  tags                           = try(each.value.tags,null)
-  inherit_tags                   = try(each.value.inherit_tags, false)
-  source_virtual_machine         = try(each.value.source_virtual_machine.null)
-  os_disk                        = try(each.value.os_disk,null)
-  data_disk                      = try(each.value.data_disk,[])
-  zone_resilient                 = try(each.value.zone_resilient,false)
-  hyper_v_generation             = try(each.value.hyper_v_generation,"V1")
-  #Outputs from modules for lookup
-  resource_groups                = module.Landscape-Resource-Groups
-}
-
-output "AzureImages"{
-  value = module.Landscape-Azure-Images
 }

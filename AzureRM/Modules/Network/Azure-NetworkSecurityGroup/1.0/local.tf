@@ -15,15 +15,15 @@ locals {
   tenant_id               = data.azurerm_client_config.current.tenant_id
   object_id               = data.azurerm_client_config.current.object_id
   subscription_id         = data.azurerm_subscription.current.subscription_id
-  resource_group_name     = var.resource_group.name == null ? var.resource_groups[var.resource_group.tag].name : data.azurerm_resource_group.this[0].name
-  resource_group_tags     = var.resource_group.name == null ? var.resource_groups[var.resource_group.tag].tags : data.azurerm_resource_group.this[0].tags
+  resource_group_name     = var.resource_group.name == null ? var.resource_groups[var.resource_group.key].name : data.azurerm_resource_group.this[0].name
+  resource_group_tags     = var.resource_group.name == null ? var.resource_groups[var.resource_group.key].tags : data.azurerm_resource_group.this[0].tags
   tags                    = merge(var.tags, (var.inherit_tags == true ? local.resource_group_tags : {}))
-  resource_group_location = var.resource_group.name == null ? var.resource_groups[var.resource_group.tag].location : data.azurerm_resource_group.this[0].location
+  resource_group_location = var.resource_group.name == null ? var.resource_groups[var.resource_group.key].location : data.azurerm_resource_group.this[0].location
   location                = var.location == null ? local.resource_group_location : var.location
 
 }
 
-# TODO, Data block lookup for Application security groups
+# TODO : Add data block based lookup
 
 # Specific to NSG rule assignment.
 locals {
@@ -44,7 +44,7 @@ locals {
       (
         asg.id == null ? (
           asg.name == null ? (
-            var.application_security_groups[asg.tag].id
+            var.application_security_groups[asg.key].id
           ) : "/subscriptions/${local.subscription_id}/resourceGroups/${asg.resource_group_name == null ? local.resource_group_name : asg.resource_group_name}/providers/Microsoft.Network/applicationSecurityGroups/${asg.name}"
         ) : asg.id
       )
@@ -57,7 +57,7 @@ locals {
       (
         asg.id == null ? (
           asg.name == null ? (
-            var.application_security_groups[asg.tag].id
+            var.application_security_groups[asg.key].id
           ) : "/subscriptions/${local.subscription_id}/resourceGroups/${asg.resource_group_name == null ? local.resource_group_name : asg.resource_group_name}/providers/Microsoft.Network/applicationSecurityGroups/${asg.name}"
         ) : asg.id
       )

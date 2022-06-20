@@ -9,7 +9,7 @@ resource "azurerm_automation_account" "this" {
 
   # Added identity block to support Azure Automation Account with Managed Identity
   # Single block
-  dynamic "identity"{
+  dynamic "identity" {
     for_each = local.identity == null ? [] : [1]
     content {
       type = local.identity.type

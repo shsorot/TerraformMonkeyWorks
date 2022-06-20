@@ -7,29 +7,27 @@ resource "azurerm_network_interface" "this" {
   internal_dns_name_label       = var.internal_dns_name_label
   tags                          = local.tags
 
+  # Multiple blocks, Mandatory
+  # TODO : add idx,instance style loop to select first list object as primary
+  # TODO : Add data block based lookup
   dynamic "ip_configuration" {
-    for_each = var.ip_configuration
+    for_each = { for idx, instance in local.ip_configuration : idx => instance }
     content {
       name = ip_configuration.value.name
-      subnet_id = ip_configuration.value.subnet.id == null ? (
-        ip_configuration.value.subnet.name == null && ip_configuration.value.subnet.virtual_network_name == null ? (
-          var.virtual_networks[ip_configuration.value.subnet.virtual_network_tag].subnet[ip_configuration.value.subnet.tag].id
-        ) : "/subscriptions/${local.subscription_id}/resourceGroups/${ip_configuration.value.subnet.resource_group_name == null ? local.resource_group_name : ip_configuration.value.subnet.resource_group_name}/providers/Microsoft.Network/virtualNetworks/${ip_configuration.value.subnet.virtual_network_name}/subnets/${ip_configuration.value.subnet.name}"
-      ) : ip_configuration.value.subnet.id
-
+      subnet_id = ip_configuration.value.subnet_id
       private_ip_address_version    = ip_configuration.value.private_ip_address_version
       private_ip_address_allocation = ip_configuration.value.private_ip_address == null ? "Dynamic" : "Static"
       private_ip_address            = ip_configuration.value.private_ip_address
 
-      public_ip_address_id = ip_configuration.value.public_ip_address == null ? null : (
-        ip_configuration.value.public_ip_address.id == null ? (
-          ip_configuration.value.public_ip_address.name == null ? (
-            var.public_ip_addresses[ip_configuration.value.public_ip_address.tag].id
-          ) : "/subscriptions/${local.subscription_id}/resourceGroups/${ip_configuration.value.public_ip_address.resource_group_name == null ? local.resource_group_name : ip_configuration.value.public_ip_address.resource_group_name}/providers/Microsoft.Network/publicIPAddresses/${ip_configuration.value.public_ip_address.name}"
-        ) : ip_configuration.value.public_ip_address.id
-      )
-
-      primary = ip_configuration.value.primary == null ? (var.ip_configuration[0].name == ip_configuration.value.name ? true : false) : ip_configuration.value.primary
+      public_ip_address_id = ip_configuration.value.public_ip_address_id
+      # TODO : find a way to detect and set first IPConfig as primary if none of the configs have this property
+      primary = ip_configuration.value.primary
     }
   }
+
+  # Added in provider > 3.xx.0
+  edge_zone = var.edge_zone
+  dns_servers = var.dns_servers
+
+
 }

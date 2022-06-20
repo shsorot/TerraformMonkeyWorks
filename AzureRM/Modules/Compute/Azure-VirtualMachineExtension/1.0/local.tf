@@ -25,7 +25,7 @@ data "azurerm_virtual_machine" "this" {
 locals {
   virtual_machine_id = var.virtual_machine.id == null ? (
     var.virtual_machine.name == null && var.virtual_machine.resource_group_name == null ? (
-      var.virtual_machines[var.virtual_machine.tag].id
+      var.virtual_machines[var.virtual_machine.key].id
     ) : data.azurerm_virtual_machine.this[0].id
   ) : var.virtual_machine.id
 }

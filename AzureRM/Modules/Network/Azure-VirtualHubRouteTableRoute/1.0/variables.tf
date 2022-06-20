@@ -9,7 +9,7 @@ variable "route_table" {
     name                = optional(string)
     virtual_hub_name    = optional(string)
     resource_group_name = optional(string)
-    tag                 = optional(string)
+    key                 = optional(string)
   })
 }
 variable "route_tables" {
@@ -36,7 +36,7 @@ variable "next_hop" {
     name                = optional(string)
     resource_group_name = optional(string)
     virtual_hub_name    = optional(string)
-    tag                 = optional(string)
+    key                 = optional(string)
   })
   description = "(Required) The next hop's resource ID ( azurerm_virtual_hub_connection )"
 }

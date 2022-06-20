@@ -4,7 +4,7 @@ variable "backend_address_pool" {
     name                = optional(string)
     loadbalancer_name   = optional(string)
     resource_group_name = optional(string)
-    tag                 = optional(string)
+    key                 = optional(string)
   })
   description = "(Required) The ID of the Backend Address Pool. Changing this forces a new Backend Address Pool Address to be created."
 }
@@ -24,7 +24,7 @@ variable "virtual_network" {
     id                  = optional(string)
     name                = optional(string)
     resource_group_name = optional(string)
-    tag                 = optional(string)
+    key                 = optional(string)
   })
   description = "(Required) The ID of the Virtual Network within which the Backend Address Pool should exist."
 }

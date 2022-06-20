@@ -36,14 +36,14 @@ data "azurerm_lb_backend_address_pool" "this" {
 locals {
   virtual_network_id = var.virtual_network.id == null ? (
     var.virtual_network.name == null && var.virtual_network.resource_group_name == null ? (
-      var.virtual_networks[var.virtual_network.tag].id
+      var.virtual_networks[var.virtual_network.key].id
     ) : data.azurerm_virtual_network.this[0].id
   ) : var.virtual_network.id
 
 
   backend_address_pool_id = var.backend_address_pool.id == null ? (
     var.backend_address_pool.name == null && var.backend_address_pool.loadbalancer_name == null && var.backend_address_pool.resource_group_name == null ? (
-      var.backend_address_pools[var.backend_address_pool.tag].id
+      var.backend_address_pools[var.backend_address_pool.key].id
     ) : data.azurerm_lb_backend_address_pool.this[0].id
   ) : var.backend_address_pool.id
 }

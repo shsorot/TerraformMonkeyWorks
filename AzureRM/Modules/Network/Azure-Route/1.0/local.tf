@@ -22,5 +22,5 @@ data "azurerm_route_table" "this" {
 }
 
 locals {
-  route_table_name = var.route_table.name == null ? var.route_tables[var.route_table.tag].name : data.azurerm_route_table.this[0].name
+  route_table_name = var.route_table.name == null ? var.route_tables[var.route_table.key].name : data.azurerm_route_table.this[0].name
 }

@@ -16,10 +16,10 @@ locals {
   tenant_id               = data.azurerm_client_config.current.tenant_id
   object_id               = data.azurerm_client_config.current.object_id
   subscription_id         = data.azurerm_subscription.current.subscription_id
-  resource_group_name     = var.resource_group.name == null ? var.resource_groups[var.resource_group.tag].name : data.azurerm_resource_group.this[0].name
-  resource_group_tags     = var.resource_group.name == null ? var.resource_groups[var.resource_group.tag].tags : data.azurerm_resource_group.this[0].tags
+  resource_group_name     = var.resource_group.name == null ? var.resource_groups[var.resource_group.key].name : data.azurerm_resource_group.this[0].name
+  resource_group_tags     = var.resource_group.name == null ? var.resource_groups[var.resource_group.key].tags : data.azurerm_resource_group.this[0].tags
   tags                    = merge(var.tags, (var.inherit_tags == true ? local.resource_group_tags : {}))
-  resource_group_location = var.resource_group.name == null ? var.resource_groups[var.resource_group.tag].location : data.azurerm_resource_group.this[0].location
+  resource_group_location = var.resource_group.name == null ? var.resource_groups[var.resource_group.key].location : data.azurerm_resource_group.this[0].location
   location                = var.location == null ? local.resource_group_location : var.location
 }
 
@@ -39,7 +39,7 @@ data "azurerm_dns_zone" "this" {
 locals {
   subnet_id = var.subnet.id == null ? (
     var.subnet.name == null && var.subnet.virtual_network_name == null ? (
-      var.virtual_networks[var.subnet.virtual_network_tag].subnet[var.subnet.tag].id
+      var.virtual_networks[var.subnet.virtual_network_tag].subnet[var.subnet.key].id
     ) : data.azurerm_subnet.this[0].id
   ) : var.subnet.id
 
@@ -48,12 +48,12 @@ locals {
     private_dns_zone_ids = [for instance in var.private_dns_zone_group.private_dns_zone : (
       instance.id == null ? (
         instance.name == null ? (
-          var.dns_zones[instance.tag].id
+          var.dns_zones[instance.key].id
         ) : data.azurerm_dns_zone.this[instance.name].id
       ) : instance.id
     )]
   }
-  
+
   # TODO , add lookup for private connection resource id
   # Currently using hardcoded resource type to generate resource ID strings.
   private_service_connection = var.private_service_connection == null ? null : {

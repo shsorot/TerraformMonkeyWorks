@@ -6,6 +6,7 @@ resource "azurerm_lb" "this" {
   tags                = local.tags
 
   # TODO : add code for edge zone
+  # TODO : Add data block based lookup
   dynamic "frontend_ip_configuration" {
     for_each = { for instance in var.frontend_ip_configuration : instance.name => instance if(var.frontend_ip_configuration != null || var.frontend_ip_configuration != []) }
     content {
@@ -13,7 +14,7 @@ resource "azurerm_lb" "this" {
 
       subnet_id = try(frontend_ip_configuration.value.subnet.id, null) == null ? (
         try(frontend_ip_configuration.value.subnet.name, null) == null && try(frontend_ip_configuration.value.subnet.virtual_network_name, null) == null ? (
-          var.virtual_networks[frontend_ip_configuration.value.subnet.virtual_network_tag].subnet[frontend_ip_configuration.value.subnet.tag].id
+          var.virtual_networks[frontend_ip_configuration.value.subnet.virtual_network_tag].subnet[frontend_ip_configuration.value.subnet.key].id
         ) : "/subscriptions/${local.subscription_id}/resourceGroups/${try(frontend_ip_configuration.value.subnet.resource_group_name, local.resource_group_name)}/providers/Microsoft.Network/virtualNetworks/${frontend_ip_configuration.value.subnet.virtual_network_name}/subnets/${frontend_ip_configuration.value.subnet.name}"
       ) : frontend_ip_configuration.value.subnet.id
 
@@ -27,7 +28,7 @@ resource "azurerm_lb" "this" {
       public_ip_address_id = frontend_ip_configuration.value.public_ip_address == null ? null : (
         try(frontend_ip_configuration.value.public_ip_address.id, null) == null ? (
           try(frontend_ip_configuration.value.public_ip_address.name, null) == null ? (
-            var.public_ip_addresses[frontend_ip_configuration.value.public_ip_address.tag].id
+            var.public_ip_addresses[frontend_ip_configuration.value.public_ip_address.key].id
           ) : "/subscriptions/${local.subscription_id}/resourceGroups/${try(frontend_ip_configuration.value.public_ip_address.resource_group_name, local.resource_group_name)}/providers/Microsoft.Network/publicIPAddresses/${frontend_ip_configuration.value.public_ip_address.name}"
         ) : frontend_ip_configuration.value.public_ip_address.id
       )
@@ -35,7 +36,7 @@ resource "azurerm_lb" "this" {
       public_ip_prefix_id = frontend_ip_configuration.value.public_ip_prefix == null ? null : (
         try(frontend_ip_configuration.value.public_ip_prefix.id, null) == null ? (
           try(frontend_ip_configuration.value.public_ip_prefix.name, null) == null ? (
-            var.public_ip_prefixes[frontend_ip_configuration.value.public_ip_prefix.tag].id
+            var.public_ip_prefixes[frontend_ip_configuration.value.public_ip_prefix.key].id
           ) : "/subscriptions/${local.subscription_id}/resourceGroups/${try(frontend_ip_configuration.value.public_ip_prefix.resource_group_name, local.resource_group_name)}/providers/Microsoft.Network/publicIPAddresses/${frontend_ip_configuration.value.public_ip_prefix.name}"
         ) : frontend_ip_configuration.value.public_ip_prefix.id
       )

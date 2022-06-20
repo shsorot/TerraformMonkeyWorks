@@ -5,8 +5,8 @@
 
 variable "resource_group" {
   type = object({
-    name = optional(string)
-    tag  = optional(string)
+    name = optional(string) # Name of the resource group
+    key  = optional(string) # Terraform Object Key to use to find the resource group from output of module Azure-ResourceGroup supplied to variable "resource_groups"
   })
   description = "(Required) The name of the resource group where to create the resource. Specify either the actual name or the Tag value that can be used to look up Resource group properties from output of module Azure-ResourceGroup."
 }
@@ -18,7 +18,13 @@ variable "resource_groups" {
     tags     = optional(map(string))
     name     = optional(string)
   }))
-  description = "(Optional) Output of Module Azure-ResourceGroup. Used to lookup RG properties using Tags"
+  description = <<EOF
+   (Optional) Output of Module Azure-ResourceGroup. Used to lookup RG properties using Terraform Object Keys"
+    id       = # ID of the resource group
+    location = # Location of the resource group
+    tags     = # List of Azure tags applied to resource group
+    name     = # Name of the resource group
+  EOF
   default     = {}
 }
 
@@ -67,7 +73,7 @@ variable "ddos_protection_plan" {
     name                = optional(string) # Name of the DDOS ID. To be used with Resource Group(Optional, local.resource_group_name is used if null) & subscription_id( current is used if not specified )
     resource_group_name = optional(string) # Resource Group to lookup the DDOS using name. If Null, the 
     subscription_id     = optional(string) # If the resource is located in a different subscription, specify this along with name and resource group name.
-    tag                 = optional(string) # If using an output of module Azure-NetworkDDOSProtectionPlan, use this value to perform a lookup instead
+    key                 = optional(string) # If using an output of module Azure-NetworkDDOSProtectionPlan, use this value to perform a lookup instead
   })
   description = "(Optional) The DDoS Protection Plan object. If provided, DDOS protection plan will be enabled."
   default     = null
@@ -82,7 +88,7 @@ variable "subnet" {
       id                  = optional(string) # (Optional)  Resource ID of the NSG if available
       name                = optional(string) # (Optional)  Name of the NSG
       resource_group_name = optional(string) # (Optional)  Resource Group where NSG is placed. If Name is provided, will be used to lookup
-      tag                 = optional(string) # When using the ouput of module Azure-NetworkSecuritygroup, use this to perform a lookup.
+      key                 = optional(string) # When using the ouput of module Azure-NetworkSecuritygroup, use this to perform a lookup.
     }))
   }))
   default = null
