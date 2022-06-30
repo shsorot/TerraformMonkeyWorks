@@ -190,8 +190,12 @@ variable "computer_name" {
 }
 
 variable "custom_data" {
-  type        = string
+  type        = object({
+    raw       = optional(string) # Raw base64 content
+    file      = optional(string) # Base64 encoded file path relative to the module/code.
+  })
   description = "(Optional) The Base64-Encoded Custom Data which should be used for this Virtual Machine. Changing this forces a new resource to be created."
+  sensitive   = true
   default     = null
 }
 
@@ -345,43 +349,27 @@ variable "proximity_placement_groups" {
   description = "(Optional) Output of module Azure-ProximityPlacementGroup for lookup of PPG ID."
 }
 
+
+
 variable "secret" {
-  type = object({
+  type = list(object({
     key_vault = object({
       id                  = optional(string)
       resource_group_name = optional(string)
       name                = optional(string)
       key                 = optional(string)
     }) #   (Required) The ID of the Key Vault from which all Secrets should be sourced.
-    # TODO: change 'url' to object with id, name and key for lookup
+    # TODO: change 'url' to object with id, name and key for lookup. Keyvault is pulled from 
     certificate = list(object({
-      url = string
+      url = object({
+        id                = optional(string)
+        name              = optional(string)
+        key               = optional(string)
+      })
     })) #   The Secret URL of a Key Vault Certificate.
-  })
+  }))
   default = null
 }
-
-# variable "secret" {
-#   type = object({
-#     key_vault = object({
-#       id                  = optional(string)
-#       resource_group_name = optional(string)
-#       name                = optional(string)
-#       key                 = optional(string)
-#     }) #   (Required) The ID of the Key Vault from which all Secrets should be sourced.
-#     # TODO: change 'url' to object with id, name and key for lookup. Keyvault is pulled from 
-#     certificate = list(object({
-#       url = object({
-#         id                = optional(string)
-#         name              = optional(string)
-#         key               = optional(string)
-#       })
-#     })) #   The Secret URL of a Key Vault Certificate.
-#   })
-#   default = null
-# }
-
-
 
 # Added in provider > 3.xx.x
 variable "secure_boot_enabled" {
@@ -390,12 +378,6 @@ variable "secure_boot_enabled" {
   default     = false
 }
 
-
-# variable "source_image_id" {
-#   type        = string
-#   description = "(Optional) The ID of the Image which this Virtual Machine should be created from. Changing this forces a new resource to be created."
-#   default     = null
-# }
 
 variable "source_image"{
   type = object({
@@ -493,4 +475,13 @@ variable "user_assigned_identities" {
     id = optional(string)
   }))
   default = {}
+}
+
+variable "key_vault_certificates"{
+  type = map(object({
+    id = optional(string)
+    secret_id = optional(string)
+  }))
+  default = {}
+  description = "(Optional) Output of module Azure-KeyVaultCertificates. Used for lookup of certificate properties via key."
 }
