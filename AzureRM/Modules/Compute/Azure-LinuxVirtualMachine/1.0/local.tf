@@ -68,27 +68,45 @@ data "azurerm_disk_encryption_set" "this" {
 }
 
 # Block for key vault lookup (for secret block )
+# data "azurerm_key_vault" "this" {
+#   for_each            = var.secret == null || var.secret == [] ? {} : { for instance in var.secret.keyvault : instance.name => instance if instance.name != null }
+#   name                = each.key
+#   resource_group_name = coalesce(each.value.resource_group_name, local.resource_group_name)
+# }
+
+# # Block for certificate sub block within secret block
+# data "azurerm_key_vault_certificate" "this"{
+#   for_each            = var.secret == null || var.secret == []? {} : (
+#     [ for instance in var.secret: [for certificate in instance.certificate : { 
+#           key_vault = instance.key_vault
+#           url = certificate.url 
+#        }if certificate.url.name != null]
+#     ]
+#   )
+#   name                = each.value.url.name
+#   key_vault_id        = each.value.url.key_vault.id == null ? (
+#     each.value.key_vault.name == null ? (
+#       var.key_vaults[each.value.key_vault.key].id
+#     ) : data.azurerm_key_vault.this[each.value.key_vault.name].id
+#   ) : each.value.url.key_vault.id
+# }
+
+# Block for secret and winrm_listener(dependency) blocks
 data "azurerm_key_vault" "this" {
-  for_each            = var.secret == null || var.secret == [] ? {} : { for instance in var.secret.keyvault : instance.name => instance if instance.name != null }
-  name                = each.key
-  resource_group_name = coalesce(each.value.resource_group_name, local.resource_group_name)
+  for_each = { for instance in local.merged_certificates_list : instance.key_vault_name => instance if instance.key_vault_name != null }
+  name                 = each.value.key_vault_name
+  resource_group_name  = each.value.key_vault_resource_group_name
 }
 
-# Block for certificate sub block within secret block
+# Block for secret and winrm_listener blocks
 data "azurerm_key_vault_certificate" "this"{
-  for_each            = var.secret == null || var.secret == []? {} : (
-    [ for instance in var.secret: [for certificate in instance.certificate : { 
-          key_vault = instance.key_vault
-          url = certificate.url 
-       }if certificate.url.name != null]
-    ]
-  )
-  name                = each.value.url.name
-  key_vault_id        = each.value.url.key_vault.id == null ? (
-    each.value.key_vault.name == null ? (
-      var.key_vaults[each.value.key_vault.key].id
-    ) : data.azurerm_key_vault.this[each.value.key_vault.name].id
-  ) : each.value.url.key_vault.id
+  for_each = { for instance in local.merged_certificates_list : instance.certificate_name => instance if instance.certificate_name != null}
+  name     = each.value.certificate_name
+  key_vault_id = each.value.key_vault_id == null ? (
+    each.value.key_vault_name == null ? (
+       var.key_vaults[each.value.key_vault_key].id
+    ) : data.azurerm_key_vault.this[each.value.key].id
+  ) : each.value.key_vault_id
 }
 
 # Block for "virtual_machine_scale_set_id" variable generation
@@ -112,6 +130,27 @@ data "azurerm_image" "this" {
 }
 
 locals {
+
+  # # Consolidated variable object for certificate url from secrets and winrm_listener to simplify the data blocks for keyvault and certificates
+  merged_secret_certificates_list = flatten(var.secret == null || var.secret == [] ? [] : (
+    [ for instance1 in var.secret : 
+      [for instance2 in instance1.certificate : {
+        key_vault_name = instance1.key_vault.name
+        key_vault_resource_group_name = coalesce(instance1.key_vault.resource_group_name,local.resource_group_name)
+        key_vault_id = instance1.key_vault.id
+        key_vault_key = instance1.key_vault.key
+        certificate_name = instance2.url.name
+        certificate_id = instance2.url.id
+        certificate_key = instance2.url.key
+        }
+      ] 
+    ]
+  ))
+
+  # common list of all keyvaults and certificates used in this module. Simpifies lookup as multiple blocks can lookup certificate url's & keyvault ID from a single list of objects
+  merged_certificates_list = distinct(local.merged_secret_certificates_list)
+
+
   user_data = var.user_data == null || var.user_data == {} ? null : (
     var.user_data.raw == null ? (
       var.user_data.file == null ? null : filebase64(var.user_data.file)
@@ -159,15 +198,22 @@ locals {
     ) : var.os_disk.disk_encryption_set_id
   )
 
-  # Todo : Add lookup for certificate ID in certificate block ( containing url )
-  # secret = var.secret == null ? [] : [for instance in var.secret : {
-  #   certificate = instance.value.certificate
-  #   keyvault_id = instance.value.keyvault.id == null ? (
-  #     instance.value.keyvault.name == null ? (
-  #       var.key_vaults[instance.value.keyvault.key].id
-  #     ) : data.azurerm_key_vault.this[instance.value.keyvault.name].id
-  #   ) : instance.value.keyvault.id
-  # }]
+  # secret = var.secret == null || var.secret == [] ? [] : [
+  #   for instance in var.secret : {
+  #     key_vault_id = instance.value.key_vault.id == null ? (
+  #       instance.value.key_vault.name == null ? (
+  #         var.key_vaults[instance.value.key_vault.key].id
+  #       ) : data.azurerm_key_vault.this[instance.value.key_vault.name].id
+  #     ) : instance.value.key_vault.id
+  #     certificate = [ for certificate in instance.value.certificate : {
+  #       url = certificate.url.id == null ? (
+  #         certificate.url.name == null ? (
+  #           var.key_vault_certificates[certificate.url.key].secret_id
+  #         ) : data.azurerm_key_vault_certificate.this[certificate.url.name].secret_id
+  #       ) : certificate.url.id
+  #       } 
+  #     ]
+  #   }]
 
   secret = var.secret == null || var.secret == [] ? [] : [
     for instance in var.secret : {
@@ -179,12 +225,14 @@ locals {
       certificate = [ for certificate in instance.value.certificate : {
         url = certificate.url.id == null ? (
           certificate.url.name == null ? (
-            data.azurerm_key_vault_certificate.this[certificate.url.name].id
-          ) : data.azurerm_key_vault_certificate.this[certificate.url.name].id
+            data.azurerm_key_vault_certificate.this[certificate.url.name].secret_id
+          ) : data.azurerm_key_vault_certificate.this[certificate.url.name].secret_id
         ) : certificate.url.id
+        store = certificate.store
         } 
       ]
     }]
+
 
 
 
@@ -233,12 +281,15 @@ locals {
     }
   )
 
-
   source_image_id = var.source_image == null || var.source_image == {} ? null : (
     var.source_image.id == null ? (
       var.source_image.name == null ? (
         var.azure_images[var.source_image.key].id
       ) : data.azurerm_image.this[var.source_image.name].id
     ) : var.source_image.id
+  )
+
+  custom_data = var.custom_data == null || var.custom_data == {} ? null : (
+    var.custom_data.raw == null ? filebase64(var.custom_data.file) : var.custom_data.raw
   )
 }
