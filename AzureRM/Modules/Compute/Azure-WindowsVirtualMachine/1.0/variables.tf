@@ -69,6 +69,20 @@ variable "admin_password" {
   default     = null
 }
 
+variable "admin_ssh_key" {
+  type = list(object({
+    username   = string
+    public_key = string
+  }))
+  default = []
+}
+
+variable "disable_password_authentication" {
+  type        = bool
+  description = "(Optional) Should Password Authentication be disabled on this Virtual Machine? Defaults to true. Changing this forces a new resource to be created."
+  default     = false
+}
+
 variable "network_interface" {
   type = list(object({
     id                  = optional(string)
@@ -133,13 +147,14 @@ variable "additional_capabilities" {
 }
 
 variable "additional_unattend_content" {
-  type = object({
-    content = string #   (Required) The XML formatted content that is added to the unattend.xml file for the specified path and component. Changing this forces a new resource to be created.
-    setting = string #   (Required) The name of the setting to which the content applies. Possible values are AutoLogon and FirstLogonCommands. Changing this forces a new resource to be created.
-  })
-  description = "(Optional) Custom settings to override Azure Unattend XML that is pushed at VM provision time."
-  default     = null
+  type = list(object({
+    content = string # (Required) The XML formatted content that is added to the unattend.xml file for the specified path and component. Changing this forces a new resource to be created.
+    setting = string # (Required) The name of the setting to which the content applies. Possible values are AutoLogon and FirstLogonCommands. Changing this forces a new resource to be created.
+  }))
+  sensitive = true
+  default = null
 }
+
 
 variable "allow_extension_operations" {
   type        = bool
@@ -184,8 +199,12 @@ variable "computer_name" {
 }
 
 variable "custom_data" {
-  type        = string
+  type        = object({
+    raw       = optional(string) # Raw base64 content
+    file      = optional(string) # Base64 encoded file path relative to the module/code.
+  })
   description = "(Optional) The Base64-Encoded Custom Data which should be used for this Virtual Machine. Changing this forces a new resource to be created."
+  sensitive   = true
   default     = null
 }
 
@@ -210,10 +229,38 @@ variable "dedicated_hosts" {
   default     = {}
 }
 
-variable "enable_automatic_updates" {
-  type        = bool
-  description = "(Optional) Specifies if Automatic Updates are Enabled for the Windows Virtual Machine. Changing this forces a new resource to be created."
+# Added in provider > 3.xx.x
+variable "dedicated_host_group" {
+  type = object({
+    id                  = optional(string)
+    resource_group_name = optional(string)
+    name                = optional(string)
+    key                 = optional(string)
+  })
+  description = "(Optional) The ID of a Dedicated Host group where this machine should be run on."
   default     = null
+}
+
+
+variable "dedicated_host_groups" {
+  type = map(object({
+    id = optional(string)
+  }))
+  description = "(Optional) Output of module Azure-DedicatedHostGroup."
+  default     = {}
+}
+
+# added in provider > 3.xx.x
+variable "edge_zone" {
+  type        = string
+  description = "(Optional) Specifies the Edge Zone within the Azure Region where this Linux Virtual Machine should exist. Changing this forces a new Linux Virtual Machine to be created."
+  default     = null
+}
+
+variable "enable_automatic_updates"{
+  type = bool
+  description = "(Optional)(Optional) Specifies if Automatic Updates are Enabled for the Windows Virtual Machine. Changing this forces a new resource to be created."
+  default = false
 }
 
 variable "encryption_at_host_enabled" {
@@ -262,13 +309,12 @@ variable "max_bid_price" {
   default     = null
 }
 
-
+# added in provider > 3.xx.x
 variable "patch_mode" {
   type        = string
-  description = "(Optional) Specifies the mode of in-guest patching to this Windows Virtual Machine. Possible values are Manual, AutomaticByOS and AutomaticByPlatform. Defaults to AutomaticByOS."
-  default     = null
+  description = "(Optional) Specifies the mode of in-guest patching to this Linux Virtual Machine. Possible values are AutomaticByPlatform and ImageDefault. Defaults to ImageDefault. For more information on patch modes please see the product documentation."
+  default     = "ImageDefault"
 }
-
 
 variable "plan" {
   type = object({
@@ -283,7 +329,7 @@ variable "plan" {
 variable "platform_fault_domain" {
   type        = number
   description = "(Optional) Specifies the Platform Fault Domain in which this windows Virtual Machine should be created. Defaults to -1, which means this will be automatically assigned to a fault domain that best maintains balance across the available fault domains. Changing this forces a new windows Virtual Machine to be created."
-  default     = null
+  default     = -1
 }
 
 variable "priority" {
@@ -309,7 +355,7 @@ variable "proximity_placement_group" {
   default     = null
 }
 
-
+# Used by "proximity_placement_groups"
 variable "proximity_placement_groups" {
   type = map(object({
     proximity_placement_group_id = optional(string)
@@ -318,37 +364,61 @@ variable "proximity_placement_groups" {
   description = "(Optional) Output of module Azure-ProximityPlacementGroup for lookup of PPG ID."
 }
 
+
 variable "secret" {
-  type = object({
+  type = list(object({
     key_vault = object({
       id                  = optional(string)
       resource_group_name = optional(string)
       name                = optional(string)
       key                 = optional(string)
     }) #   (Required) The ID of the Key Vault from which all Secrets should be sourced.
+    # TODO: change 'url' to object with id, name and key for lookup. Keyvault is pulled from 
     certificate = list(object({
-      url   = string
-      store = string
+      store  = string # (Required) The certificate store on the Virtual Machine where the certificate should be added.
+      url = object({
+        id                = optional(string)
+        name              = optional(string)
+        key               = optional(string)
+      })
     })) #   The Secret URL of a Key Vault Certificate.
-  })
+  }))
   default = null
 }
 
 
-variable "key_vaults" {
-  type = map(object({
-    id  = string
-    uri = optional(string)
-  }))
-  description = "(Optional) Output of module Azure-KeyVault, to be used to lookup Key vault ID using tags."
-  default     = {}
+
+# Added in provider > 3.xx.x
+variable "secure_boot_enabled" {
+  type        = bool
+  description = "(Optional) Specifies whether secure boot should be enabled on the virtual machine. Changing this forces a new resource to be created."
+  default     = false
 }
 
 
-variable "source_image_id" {
-  type        = string
+# variable "source_image_id" {
+#   type        = string
+#   description = "(Optional) The ID of the Image which this Virtual Machine should be created from. Changing this forces a new resource to be created."
+#   default     = null
+# }
+
+variable "source_image"{
+  type = object({
+    id                  = optional(string)  # (Optional) Resource ID of the Azure compute image
+    name                = optional(string)  # (Optional) Name of the Azure compute image
+    resource_group_name = optional(string)  # (Optional) Resource group name of the Azure compute image. If null, parent resource resource_group_name will be used.
+    key                 = optional(string)  # (Optional) Key of the Azure compute image used for lookup from output of module Azure-Image
+  })
   description = "(Optional) The ID of the Image which this Virtual Machine should be created from. Changing this forces a new resource to be created."
   default     = null
+}
+
+variable "azure_images"{
+  type = map(object({
+    id = string # Resource ID of the Azure compute image
+  }))
+  description = "(Optional) Output of module Azure-Image for lookup of image ID."
+  default = {}
 }
 
 variable "source_image_reference" {
@@ -366,10 +436,37 @@ variable "source_image_reference" {
   }
 }
 
-variable "timezone" {
-  type        = string
-  description = "(Optional) Specifies the Time Zone which should be used by the Virtual Machine, the possible values are defined here :https://jackstromberg.com/2017/01/list-of-time-zones-consumed-by-azure/."
-  default     = null
+# added in provider > 3.xx.x
+variable "termination_notification" {
+  type = object({
+    enabled = bool             #  (Required) Should the termination notification be enabled on this Virtual Machine? Defaults to false.
+    timeout = optional(number) # (Optional) Length of time (in minutes, between 5 and 15) a notification to be sent to the VM on the instance metadata server till the VM gets deleted. The time duration should be specified in ISO 8601 format.
+  })
+  default = {
+    enabled = false
+  }
+}
+
+variable "timezone"{
+  type = string
+  description = "(Optional) Specifies the Time Zone which should be used by the Virtual Machine, the possible values are defined here: https://jackstromberg.com/2017/01/list-of-time-zones-consumed-by-azure/ ."
+  default = null
+}
+
+# added in provider > 3.xx.x
+variable "user_data" {
+  type = object({
+    raw  = optional(string) # (Optional) The Base64-Encoded User Data which should be used for this Virtual Machine.
+    file = optional(string) # (Optional) The file whose content will be encoded as Base64 and used for this Virtual Machine.
+  })
+  sensitive = true
+  default = null
+}
+# added in provider > 3.xx.x
+variable "vtpm_enabled" {
+  type        = bool
+  description = " (Optional) Specifies whether vTPM should be enabled on the virtual machine. Changing this forces a new resource to be created."
+  default     = false
 }
 
 variable "virtual_machine_scale_set" {
@@ -383,29 +480,56 @@ variable "virtual_machine_scale_set" {
   default     = null
 }
 
-variable "azurerm_orchestrated_virtual_machine_scale_sets" {
+# Used by "virtual_machine_scale_set_id"
+variable "virtual_machine_scale_sets" {
   type = map(object({
-    id        = optional(string)
-    unique_id = optional(string)
-    identity = optional(object({
-      principal_id = string
-    }))
+    id = optional(string) # Resource ID of the virtual machine scale set
   }))
+  description = "(Optional) Merged output of Azure-VirtualMachineScaleSet, Azure-WindowsVirtualMachineScaleSet, Azure-Linux-VirtualMachineScaleSet & Azure-OrchestratedVirtualMachineScaleSet"
   default = {}
 }
 
-variable "winrm_listener" {
-  type = list(object({
-    protocol        = string #   (Required) Specifies Specifies the protocol of listener. Possible values are Http or Https
-    certificate_url = string #   (Optional) The Secret URL of a Key Vault Certificate, which must be specified when protocol is set to Https.
+# Used by "secrets"
+variable "key_vaults" {
+  type = map(object({
+    id  = string
+    uri = optional(string)
   }))
-  default = null
+  description = "(Optional) Output of module Azure-KeyVault, to be used to lookup Key vault ID using tags."
+  default     = {}
 }
 
-
+# Used by "identity"
 variable "user_assigned_identities" {
   type = map(object({
     id = optional(string)
   }))
   default = {}
+}
+
+
+variable "winrm_listener"{
+  type = list(object({
+    protocol = string # (Required) Specifies Specifies the protocol of listener. Possible values are Http or Https
+    certificate = optional(object({
+      url = object({
+        id = optional(string)
+        name = optional(string)
+        key = optional(string)
+        key_vault_name = optional(string)
+        key_vault_resource_group_name = optional(string)
+        key_vault_key = optional(string)
+      })
+    })) #  (Optional) The Secret URL of a Key Vault Certificate, which must be specified when protocol is set to Https.
+  }))
+  default = []
+}
+
+variable "key_vault_certificates"{
+  type = map(object({
+    id = optional(string)
+    secret_id = optional(string)
+  }))
+  default = {}
+  description = "(Optional) Output of module Azure-KeyVaultCertificates. Used for lookup of certificate properties via key."
 }

@@ -65,7 +65,7 @@ resource "azurerm_linux_virtual_machine" "this" {
   # If null, use VM name.
   computer_name = var.computer_name == null ? var.name : var.computer_name
   # changing this forced recreation of VM.
-  custom_data = var.custom_data
+  custom_data = local.custom_data
 
   # Use either decicated host or dedicated host group. Not both
   dedicated_host_id               = local.dedicated_host_id

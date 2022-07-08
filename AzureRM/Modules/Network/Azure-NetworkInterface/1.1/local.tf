@@ -34,7 +34,7 @@ data "azurerm_subnet" "this" {
 
 
 # Data block used by ip_configuation->public_ip_address_id
-# for some reasons, terraform is not parsing multiple conditions in for loop 'if' sub statement
+# for some reasons, terraform is not parsing multiple conditions in for loop 'if' sub statement, workaround implemented as nested if
 data "azurerm_public_ip" "this" {
   for_each = { for instance in var.ip_configuration :
     instance.public_ip_address.name => instance.public_ip_address
@@ -60,8 +60,9 @@ data "azurerm_network_security_group" "this" {
 
 # Data block used by IP Configuration -> gateway_load_balancer_frontend_ip_configuration_id & azurerm_network_interface_backend_address_pool_association.tf(backend pool needs load balancer ID)
 
-# Due to limitation by Terraform, there is no data block available for frontend IP configuration, therefore ,we shall retrieve the Load balancer data object and append frontend IP config name to it for the momemnt
+# Due to limitation by Terraform, there is no data block available for frontend IP configuration, therefore ,we shall retrieve the Load balancer data object and extract frontend ID from one of it's sub-properties
 # TODO : replace with data block for frontend IP configuration when released by Terraform AzureRM provider
+# for some reasons, terraform is not parsing multiple conditions in for loop 'if' sub statement, workaround implemented as nested if
 data "azurerm_lb" "this" {
   for_each = { for instance in var.ip_configuration :
     concat(instance.gateway_load_balancer_frontend_ip_configuration.load_balancer_name, "-", instance.gateway_load_balancer_frontend_ip_configuration.name) => instance.gateway_load_balancer_frontend_ip_configuration
@@ -72,10 +73,23 @@ data "azurerm_lb" "this" {
 }
 
 # # Data block used by azurerm_network_interface_backend_address_pool_association.tf code
-# data "azurerm_lb_backend_address_pool" "backendpool" {
-#   for_each            = { for instance in var.ip_configuration : instance.gateway_load_balancer_frontend_ip_configuration_id.load_balancer_name => instance.gateway_load_balancer_frontend_ip_configuration_id if instance.gateway_load_balancer_frontend_ip_configuration_id != null }
-#   loadbalancer_id = data.azurerm_lb.example.id
-# }
+data "azurerm_lb" "azurerm_network_interface_backend_address_pool_association"{
+  for_each = { for instance in var.ip_configuration :
+    concat(instance.backend_address_pool.load_balancer_name,"-",instance.backend_address_pool.name) => instance 
+    if (instance.backend_address_pool == null || instance.backend_address_pool == {} ? false : (instance.backend_address_pool.name == null && instance.backend_address_pool.load_balancer_name == null ? false : true))
+  }
+  name                = each.value.load_balancer_name
+  resource_group_name = coalesce(each.value.resource_group_name, local.resource_group_name) 
+}
+
+data "azurerm_lb_backend_address_pool" "azurerm_network_interface_backend_address_pool_association" {
+  for_each = { for instance in var.ip_configuration :
+    concat(instance.backend_address_pool.load_balancer_name,"-",instance.backend_address_pool.name) => instance 
+    if (instance.backend_address_pool == null || instance.backend_address_pool == {} ? false : (instance.backend_address_pool.name == null && instance.backend_address_pool.load_balancer_name == null ? false : true))
+  }
+  name            = each.value.name
+  loadbalancer_id = data.azurerm_lb.azurerm_network_interface_backend_address_pool_association[concat(each.value.backend_address_pool.load_balancer_name,"-",each.value.backend_address_pool.name)].id
+}
 
 locals {
   # load_balanced_ip_configuration = { for v in var.ip_configuration : v.name => v.backend_address_pool  if  v.backend_address_pool != null }
@@ -87,7 +101,7 @@ locals {
         backend_address_pool_id = instance.id == null ? (
           instance.name == null && instance.load_balancer_name == null ? (
             var.loadbalancers[instance.loadbalancer_tag].backend_address_pool[instance.backend_pool_tag].id
-          ) : "/subscriptions/${local.subscription_id}/resourceGroups/${instance.resource_group_name == null ? local.resource_group_name : instance.resource_group_name}/providers/Microsoft.Network/loadBalancers/${instance.load_balancer_name}/backendAddressPools/${instance.name}"
+          ) : data.azurerm_lb_backend_address_pool.azurerm_network_interface_backend_address_pool_association[concat(instance.backend_address_pool.load_balancer_name,"-",instance.backend_address_pool.name)].id
         ) : instance.id
       }
     ]

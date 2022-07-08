@@ -66,7 +66,7 @@ data "azurerm_subnet" "this" {
 locals {
   subnet_id = var.subnet.id == null ? (
     var.subnet.name == null ? (
-      var.virtual_networks[var.subnet.virtual_network_tag].subnet[var.subnet.key].id
+      var.virtual_networks[var.subnet.virtual_network_key].subnet[var.subnet.key].id
     ) : data.azurerm_subnet.this[0].id
   ) : var.subnet.id
 }
@@ -76,22 +76,17 @@ locals {
   service_level = var.pool.name == null ? var.netapp_pools[var.pool.key].service_level : data.azurerm_netapp_pool.this[0].service_level
 }
 
-# <TODO> Add a resource block for remote volume lookup
-
+# TODO: Add a resource block for remote volume lookup
+# Remote volume block cannot use output of Azure-NetappVolume as it will cause a circular loop
 # data "azurerm_netapp_volume" "this"{
-#   count               = var.data_protection_replication.remote_volume_name == null ? 0 : 1
-
+#   count = var.data_protection_replication == null || var.data_protection_replication == {} ? 0 : (
+#     var.data_protection_replication.remote_volume_resource.name == null && var.data_protection_replication.remote_volume_resource.account_name == null && var.data_protection_replication.remote_volume_resource.pool_name == null ? 0 : 1
+#   )
+#   name                = var.data_protection_replication.remote_volume_resource.name
+#   account_name        = var.data_protection_replication.remote_volume_resource.account_name
+#   pool_name           = var.data_protection_replication.remote_volume_resource.pool_name
+#   resource_group_name = coalesce(var.data_protection_replication.remote_volume_resource.resource_group_name,local.resource_group_name)
 # }
-
-# Local variables for data protection replication block
-locals {
-  data_protection_replication = var.data_protection_replication == null || var.data_protection_replication == {} ? null : {
-    endpoint_type             = coalesce(var.data_protection_replication.endpoint_type, "dst")
-    remote_volume_location    = var.data_protection_replication.remote_volume_location
-    remote_volume_resource_id = var.data_protection_replication.remote_volume_resource_id
-    replication_frequency     = var.data_protection_replication.replication_frequency
-  }
-}
 
 data "azurerm_netapp_snapshot_policy" "this" {
   count = var.data_protection_snapshot_policy == null || var.data_protection_snapshot_policy == {} ? 0 : (
@@ -99,16 +94,6 @@ data "azurerm_netapp_snapshot_policy" "this" {
   resource_group_name = local.resource_group_name
   account_name        = local.account_name
   name                = var.data_protection_snapshot_policy.name
-}
-
-# local variable for data protection snapshot policy
-locals {
-  data_protection_snapshot_policy_id = var.data_protection_snapshot_policy == null || var.data_protection_snapshot_policy == {} ? null : (var.data_protection_snapshot_policy.id == null ? (
-    var.data_protection_snapshot_policy.name == null ? (
-      var.data_protection_snapshot_policy.tag == null ? null : var.snapshot_policies[var.data_protection_snapshot_policy.key].id
-    ) : data.azurerm_netapp_snapshot_policy.this[0].id
-    ) : var.data_protection_snapshot_policy.id
-  )
 }
 
 # Snapshots must exist in the same capacity pool and account as the new destination volume.
@@ -122,13 +107,27 @@ data "azurerm_netapp_snapshot" "this" {
   volume_name         = var.create_from_snapshot_resource.volume_name
 }
 
-# Block for volume  Snapshot 
-# TODO : lookup of snapshot created externally or via Tags
+# Local variables for data protection replication block
 locals {
+  data_protection_replication = var.data_protection_replication == null || var.data_protection_replication == {} ? null : {
+    endpoint_type             = coalesce(var.data_protection_replication.endpoint_type, "dst")
+    remote_volume_location    = var.data_protection_replication.remote_volume_location
+    remote_volume_resource_id = var.data_protection_replication.remote_volume_resource_id
+    replication_frequency     = var.data_protection_replication.replication_frequency
+  }
+
+  data_protection_snapshot_policy_id = var.data_protection_snapshot_policy == null || var.data_protection_snapshot_policy == {} ? null : (var.data_protection_snapshot_policy.id == null ? (
+    var.data_protection_snapshot_policy.name == null ? (
+      var.data_protection_snapshot_policy.key == null ? null : var.snapshot_policies[var.data_protection_snapshot_policy.key].id
+    ) : data.azurerm_netapp_snapshot_policy.this[0].id
+    ) : var.data_protection_snapshot_policy.id
+  )
+  
+  # Block for volume  Snapshot 
   create_from_snapshot_resource_id = var.create_from_snapshot_resource == null || var.create_from_snapshot_resource == {} ? null : (
     var.create_from_snapshot_resource.id == null ? (
       var.create_from_snapshot_resource.name == null ? (
-        var.create_from_snapshot_resource.tag == null ? null : var.netapp_snapshots[var.create_from_snapshot_resource.key].id
+        var.create_from_snapshot_resource.key == null ? null : var.netapp_snapshots[var.create_from_snapshot_resource.key].id
       ) : data.azurerm_netapp_snapshot.this[0].id
     ) : var.create_from_snapshot_resource.id
   )

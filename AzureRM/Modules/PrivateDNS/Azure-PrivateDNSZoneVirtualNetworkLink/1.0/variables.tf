@@ -17,6 +17,7 @@ variable "private_dns_zones"{
     id    = optional(string)
     name  = optional(string)
   }))
+  description = "(Optional) Output of module Azure-PrivateDNSZone. Used to lookup DNS zone ID and properties using key."
   default = {} 
 }
 # variable "resource_group_name" {

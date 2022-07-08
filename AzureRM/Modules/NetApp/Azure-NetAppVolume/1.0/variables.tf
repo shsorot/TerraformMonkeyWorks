@@ -9,7 +9,7 @@ variable "resource_group" {
     name = optional(string) # Name of the resource group
     key  = optional(string) # Terraform Object Key to use to find the resource group from output of module Azure-ResourceGroup supplied to variable "resource_groups"
   })
-  description = "(Required) The name of the resource group where to create the resource. Specify either the actual name or the Tag value that can be used to look up Resource group properties from output of module Azure-ResourceGroup."
+  description = "(Required) The name of the resource group where to create the resource. Specify either the actual name or the key value that can be used to look up Resource group properties from output of module Azure-ResourceGroup."
 }
 
 variable "resource_groups" {
@@ -50,9 +50,9 @@ variable "inherit_tags" {
 variable "account" {
   type = object({
     name = optional(string) # Name of the NetApp Account 
-    key  = optional(string) # alternatively, the tag specifying the NetApp Account from the output of module Azure-NetAppAccount
+    key  = optional(string) # alternatively, the key specifying the NetApp Account from the output of module Azure-NetAppAccount
   })
-  description = "(Required) The name of the NetApp Account. Specify either the actual name or the Tag value that can be used to look up NetApp Account properties from output of module Azure-NetAppAccount."
+  description = "(Required) The name of the NetApp Account. Specify either the actual name or the key value that can be used to look up NetApp Account properties from output of module Azure-NetAppAccount."
 }
 
 variable "netapp_accounts" {
@@ -67,9 +67,9 @@ variable "netapp_accounts" {
 variable "pool" {
   type = object({
     name = optional(string) # Name of the NetApp Capacity pool located in the NetApp Account specified in variable "account"
-    key  = optional(string) # alternatively, the tag specifying the NetApp Pool from the output of module Azure-NetAppPool
+    key  = optional(string) # alternatively, the key specifying the NetApp Pool from the output of module Azure-NetAppPool
   })
-  description = "(Required) The name of the NetApp Pool. Specify either the actual name or the Tag value that can be used to look up NetApp Account properties from output of module Azure-NetAppPool."
+  description = "(Required) The name of the NetApp Pool. Specify either the actual name or the key value that can be used to look up NetApp Account properties from output of module Azure-NetAppPool."
 }
 
 variable "netapp_pools" {
@@ -113,13 +113,13 @@ variable "subnet" {
     name                 = optional(string)
     virtual_network_name = optional(string)
     resource_group_name  = optional(string)
-    tag                  = optional(string)
+    key                  = optional(string)
     virtual_network_key  = optional(string)
   })
 }
 
 variable "virtual_networks" {
-  description = "(Optional) Output object from Module Azure-VirtualNetwork, to be used with 'virtual_network_tag' and 'virtual_network_tag'"
+  description = "(Optional) Output object from Module Azure-VirtualNetwork, to be used with 'virtual_network_key' and 'virtual_network_key'"
   type = map(object({
     id   = string # Resource ID of the virtual Network
     name = string # Name of the Virtual Network
@@ -141,7 +141,7 @@ variable "snapshot_directory_visible" {
   default     = true
 }
 
-# TODO : modify to accept object to allow data based lookup or Tag based lookup.
+# TODO : modify to accept object to allow data based lookup or key based lookup.
 # TODO : fetch volume properties from the snapshot resource
 # variable "create_from_snapshot_resource_id" {
 #   type        = string
@@ -185,7 +185,7 @@ variable "data_protection_snapshot_policy" {
   type = object({
     id   = optional(string) # Resource ID of the Snapshot policy
     name = optional(string) # Name of the Snapshot policy existing within the NetApp Account
-    key  = optional(string) # Name of the Snapshot policy Tag available in the output of Azure-NetAppSnapshotPolicy
+    key  = optional(string) # Name of the Snapshot policy key available in the output of Azure-NetAppSnapshotPolicy
   })
   default = null
 }

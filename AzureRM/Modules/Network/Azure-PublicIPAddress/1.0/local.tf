@@ -23,14 +23,19 @@ locals {
   location                = var.location == null ? local.resource_group_location : var.location
 }
 
-# TODO : Add data block based lookup
+# Block used by Public IP Prefix ID
+data "azurerm_public_ip_prefix" "this" {
+  count   = var.public_ip_prefix == null || var.public_ip_prefix == {} ? 0 : ( var.public_ip_prefix.name == null ? 0 : 1)
+  name    = var.public_ip_prefix.name
+  resource_group_name = coalesce(var.public_ip_prefix.resource_group_name, local.resource_group_name)
+}
+
 locals {
   public_ip_prefix_id = var.public_ip_prefix == null || var.public_ip_prefix == {} ? null : (
     var.public_ip_prefix.id == null ? (
       var.public_ip_prefix.name == null ? (
         var.public_ip_prefixes[var.public_ip_prefix.key].id
-      ) : "/subscriptions/${local.subscription_id}/resourceGroups/${var.public_ip_prefix.resource_group_name == null ? local.resource_group_name : var.public_ip_prefix.resource_group_name}/providers/Microsoft.Network/publicIPPrefixes/${var.public_ip_prefix.name}"
+      ) : data.azurerm_public_ip_prefix.this[0].id
     ) : var.public_ip_prefix.id
   )
-
 }
