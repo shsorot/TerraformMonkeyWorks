@@ -56,6 +56,7 @@ locals {
 
   # TODO , add lookup for private connection resource id
   # Currently using hardcoded resource type to generate resource ID strings.
+  # This will need a big list of resources that can have Private endpoint attached
   private_service_connection = var.private_service_connection == null ? null : {
     name                 = var.private_service_connection.name
     is_manual_connection = var.private_service_connection.is_manual_connection

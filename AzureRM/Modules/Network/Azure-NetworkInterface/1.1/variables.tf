@@ -98,8 +98,8 @@ variable "ip_configuration" {
       resource_group_name = optional(string)
       key                 = optional(string)
     }))
-    # (Optional) The backend address pool to attach this Ip configuation to. Only one backend address pool can be attached to an IP configuration.
-    backend_address_pool = optional(list(object({
+    # (Optional) The backend address pool to attach this Ip configuation to. Only one backend address pool can be attached to an IP configuration at this time.
+    backend_address_pool = optional(object({
       id                  = optional(string)
       name                = optional(string)
       load_balancer_name  = optional(string)
@@ -107,7 +107,7 @@ variable "ip_configuration" {
       key                 = optional(string)
       key                 = optional(string)
       load_balancer_key   = optional(string)
-    })))
+    }))
     # Introduced in provider > 3.xx.x
     # (Optional) The Frontend IP Configuration ID of a Gateway SKU Load Balancer. this is different from Backend Address pool attached to the ip configuration
     gateway_load_balancer_frontend_ip_configuration = optional(object({

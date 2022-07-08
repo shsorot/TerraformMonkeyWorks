@@ -4,7 +4,7 @@ resource "azurerm_private_endpoint" "this" {
   location            = local.location
   subnet_id           = local.subnet_id
 
-  # Single block only
+  # Single block, Optional
   dynamic "private_dns_zone_group" {
     for_each = local.private_dns_zone_group == null ? [] : [1]
     content {
@@ -13,7 +13,8 @@ resource "azurerm_private_endpoint" "this" {
     }
   }
 
-  # Single block only
+  # Single block, Mandatory
+  # TODO : change from dynamic to static based on mandatory property
   dynamic "private_service_connection" {
     for_each = local.private_service_connection == null ? [] : [1]
     content {
