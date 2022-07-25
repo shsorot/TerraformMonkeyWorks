@@ -7,6 +7,7 @@ module "Landscape-Storage-Accounts" {
   source                     = "../../../AzureRM/Modules/Storage/Azure-StorageAccount/1.0"
   for_each                   = var.StorageAccounts
   name                       = each.value.name == null ? each.key : each.value.name
+
   resource_group             = each.value.resource_group
   location                   = try(each.value.location, null)
   account_kind               = try(each.value.account_kind, null)
@@ -48,6 +49,7 @@ module "Landscape-Storage-Containers" {
   source                = "../../../AzureRM/Modules/Storage/Azure-StorageContainer/1.0"
   for_each              = var.StorageContainers
   name                  = each.value.name == null ? each.key : each.value.name
+
   storage_account_name  = each.value.storage_account_name
   container_access_type = each.value.container_access_type
   metadata              = each.value.metadata
@@ -70,6 +72,7 @@ module "Landscape-Storage-Shares" {
   source               = "../../../AzureRM/Modules/Storage/Azure-StorageShare/1.0"
   for_each             = var.StorageShares
   name                 = each.value.name == null ? each.key : each.value.name
+
   storage_account_name = each.value.storage_account_name
   acl                  = try(each.value.acl, null)
   quota                = try(each.value.quota, null)

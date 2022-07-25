@@ -236,7 +236,7 @@ variable "network_rules" {
       name                 = optional(string)
       virtual_network_name = optional(string)
       resource_group_name  = optional(string)
-      tag                  = optional(string)
+      key                  = optional(string)
       virtual_network_key  = optional(string)
     }))) # (Optional) A list of resource ids for subnets.
     private_link_access = optional(map(object({

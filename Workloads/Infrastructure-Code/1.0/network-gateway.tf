@@ -6,6 +6,7 @@ module "Landscape-Virtual-WANs" {
   source                            = "../../../AzureRM/Modules/Network/Azure-VirtualWAN/1.0"
   for_each                          = var.VirtualWANs
   name                              = each.value.name == null ? each.key : each.value.name
+
   resource_group                    = each.value.resource_group
   location                          = try(each.value.location, null)
   tags                              = each.value.tags
@@ -32,7 +33,8 @@ variable "ExpressRoutePorts" {
 module "Landscape-ExpressRoute-Ports" {
   source            = "../../../AzureRM/Modules/Network/Azure-ExpressRoutePort/1.0"
   for_each          = var.ExpressRoutePorts
-  name              = each.value.name == null ? each.key : each.value.namepressRoutePorts
+  name              = each.value.name == null ? each.key : each.value.name
+
   resource_group    = each.value.resource_group
   location          = try(each.value.location, null)
   tags              = try(each.value.tags, {})
@@ -61,6 +63,7 @@ module "Landscape-ExpressRoute-Circuits" {
   source                   = "../../../AzureRM/Modules/Network/Azure-ExpressRouteCircuit/1.0"
   for_each                 = var.ExpressRouteCircuits
   name                     = each.value.name == null ? each.key : each.value.name
+
   resource_group           = each.value.resource_group
   location                 = try(each.value.location, null)
   tags                     = try(each.value.tags, {})
@@ -89,6 +92,7 @@ module "Landscape-ExpressRoute-Circuit-Authorization" {
   source                 = "../../../AzureRM/Modules/Network/Azure-ExpressRouteCircuitAuthorization/1.0"
   for_each               = var.ExpressRouteCircuitAuthorizations
   name                   = each.value.name == null ? each.key : each.value.name
+
   resource_group         = each.value.resource_group
   express_route_circuit  = each.value.express_route_circuit
   resource_groups        = module.Landscape-Resource-Groups
@@ -110,6 +114,7 @@ module "Landscape-ExpressRoute-Gateways" {
   source          = "../../../AzureRM/Modules/Network/Azure-ExpressRouteGateway/1.0"
   for_each        = var.ExpressRouteGateways
   name            = each.value.name == null ? each.key : each.value.name
+
   resource_group  = each.value.resource_group
   location        = try(each.value.location, null)
   tags            = try(each.value.tags, {})
@@ -163,6 +168,7 @@ module "Landscape-ExpressRoute-Connections" {
   source                         = "../../../AzureRM/Modules/Network/Azure-ExpressRouteConnection/1.0"
   for_each                       = var.ExpressRouteConnections
   name                           = each.value.name == null ? each.key : each.value.name
+
   express_route_circuit_peering  = each.value.express_route_circuit_peering
   express_route_gateway          = each.value.express_route_gateway
   authorization_key              = each.value.authorization_key
@@ -186,6 +192,7 @@ module "Landscape-ExpressRoute-Circuit-Connections" {
   source                         = "../../../AzureRM/Modules/Network/Azure-ExpressRouteCircuitConnection/1.0"
   for_each                       = var.ExpressRouteCircuitConnections
   name                           = each.value.name == null ? each.key : each.value.name
+
   peering                        = each.value.peering
   peer_peering                   = each.value.peer_peering
   address_prefix_ipv6            = each.value.address_prefix_ipv6

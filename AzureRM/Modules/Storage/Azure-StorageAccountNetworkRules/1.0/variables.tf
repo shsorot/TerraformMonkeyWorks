@@ -42,7 +42,7 @@ variable "virtual_network_subnet" {
     name                 = optional(string)
     virtual_network_name = optional(string)
     resource_group_name  = optional(string)
-    tag                  = optional(string)
+    key                  = optional(string)
     virtual_network_key  = optional(string)
   })
   default = null

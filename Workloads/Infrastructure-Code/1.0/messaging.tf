@@ -7,6 +7,7 @@ module "Landscape-EventHubs" {
   source              = "../../../AzureRM/Modules/Messaging/Azure-EventHub/1.0"
   for_each            = var.EventHubs
   name                = each.value.name == null ? each.key : each.value.name
+
   namespace_name      = each.value.namespace_name
   resource_group      = each.value.resource_group
   partition_count     = each.value.partition_count
@@ -30,6 +31,7 @@ module "Landscape-EventHub-Clusters" {
   source          = "../../../AzureRM/Modules/Messaging/Azure-EventHubCluster/1.0"
   for_each        = var.EventHubClusters
   name            = each.value.name == null ? each.key : each.value.name
+
   resource_group  = each.value.resource_group
   location        = try(each.value.location, null)
   sku_name        = try(each.value.sku_name, "Dedicated_1")
@@ -51,6 +53,7 @@ module "Landscape-EventHub-Namespace" {
   source                   = "../../../AzureRM/Modules/Messaging/Azure-EventHubNamespace/1.0"
   for_each                 = var.EventHubNameSpaces
   name                     = each.value.name == null ? each.key : each.value.name
+
   resource_group           = each.value.resource_group
   location                 = try(each.value.location, null)
   tags                     = try(each.value.tags, local.tags)

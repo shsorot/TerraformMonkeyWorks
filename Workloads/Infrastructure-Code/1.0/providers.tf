@@ -22,6 +22,13 @@ provider "azurerm" {
   partner_id = ""
 }
 
+provider "azurerm" {
+  alias = "test"
+  subscription_id = "ae894bb7-da9a-40de-b039-5018557f3df1"
+  tenant_id = "72f988bf-86f1-41af-91ab-2d7cd011db47"
+  features{}
+}
+
 terraform {
   required_version = ">= 1.0.0"
   required_providers {

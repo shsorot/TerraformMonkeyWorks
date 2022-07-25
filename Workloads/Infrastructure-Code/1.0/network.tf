@@ -15,6 +15,7 @@ module "Landscape-Application-Security-Groups" {
   source          = "../../../AzureRM/Modules/Network/Azure-ApplicationSecurityGroup/1.0"
   for_each        = var.ApplicationSecurityGroups
   name            = each.value.name == null ? each.key : each.value.name
+
   resource_group  = each.value.resource_group
   location        = try(each.value.location, null)
   tags            = try(each.value.tags, local.tags)
@@ -36,6 +37,7 @@ module "Landscape-Network-Security-Groups" {
   source                      = "../../../AzureRM/Modules/Network/Azure-NetworkSecurityGroup/1.0"
   for_each                    = var.NetworkSecurityGroups
   name                        = each.value.name == null ? each.key : each.value.name
+
   resource_group              = each.value.resource_group
   location                    = try(each.value.location, null)
   tags                        = try(each.value.tags, local.tags)
@@ -75,6 +77,7 @@ module "Landscape-DDOS-Protection-Plans" {
   source          = "../../../AzureRM/Modules/Network/Azure-NetworkDDOSProtectionPlan/1.0"
   for_each        = var.DDOSProtectionPlans
   name            = each.value.name == null ? each.key : each.value.name
+
   resource_group  = each.value.resource_group
   location        = try(each.value.location, null)
   tags            = try(each.value.tags, local.tags)
@@ -96,6 +99,7 @@ module "Landscape-Virtual-Networks" {
   source         = "../../../AzureRM/Modules/Network/Azure-VirtualNetwork/2.0"
   for_each       = var.VirtualNetworks
   name           = each.value.name == null ? each.key : each.value.name
+
   resource_group = each.value.resource_group
   location       = try(each.value.location, null)
   address_space  = each.value.address_space
@@ -131,6 +135,7 @@ module "Landscape-Virtual-Subnets" {
   resource_group                                 = each.value.resource_group
   virtual_network_name                           = each.value.virtual_network_name
   name                                           = each.value.name == null ? each.key : each.value.name
+
   address_prefixes                               = each.value.address_prefixes
   service_endpoints                              = try(each.value.service_endpoints, [])
   service_endpoint_policy_ids                    = try(each.value.service_endpoint_policy_ids, null)
@@ -153,6 +158,7 @@ module "Landscape-Public-IP-Prefixes" {
   source          = "../../../AzureRM/Modules/Network/Azure-PublicIPPrefix/1.0"
   for_each        = var.PublicIPPrefixes
   name            = each.value.name == null ? each.key : each.value.name
+
   resource_group  = each.value.resource_group
   location        = try(each.value.location, null)
   prefix_length   = each.value.prefix_length
@@ -175,6 +181,7 @@ module "Landscape-Public-IP-Addresses" {
   source                  = "../../../AzureRM/Modules/Network/Azure-PublicIPAddress/1.0"
   for_each                = var.PublicIPAddresses
   name                    = each.value.name == null ? each.key : each.value.name
+
   resource_group          = each.value.resource_group
   location                = try(each.value.location, null)
   allocation_method       = try(each.value.allocation_method, "Dynamic")
@@ -207,9 +214,10 @@ variable "NetworkInterfaces" {
 
 
 module "Landscape-Virtual-Network-Interfaces" {
-  source                        = "../../../AzureRM/Modules/Network/Azure-NetworkInterface/1.1"
+  source                        = "../../../AzureRM/Modules/Network/Azure-NetworkInterface/2.0"
   for_each                      = var.NetworkInterfaces
   name                          = each.value.name == null ? each.key : each.value.name
+
   resource_group                = each.value.resource_group
   location                      = try(each.value.location, null)
   tags                          = try(each.value.tags, local.tags)

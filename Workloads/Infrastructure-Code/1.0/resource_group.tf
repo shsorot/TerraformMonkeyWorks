@@ -14,6 +14,7 @@ module "Landscape-Resource-Groups" {
   source               = "../../../AzureRM/Modules/Resources/Azure-ResourceGroup/1.0"
   for_each             = var.ResourceGroups
   name                 = each.value.name == null ? each.key : each.value.name
+
   location             = each.value.location
   management_lock_name = try(each.value.management_lock_name, null)
   lock_level           = try(each.value.lock_level, null)

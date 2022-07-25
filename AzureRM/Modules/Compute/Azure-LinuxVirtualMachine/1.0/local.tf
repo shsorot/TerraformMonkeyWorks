@@ -235,6 +235,7 @@ locals {
 
 
 
+
   # Note that Orchestrated Virtual Machine Scale Sets, Virtual Machine Scale Sets & Windows/Linux Virtual Machine Scale Sets are all the same 
   # in the sense that they are all represented by the same data source. Terraform treats them different due to the fact that they have different
   # OS and orchestration types

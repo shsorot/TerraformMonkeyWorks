@@ -46,12 +46,15 @@ variable "inherit_tags" {
 }
 
 
+# Note: there is no key based lookup as it results in a self-referential loop, which is not allowed by Terraform.data 
+# You could technically create two calls of module , one for base and one for child policies and pass the output of the base module to child module
+# If this is the case, please uncomment line:57, 63:72 and in file local.tf:73
 variable "base_policy" {
   type = object({
-    id                  = optional(string)
-    name                = optional(string)
-    resource_group_name = optional(string)
-    key                 = optional(string)
+    id                  = optional(string)    # Resource ID of the base policy to be used
+    name                = optional(string)    # Name of the base policy if the ID is unknown.
+    resource_group_name = optional(string)    # Resource group where the policy resides. If null, primary resource_group will be used for lookup
+    # key                = optional(string)    # Key value of the policy from output of module Azure-FirewallPolicy
   })
   description = "(Optional) The ID of the base Firewall Policy."
   default     = null

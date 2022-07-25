@@ -9,6 +9,7 @@ module "Landscape-Recovery-Service-Vaults" {
   source              = "../../../AzureRM/Modules/RecoveryServices/Azure-RecoveryServicesVault/1.0"
   for_each            = var.RecoveryServicesVaults
   name                = each.value.name == null ? each.key : each.value.name
+
   resource_group      = each.value.resource_group
   location            = try(each.value.location, null)
   tags                = try(each.value.tags, local.tags)
@@ -32,6 +33,7 @@ module "Landscape-Backup-Policy-VMs" {
   source                         = "../../../AzureRM/Modules/RecoveryServices/Azure-BackupPolicyVM/1.0"
   for_each                       = var.BackupPolicyVMs
   name                           = each.value.name == null ? each.key : each.value.name
+
   resource_group                 = each.value.resource_group
   recovery_vault                 = each.value.recovery_vault
   instant_restore_retention_days = try(each.value.instant_restore_retention_days, null)
