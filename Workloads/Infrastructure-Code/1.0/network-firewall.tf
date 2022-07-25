@@ -30,35 +30,35 @@ output "AzureFirewalls" {
   value = module.Landscape-Azure-Firewalls
 }
 
-variable "Firewallpolicies"{
+variable "Firewallpolicies" {
   default = {}
 }
 
 
-module "Landscape-Azure-Firewall-Policies"{
-  source = "../../../AzureRM/Modules/Network-Firewall/Azure-FirewallPolicy/1.0"
-  for_each = var.Firewallpolicies
-  name = each.value.name == null ? each.key : each.value.name
-  resource_group = each.value.resource_group
-  location = try(each.value.location, null)
-  tags = try(each.value.tags, local.tags)
-  inherit_tags = try(each.value.inherit_tags, false)
-  base_policy = try(each.value.base_policy,null)
-  dns = try(each.value.dns, null)
-  insights = try(each.value.insights,null)
-  intrusion_detection = try(each.value.intrusion_detection,null)
-  private_ip_ranges = try(each.value.private_ip_ranges,null)
-  sku = try(each.value.sku,"Standard")
-  threat_intelligence_allowlist = try(each.value.threat_intelligence_allowlist,null)
-  threat_intelligence_mode = try(each.value.threat_intelligence_mode,"Alert")
-  tls_certificate  = try(each.value.tls_certificate,null)
+module "Landscape-Azure-Firewall-Policies" {
+  source                        = "../../../AzureRM/Modules/Network-Firewall/Azure-FirewallPolicy/1.0"
+  for_each                      = var.Firewallpolicies
+  name                          = each.value.name == null ? each.key : each.value.name
+  resource_group                = each.value.resource_group
+  location                      = try(each.value.location, null)
+  tags                          = try(each.value.tags, local.tags)
+  inherit_tags                  = try(each.value.inherit_tags, false)
+  base_policy                   = try(each.value.base_policy, null)
+  dns                           = try(each.value.dns, null)
+  insights                      = try(each.value.insights, null)
+  intrusion_detection           = try(each.value.intrusion_detection, null)
+  private_ip_ranges             = try(each.value.private_ip_ranges, null)
+  sku                           = try(each.value.sku, "Standard")
+  threat_intelligence_allowlist = try(each.value.threat_intelligence_allowlist, null)
+  threat_intelligence_mode      = try(each.value.threat_intelligence_mode, "Alert")
+  tls_certificate               = try(each.value.tls_certificate, null)
 
   log_analytics_workspaces = module.Landscape-Log-Analytics-Workspaces
-  resource_groups = module.Landscape-Resource-Groups
-  keyvault_certificates = module.Landscape-Key-Vault-Certificates
-  user_assigned_identities                        = module.Landscape-User-Assigned-Identities
+  resource_groups          = module.Landscape-Resource-Groups
+  keyvault_certificates    = module.Landscape-Key-Vault-Certificates
+  user_assigned_identities = module.Landscape-User-Assigned-Identities
 }
 
-output "Firewallpolicies"{
+output "Firewallpolicies" {
   value = module.Landscape-Azure-Firewall-Policies
 }

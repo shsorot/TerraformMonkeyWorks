@@ -69,7 +69,12 @@ variable "os_disk" {
       name                = optional(string) # (Optional) Specifies the name of the managed disk resource that you want to use to create the image.
       resource_group_name = optional(string) # (Optional) Specifies the name of the resource group where the managed disk is located.
     }))                                      # (Optional) Specifies the managed disk ID to use for the virtual machine.
-    blob_uri = optional(string)              # (Optional) Specifies the blob URI of the VHD to use for the virtual machine.
+    blob     = optional(object({             # (Optional) Specifies the blob URI of the VHD to use for the virtual machine.
+        uri   = optional(string)
+        name  = optional(string)
+        storage_account_name  = optional(string)
+        storage_container_name= optional(string)
+    }))
     caching  = optional(string)              # (Optional) Specifies the caching requirements. Possible values include: 'None', 'ReadOnly', 'ReadWrite'
     size_gb  = optional(number)              # (Optional) Specifies the size of the VHD to use for the virtual machine.
   })

@@ -90,9 +90,9 @@ module "Landscape-Netapp-Volumes" {
   subnet                          = each.value.subnet
   storage_quota_in_gb             = each.value.storage_quota_in_gb
   snapshot_directory_visible      = try(each.value.snapshot_directory_visible, false)
-  create_from_snapshot_resource   = try(each.value.create_from_snapshot_resource_id, {})
-  data_protection_replication     = try(each.value.data_protection_replication, {})
-  data_protection_snapshot_policy = try(each.value.data_protection_snapshot_policy, {})
+  create_from_snapshot_resource   = try(each.value.create_from_snapshot_resource, null)
+  data_protection_replication     = try(each.value.data_protection_replication, null)
+  data_protection_snapshot_policy = try(each.value.data_protection_snapshot_policy, null)
   export_policy_rule              = try(each.value.export_policy_rule, null)
   throughput_in_mibps             = try(each.value.throughput_in_mibps, null)
   virtual_networks                = module.Landscape-Virtual-Networks

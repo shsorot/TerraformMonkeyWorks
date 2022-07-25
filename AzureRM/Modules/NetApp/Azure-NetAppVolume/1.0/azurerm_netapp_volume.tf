@@ -17,15 +17,15 @@ resource "azurerm_netapp_volume" "this" {
   # # Single Block
   # Note: currently only paired region replication within same subscription is supported.
   # Both source and target can exist in the same resource group.
-  # dynamic "data_protection_replication" {
-  #   for_each = local.data_protection_replication == null || local.data_protection_replication == {} ? [] : [1]
-  #   content {
-  #     endpoint_type             = local.data_protection_replication.endpoint_type
-  #     remote_volume_location    = local.data_protection_replication.remote_volume_location
-  #     remote_volume_resource_id = local.data_protection_replication.remote_volume_resource_id
-  #     replication_frequency     = local.data_protection_replication.replication_frequency
-  #   }
-  # }
+  dynamic "data_protection_replication" {
+    for_each = local.data_protection_replication == null ? [] : [1]
+    content {
+      endpoint_type             = local.data_protection_replication.endpoint_type
+      remote_volume_location    = local.data_protection_replication.remote_volume_location
+      remote_volume_resource_id = local.data_protection_replication.remote_volume_resource_id
+      replication_frequency     = local.data_protection_replication.replication_frequency
+    }
+  }
 
   # Single Block
   # TODO : fix issue post Hashicorp update to provider
