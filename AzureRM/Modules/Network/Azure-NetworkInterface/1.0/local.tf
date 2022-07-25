@@ -21,8 +21,5 @@ locals {
   tags                    = merge(var.tags, (var.inherit_tags == true ? local.resource_group_tags : {}))
   resource_group_location = var.resource_group.name == null ? var.resource_groups[var.resource_group.key].location : data.azurerm_resource_group.this[0].location
   location                = var.location == null ? local.resource_group_location : var.location
-
-  load_balanced_ip_configuration = { for v in var.ip_configuration : v.name => v.backend_address_pool if v.backend_address_pool != null }
-
   public_ip_address = { for v in var.ip_configuration : v.name => v.public_ip_address if v.public_ip_address != null }
 }

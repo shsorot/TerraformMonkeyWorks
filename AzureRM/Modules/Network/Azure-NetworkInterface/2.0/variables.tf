@@ -105,7 +105,6 @@ variable "ip_configuration" {
       load_balancer_name  = optional(string)
       resource_group_name = optional(string)
       key                 = optional(string)
-      key                 = optional(string)
       load_balancer_key   = optional(string)
     }))
     # Introduced in provider > 3.xx.x

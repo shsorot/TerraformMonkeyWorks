@@ -6,6 +6,7 @@ module "Landscape-Local-Network-Gateways" {
   source          = "../../../AzureRM/Modules/Network/Azure-LocalNetworkGateway/1.0"
   for_each        = var.LocalNetworkGateways
   name            = each.value.name == null ? each.key : each.value.name
+
   resource_group  = each.value.resource_group
   location        = try(each.value.location, null)
   tags            = try(each.value.tags, {})
@@ -30,6 +31,7 @@ module "Landscape-VPN-Gateways" {
   source                        = "../../../AzureRM/Modules/Network/Azure-VirtualNetworkGateway/1.0"
   for_each                      = var.VPNGateways
   name                          = each.value.name == null ? each.key : each.value.name
+
   resource_group                = each.value.resource_group
   location                      = try(each.value.location, null)
   tags                          = try(each.value.tags, {})
@@ -65,6 +67,7 @@ module "Landscape-VPN-Gateway-Connections" {
   source                             = "../../../AzureRM/Modules/Network/Azure-VirtualNetworkGatewayConnection/1.0"
   for_each                           = var.VPNGatewayConnections
   name                               = each.value.name == null ? each.key : each.value.name
+
   resource_group                     = each.value.resource_group
   location                           = try(each.value.location, null)
   tags                               = try(each.value.tags, {})

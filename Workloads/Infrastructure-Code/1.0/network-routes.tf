@@ -8,6 +8,7 @@ module "Landscape-Route-Tables" {
   source                        = "../../../AzureRM/Modules/Network/Azure-RouteTable/1.1"
   for_each                      = var.RouteTables
   name                          = each.value.name == null ? each.key : each.value.name
+
   resource_group                = each.value.resource_group
   location                      = try(each.value.location, null)
   disable_bgp_route_propagation = each.value.disable_bgp_route_propagation
@@ -31,6 +32,7 @@ module "Landscape-Routes" {
   source                 = "../../../AzureRM/Modules/Network/Azure-Route/1.0"
   for_each               = var.Routes
   name                   = each.value.name == null ? each.key : each.value.name
+
   resource_group_name    = each.value.resource_group_name
   route_table            = each.value.route_table
   address_prefix         = each.value.address_prefix
@@ -51,6 +53,7 @@ module "Landscape-Route-Filters" {
   source          = "../../../AzureRM/Modules/Network/Azure-RouteFilter/1.0"
   for_each        = var.RouteFilters
   name            = each.value.name == null ? each.key : each.value.name
+
   resource_group  = each.value.resource_group
   location        = try(each.value.location, null)
   tags            = try(each.value.tags, {})

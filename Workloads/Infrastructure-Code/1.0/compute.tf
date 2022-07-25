@@ -7,6 +7,7 @@ module "Landscape-SSH-Public-Keys" {
   source          = "../../../AzureRM/Modules/Compute/Azure-SSHPublicKey/1.0"
   for_each        = var.SSHPublicKeys
   name            = each.value.name == null ? each.key : each.value.name
+
   resource_group  = each.value.resource_group
   location        = try(each.value.location, null)
   tags            = try(each.value.tags, local.tags)
@@ -30,6 +31,7 @@ module "Landscape-Availability-Sets" {
   source                       = "../../../AzureRM/Modules/Compute/Azure-AvailabilitySet/1.0"
   for_each                     = var.AvailabilitySets
   name                         = each.value.name == null ? each.key : each.value.name
+
   resource_group               = each.value.resource_group
   location                     = try(each.value.location, null)
   platform_fault_domain_count  = try(each.value.platform_fault_domain_count, 2)
@@ -54,6 +56,7 @@ module "Landscape-Disk-Access" {
   source          = "../../../AzureRM/Modules/Compute/Azure-DiskAccess/1.0"
   for_each        = var.DiskAccess
   name            = each.value.name == null ? each.key : each.value.name
+
   resource_group  = each.value.resource_group
   location        = try(each.value.location, null)
   tags            = try(each.value.tags, local.tags)
@@ -80,30 +83,6 @@ module "Landscape-ProximityPlacement-Groups" {
 output "ProximityPlacementGroups" {
   value = module.Landscape-ProximityPlacement-Groups
 }
-
-# variable "OrchestratedVirtualMachineScaleSets" {
-#   default = {}
-# }
-
-# module "Landscape-Orchestrated-VirtualMachine-ScaleSets" {
-#   source                      = "../../../AzureRM/Modules/Compute/Azure-OrchestratedVirtualMachineScaleSet/1.0"
-#   for_each                    = var.OrchestratedVirtualMachineScaleSets
-#   name                        = each.value.name == null ? each.key : each.value.name
-#   resource_group              = each.value.resource_group
-#   location                    = try(each.value.location, null)
-#   tags                        = try(each.value.tags, local.tags)
-#   inherit_tags                = try(each.value.inherit_tags, false)
-#   zones                       = try(each.value.zones, null)
-#   platform_fault_domain_count = each.value.platform_fault_domain_count
-#   proximity_placement_group   = try(each.value.proximity_placement_group, null)
-#   single_placement_group      = try(each.value.single_placement_group, false)
-#   proximity_placement_groups  = module.Landscape-ProximityPlacement-Groups
-#   resource_groups             = module.Landscape-Resource-Groups
-# }
-
-# output "OrchestratedVirtualMachineScaleSets" {
-#   value = module.Landscape-Orchestrated-VirtualMachine-ScaleSets
-# }
 
 
 variable "DedicatedHosts" {
@@ -163,6 +142,7 @@ module "Landscape-Disk-Encryption-Sets" {
   source                    = "../../../AzureRM/Modules/Compute/Azure-DiskEncryptionSet/1.0"
   for_each                  = var.DiskEncryptionSets
   name                      = each.value.name == null ? each.key : each.value.name
+
   resource_group            = each.value.resource_group
   location                  = try(each.value.location, null)
   tags                      = try(each.value.tags, local.tags)
@@ -188,6 +168,7 @@ module "Landscape-Managed-Disks" {
   source                        = "../../../AzureRM/Modules/Compute/Azure-ManagedDisk/1.0"
   for_each                      = var.ManagedDisks
   name                          = each.value.name == null ? each.key : each.value.name
+
   resource_group                = each.value.resource_group
   location                      = try(each.value.location, null)
   tags                          = try(each.value.tags, local.tags)
@@ -323,6 +304,7 @@ module "Landscape-Azure-Windows-Virtual-Machines" {
   source                      = "../../../AzureRM/Modules/Compute/Azure-WindowsVirtualMachine/1.0"
   for_each                    = var.WindowsVirtualMachines
   name                        = each.value.name == null ? each.key : each.value.name
+
   resource_group              = try(each.value.resource_group, null)
   location                    = try(try(each.value.location, null), null)
   tags                        = try(each.value.tags, local.tags)
@@ -385,6 +367,7 @@ variable "VirtualMachineManagedDiskAttachments" {
 module "Landscape-Azure-Virtual-Machine-Managed-Disk-Attachments" {
   source                    = "../../../AzureRM/Modules/Compute/Azure-VirtualMachineDataDiskAttachment/1.0"
   for_each                  = var.VirtualMachineManagedDiskAttachments
+
   virtual_machine           = each.value.virtual_machine
   managed_disk              = each.value.managed_disk
   lun                       = each.value.lun
@@ -415,7 +398,8 @@ variable "VirtualMachineExtensions" {
 module "Landscape-Virtual-Machine-Extensions" {
   source                     = "../../../AzureRM/Modules/Compute/Azure-VirtualMachineExtension/1.0"
   for_each                   = var.VirtualMachineExtensions
-  name                       = each.value.name
+
+  name                       = each.value.name == null ? each.key : each.value.name
   tags                       = try(each.value.tags, local.tags)
   virtual_machine            = try(each.value.virtual_machine, null)
   publisher                  = each.value.publisher
@@ -439,6 +423,7 @@ variable "ADDS-DomainJoin" {
 module "Landscape-ADDS-DomainJoin" {
   source                    = "../../../AzureRM/Modules/Compute/Azure-VirtualMachineDomainJoin/1.0"
   for_each                  = var.VirtualMachineExtensions
+  
   tags                      = try(each.value.tags, local.tags)
   virtual_machine           = try(each.value.virtual_machine, null)
   active_directory_domain   = each.value.active_directory_domain
@@ -461,6 +446,7 @@ module "Landscape-Azure-Images"{
   source                         = "../../../AzureRM/Modules/Compute/Azure-Image/1.0"
   for_each                       = var.AzureImages
   name                           = each.value.name == null ? each.key : each.value.name
+
   resource_group                 = each.value.resource_group
   location                       = each.value.location
   tags                           = try(each.value.tags,null)

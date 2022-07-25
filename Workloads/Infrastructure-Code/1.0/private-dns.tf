@@ -6,6 +6,7 @@ module "Landscape-Private-DNS-Zones" {
   source          = "../../../AzureRM/Modules/PrivateDNS/Azure-PrivateDNSZone/1.0"
   for_each        = var.PrivateDNSZones
   name            = each.value.name == null ? each.key : each.value.name
+
   resource_group  = each.value.resource_group
   tags            = try(each.value.tags, local.tags)
   inherit_tags    = try(each.value.inherit_tags, false)
@@ -25,6 +26,7 @@ module "Landscape-Private-DNS-Zones-Virtual-Network-Links" {
   source                = "../../../AzureRM/Modules/PrivateDNS/Azure-PrivateDNSZoneVirtualNetworkLink/1.0"
   for_each              = var.PrivateDNSZonesVirtualNetworkLinks
   name                  = each.value.name == null ? each.key : each.value.name
+
   resource_group        = each.value.resource_group
   tags                  = try(each.value.tags, local.tags)
   inherit_tags          = try(each.value.inherit_tags, false)

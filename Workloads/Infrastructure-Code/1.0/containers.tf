@@ -6,6 +6,7 @@ module "Landscape-Container-Groups" {
   source                    = "../../../AzureRM/Modules/Container/Azure-ContainerGroup/1.0"
   for_each                  = var.ContainerGroups
   name                      = each.value.name == null ? each.key : each.value.name
+
   resource_group            = each.value.resource_group
   location                  = try(each.value.location, null)
   tags                      = try(each.value.tags, local.tags)
@@ -37,6 +38,7 @@ module "Landscape-Container-Registries" {
   source                        = "../../../AzureRM/Modules/Container/Azure-ContainerRegistry/1.0"
   for_each                      = var.ContainerRegistries
   name                          = each.value.name == null ? each.key : each.value.name
+
   resource_group                = each.value.resource_group
   location                      = try(each.value.location, null)
   tags                          = try(each.value.tags, local.tags)

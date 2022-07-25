@@ -24,10 +24,15 @@ locals {
 }
 
 # Data block for User assigned identity
+# TODO: fix this code
 data "azurerm_user_assigned_identity" "this" {
-  for_each = var.identity == null ? null : (var.identity.type == "UserAssignedIdentity" || var.identity.type == "SystemAssigned, UserAssigned" ? {
-    for instance in var.identity.identity : instance.name => instance if instance.name != null
-  } : null)
+  for_each = { for instance in (var.identity == null || var.identity == {} ? [] : var.identity.identity ) : instance.name => instance if (
+      var.identity.identity == null || var.identity.identity == [] ? false : (
+        instance.name == null ? false : true
+      )
+    )
+  }
+
   name                = each.value.name
   resource_group_name = coalesce(each.value.resource_group_name, local.resource_group_name)
 }

@@ -6,6 +6,7 @@ module "Landscape-Key-Vaults" {
   source                          = "../../../AzureRM/Modules/KeyVault/Azure-KeyVault/1.0"
   for_each                        = var.KeyVaults
   name                            = each.value.name == null ? each.key : each.value.name
+
   resource_group                  = each.value.resource_group
   location                        = try(each.value.location, null)
   sku_name                        = try(each.value.sku_name, null)
@@ -58,6 +59,7 @@ module "Landscape-Key-Vault-Keys" {
   source          = "../../../AzureRM/Modules/KeyVault/Azure-KeyVaultKey/1.0"
   for_each        = var.KeyVaultKeys
   name            = each.value.name == null ? each.key : each.value.name
+
   key_vault       = each.value.key_vault
   key_vaults      = module.Landscape-Key-Vaults
   key_type        = each.value.key_type
@@ -80,6 +82,7 @@ module "Landscape_Key-Vault-Secrets" {
   source          = "../../../AzureRM/Modules/KeyVault/Azure-KeyVaultSecret/1.0"
   for_each        = var.KeyVaultSecrets
   name            = each.value.name == null ? each.key : each.value.name
+
   value           = each.value.value
   key_vault       = each.value.key_vault
   key_vaults      = module.Landscape-Key-Vaults
@@ -101,6 +104,7 @@ module "Landscape-Key-Vault-Certificates" {
   source             = "../../../AzureRM/Modules/KeyVault/Azure-KeyVaultCertificate/1.0"
   for_each           = var.KeyVaultCertificates
   name               = each.value.name == null ? each.key : each.value.name
+
   key_vault          = each.value.key_vault
   key_vaults         = module.Landscape-Key-Vaults
   certificate        = try(each.value.certificate, null)

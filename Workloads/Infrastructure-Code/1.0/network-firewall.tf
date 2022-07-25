@@ -7,6 +7,7 @@ module "Landscape-Azure-Firewalls" {
   source              = "../../../AzureRM/Modules/Network-Firewall/Azure-Firewall/1.0"
   for_each            = var.AzureFirewalls
   name                = each.value.name == null ? each.key : each.value.name
+
   resource_group      = each.value.resource_group
   location            = try(each.value.location, null)
   tags                = try(each.value.tags, local.tags)
@@ -39,6 +40,7 @@ module "Landscape-Azure-Firewall-Policies" {
   source                        = "../../../AzureRM/Modules/Network-Firewall/Azure-FirewallPolicy/1.0"
   for_each                      = var.Firewallpolicies
   name                          = each.value.name == null ? each.key : each.value.name
+
   resource_group                = each.value.resource_group
   location                      = try(each.value.location, null)
   tags                          = try(each.value.tags, local.tags)

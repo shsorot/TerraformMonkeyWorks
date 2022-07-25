@@ -6,6 +6,7 @@ module "Landscape-NetApp-Accounts" {
   source           = "../../../AzureRM/Modules/NetApp/Azure-NetAppAccount/1.0"
   for_each         = var.NetAppAccounts
   name             = each.value.name == null ? each.key : each.value.name
+
   resource_group   = each.value.resource_group
   location         = try(each.value.location, null)
   tags             = try(each.value.tags, local.tags)
@@ -26,6 +27,7 @@ module "Landscape-NetApp-Snapshot-Policies" {
   source           = "../../../AzureRM/Modules/NetApp/Azure-NetAppSnapshotPolicy/1.0"
   for_each         = var.NetAppSnapshotPolicies
   name             = each.value.name == null ? each.key : each.value.name
+
   resource_group   = each.value.resource_group
   location         = try(each.value.location, null)
   account          = each.value.account
@@ -52,6 +54,7 @@ module "Landscape-NetApp-Pools" {
   source          = "../../../AzureRM/Modules/NetApp/Azure-NetAppPool/1.0"
   for_each        = var.NetAppPools
   name            = each.value.name == null ? each.key : each.value.name
+
   resource_group  = each.value.resource_group
   location        = try(each.value.location, null)
   tags            = try(each.value.tags, local.tags)
@@ -78,6 +81,7 @@ module "Landscape-Netapp-Volumes" {
   source                          = "../../../AzureRM/Modules/NetApp/Azure-NetAppVolume/1.0"
   for_each                        = var.NetAppVolumes
   name                            = each.value.name == null ? each.key : each.value.name
+
   resource_group                  = each.value.resource_group
   location                        = try(each.value.location, null)
   tags                            = try(each.value.tags, local.tags)

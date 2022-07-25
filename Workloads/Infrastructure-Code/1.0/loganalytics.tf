@@ -6,6 +6,7 @@ module "Landscape-Log-Analytics-Workspaces" {
   source                            = "../../../AzureRM/Modules/LogAnalytics/Azure-LogAnalyticsWorkspace/1.0"
   for_each                          = var.LogAnalyticsWorkspaces
   name                              = each.value.name == null ? each.key : each.value.name
+
   resource_group                    = each.value.resource_group
   location                          = try(each.value.location, null)
   sku                               = try(each.value.sku, "PerGB2018")
@@ -33,6 +34,7 @@ module "Landscape-Log-Analytics-Clusters" {
   source          = "../../../AzureRM/Modules/LogAnalytics/Azure-LogAnalyticsCluster/1.0/"
   for_each        = var.LogAnalyticsCluster
   name            = each.value.name == null ? each.key : each.value.name
+
   resource_group  = each.value.resource_group
   location        = try(each.value.location, null)
   identity        = try(each.value.identity, { type = "SystemAssigned" })

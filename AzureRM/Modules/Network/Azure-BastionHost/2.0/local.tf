@@ -20,3 +20,21 @@ locals {
   resource_group_location = var.resource_group.name == null ? var.resource_groups[var.resource_group.key].location : data.azurerm_resource_group.this[0].location
   location                = var.location == null ? local.resource_group_location : var.location
 }
+
+# Data block used by azurerm_subnet.tf
+data "azurerm_virtual_network" "this"{
+  count = var.subnet.virtual_network_name == null ? 0 : 1
+  name  = var.subnet.virtual_network_name
+  resource_group_name = coalesce(var.subnet.virtual_network_name,local.resource_group_name)
+}
+
+locals {
+  virtual_network_name = var.subnet.virtual_network_name == null ? (
+    var.virtual_networks[var.subnet.virtual_network_key].name
+  ) : data.azurerm_virtual_network.this[0].name
+  virtual_network_resource_group_name = var.subnet.virtual_network_name == null ? (
+    var.virtual_networks[var.subnet.virtual_network_key].resource_group_name
+  ) : data.azurerm_virtual_network.this[0].resource_group_name
+
+  address_prefixes = var.subnet.address_prefixes
+}

@@ -83,7 +83,7 @@ variable "ip_configuration" {
       name                 = optional(string)
       virtual_network_name = optional(string)
       resource_group_name  = optional(string)
-      tag                  = optional(string)
+      key                  = optional(string)
       virtual_network_key  = optional(string)
     })
     private_ip_address         = optional(string) # Private IP Address. If left null, dynamic allocation is used.
@@ -96,38 +96,8 @@ variable "ip_configuration" {
       resource_group_name = optional(string)
       key                 = optional(string)
     }))
-    backend_address_pool = optional(object({
-      id                  = optional(string)
-      name                = optional(string)
-      load_balancer_name  = optional(string)
-      resource_group_name = optional(string)
-      backend_pool_tag    = optional(string)
-      loadbalancer_tag    = optional(string)
-    }))
   }))
 }
-
-variable "application_security_group" {
-  type = object({
-    id                  = optional(string) # Name of the ASG. This will be used to lookup ASG resource in Azure for NIC association.
-    name                = optional(string)
-    resource_group_name = optional(string) # Resource group where ASG is located. If null, local.resource_group_name will be used.
-    key                 = optional(string) # Tag to be used to lookup ASG from the output of module Azure-ApplicationSecurityGroup
-  })
-  default = null
-}
-
-variable "network_security_group" {
-  type = object({
-    id                  = optional(string) # Name of the NSG. This will be used to lookup NSG resource in Azure for NIC association.
-    name                = optional(string)
-    resource_group_name = optional(string) # Resource group where NSG is located. If null, local.resource_group_name will be used.
-    key                 = optional(string) # Tag to be used to lookup NSG from the output of module Azure-NetworkSecurityGroup
-  })
-  default = null
-}
-
-
 
 
 variable "virtual_networks" {
@@ -160,43 +130,3 @@ variable "application_security_groups" {
   default     = {}
   description = "(Optional) Output of module Azure-ApplicationSecurityGroup."
 }
-
-variable "network_security_groups" {
-  type = map(object({
-    id = string
-  }))
-  default = {}
-}
-
-variable "loadbalancers" {
-  type = map(object({
-    id                   = optional(string)
-    private_ip_address   = optional(string)
-    private_ip_addresses = optional(list(string))
-    backend_address_pool_address = optional(map(object({
-      id = string
-    })))
-    backend_address_pool = optional(map(object({
-      id = string
-    })))
-    nat_pool = optional(map(object({
-      id = string
-    })))
-    nat_rule = optional(map(object({
-      id = string
-    })))
-    probe = optional(map(object({
-      id = string
-    })))
-    rule = optional(map(object({
-      id = string
-    })))
-    frontend_ip_configuration = optional(map(object({
-      id                   = string
-      private_ip_address   = string
-      public_ip_address_id = optional(string)
-    })))
-  }))
-  default = {}
-}
-

@@ -7,6 +7,7 @@ module "Landscape-Consolidated-Loadbalancers" {
   source         = "../../../AzureRM/Modules/Loadbalancer/Azure-Loadbalancer/2.0"
   for_each       = var.ConsolidatedLoadbalancers
   name           = each.value.name == null ? each.key : each.value.name
+
   resource_group = each.value.resource_group
   location       = try(each.value.location, null)
   sku            = try(each.value.sku, null)
@@ -42,6 +43,7 @@ module "Landscape-Loadbalancers" {
   source         = "../../../AzureRM/Modules/Loadbalancer/Azure-Loadbalancer/1.0"
   for_each       = var.Loadbalancers
   name           = each.value.name == null ? each.key : each.value.name
+
   resource_group = each.value.resource_group
   location       = try(each.value.location, null)
   sku            = try(each.value.sku, null)
@@ -69,6 +71,7 @@ module "Landscape-Loadbalancer-Backend-Address-Pools" {
   source        = "../../../AzureRM/Modules/Loadbalancer/Azure-LoadbalancerBackendAddressPool/1.0"
   for_each      = var.LoadbalancerBackendAddressPools
   name          = each.value.name == null ? each.key : each.value.name
+
   loadbalancer  = each.value.loadbalancer
   loadbalancers = merge(module.Landscape-Loadbalancers, module.Landscape-Consolidated-Loadbalancers)
 }
@@ -88,6 +91,7 @@ module "Landscape-Loadbalancer-Backend-Address-Pool-Addresses" {
   backend_address_pool  = each.value.backend_address_pool
   ip_address            = each.value.ip_address
   name                  = each.value.name == null ? each.key : each.value.name
+
   virtual_network       = each.value.virtual_network
   virtual_networks      = module.Landscape-Virtual-Networks
   backend_address_pools = module.Landscape-Loadbalancer-Backend-Address-Pools
@@ -106,6 +110,7 @@ module "Landscape-Loadbalancer-Probes" {
   source              = "../../../AzureRM/Modules/Loadbalancer/Azure-LoadbalancerProbe/1.0"
   for_each            = var.LoadbalancerProbes
   name                = each.value.name == null ? each.key : each.value.name
+
   resource_group_name = each.value.resource_group_name
   loadbalancer        = each.value.loadbalancer
   protocol            = try(each.value.protocol, null)
@@ -128,6 +133,7 @@ module "Landscape-Loadbalancer-Rules" {
   source                         = "../../../AzureRM/Modules/Loadbalancer/Azure-LoadbalancerRule/1.0"
   for_each                       = var.LoadbalancerProbes
   name                           = each.value.name == null ? each.key : each.value.name
+
   loadbalancer                   = each.value.loadbalancer
   backend_address_pool           = try(each.value.backend_address_pool, null)
   probe                          = try(each.value.probe, null)

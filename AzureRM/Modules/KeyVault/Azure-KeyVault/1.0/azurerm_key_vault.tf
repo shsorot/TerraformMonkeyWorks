@@ -18,28 +18,21 @@ resource "azurerm_key_vault" "this" {
   # access_policy                   = var.access_policy == null || var.access_policy == [] ? [] : var.access_policy
   access_policy = var.access_policy
 
-  # single block
+  # Single block, Optional
   # TODO : Add data block based lookup
+  # Move complex lookup code to local.tf
+  # Note: This is a single block, but can have multiple IP rules and virtual network subnet IDS. Default action is to block, and you allow IP/subnets on individual basis
   dynamic "network_acls" {
-    for_each = var.network_acls == null || var.network_acls == {} ? [] : [1]
+    for_each = local.network_acls == null ? [] : [1]
     content {
-      default_action = (var.network_acls["default_action"] == null) ? "Deny" : var.network_acls["default_action"]
-      bypass         = (var.network_acls["bypass"] == null) ? "None" : var.network_acls["bypass"]
-      ip_rules       = (var.network_acls["ip_rules"] == null) ? [] : var.network_acls["ip_rules"]
-
-      virtual_network_subnet_ids = var.network_acls.virtual_network_subnet == null || var.network_acls.virtual_network_subnet == [] ? null : (
-        [for instance in(var.network_acls.virtual_network_subnet == null || var.network_acls.virtual_network_subnet == [] ? [] : var.network_acls.virtual_network_subnet) : (
-          instance.id == null ? (
-            instance.name == null && instance.virtual_network_name == null ? (
-              var.virtual_networks[instance.virtual_network_tag].subnet[instance.key].id
-            ) : "/subscriptions/${local.subscription_id}/resourceGroups/${instance.resource_group_name == null ? local.resource_group_name : instance.resource_group_name}/providers/Microsoft.Network/virtualNetworks/${instance.virtual_network_name}/subnets/${instance.name}"
-          ) : instance.id
-          )
-        ]
-      )
+      default_action = local.network_acls.default_action
+      bypass         = local.network_acls.bypass
+      ip_rules       = local.network_acls.ip_rules
+      virtual_network_subnet_ids = local.network_acls.virtual_network_subnet_ids
     }
   }
 
+  # Single block, Optional
   dynamic "contact" {
     for_each = var.contact == {} || var.contact == null ? [] : [1]
     content {

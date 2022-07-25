@@ -8,6 +8,13 @@ variable "name" {
   type        = string
 }
 
+# Added in provider > 3.xx.x 
+variable "public_network_access_enabled"{
+  type = bool
+  description = "(Optional) Whether public network access is allowed for the container registry. Defaults to true."
+  default = true
+}
+
 variable "resource_group" {
   type = object({
     name = optional(string) # Name of the resource group

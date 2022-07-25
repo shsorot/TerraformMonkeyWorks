@@ -6,9 +6,12 @@ resource "azurerm_automation_account" "this" {
   tags                = local.tags
 
   sku_name = var.sku_name == null ? "Basic" : var.sku_name
+  # Added in > 3.xx.x
+  public_network_access_enabled = var.public_network_access_enabled
 
   # Added identity block to support Azure Automation Account with Managed Identity
-  # Single block
+  # Single block, Optional
+  # Note: you can have both system assigned and list of user assigned identities for automation account managed identity configuration
   dynamic "identity" {
     for_each = local.identity == null ? [] : [1]
     content {

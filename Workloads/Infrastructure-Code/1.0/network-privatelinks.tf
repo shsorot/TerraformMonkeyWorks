@@ -6,6 +6,7 @@ module "Landscape-Private-Endpoints" {
   source                     = "../../../AzureRM/Modules/Network/Azure-PrivateEndpoint/1.0"
   for_each                   = var.PrivateEndpoints
   name                       = each.value.name == null ? each.key : each.value.name
+
   resource_group             = each.value.resource_group
   location                   = try(each.value.location, null)
   tags                       = try(each.value.tags, local.tags)

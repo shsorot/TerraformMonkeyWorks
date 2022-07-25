@@ -6,6 +6,7 @@ module "Landscape-NAT-Gateways" {
   source                  = "../../../AzureRM/Modules/Network/Azure-NATGateway/1.0"
   for_each                = var.NATGateways
   name                    = each.value.name == null ? each.key : each.value.name
+
   resource_group          = each.value.resource_group
   location                = try(each.value.location, null)
   idle_timeout_in_minutes = try(each.value.idle_timeout_in_minutes, 4)

@@ -65,10 +65,12 @@ data "azurerm_key_vault_certificate" "this" {
 
 locals {
 
-  # We will use subscription ID based resource ID string generation for base policy ID.
-  # Tag based lookup will cause a loop where the module feeds itself its own output for lookup.
+# Note: there is no key based lookup as it results in a self-referential loop, which is not allowed by Terraform.
+# You could technically create two calls of module , one for base and one for child policies and pass the output of the base module to child module
+# If this is the case, please uncomment line:73
   base_policy_id = var.base_policy == null ? null : (
     var.base_policy.id == null ? (
+      # var.base_policy.name == null ? (var.firewall_policies[var.base_policy.key].id ) : 
       data.azurerm_firewall_policy.this[0].id
     ) : var.base_policy.id
   )

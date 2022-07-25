@@ -7,6 +7,7 @@ module "Landscape-Virtual-Hubs" {
   source          = "../../../AzureRM/Modules/Network/Azure-VirtualHub/1.0"
   for_each        = var.VirtualHubs
   name            = each.value.name == null ? each.key : each.value.name
+
   resource_group  = each.value.resource_group
   location        = try(each.value.location, null)
   tags            = try(each.value.tags, local.tags)
@@ -32,6 +33,7 @@ module "Landscape-Virtual-Hub-IPs" {
   source                       = "../../../AzureRM/Modules/Network/Azure-VirtualHubIP/1.0"
   for_each                     = var.VirtualHubIPs
   name                         = each.value.name == null ? each.key : each.value.name
+
   virtual_hub                  = each.value.virtual_hub
   subnet                       = each.value.subnet
   private_ip_address           = try(each.value.private_ip_address, null)
@@ -56,6 +58,7 @@ module "Landscape-Virtual-Hub-Route-Tables" {
   source       = "../../../AzureRM/Modules/Network/Azure-VirtualHubRouteTable/1.0"
   for_each     = var.VirtualHubRouteTables
   name         = each.value.name == null ? each.key : each.value.name
+
   virtual_hub  = each.value.virtual_hub
   labels       = try(each.value.labels, null)
   route        = each.value.route
@@ -76,6 +79,7 @@ module "Landscape-Virtual-Hub-Connections" {
   source                    = "../../../AzureRM/Modules/Network/Azure-VirtualHubConnection/1.0"
   for_each                  = var.VirtualHubConnections
   name                      = each.value.name == null ? each.key : each.value.name
+
   virtual_hub               = each.value.virtual_hub
   remote_virtual_network    = each.value.remote_virtual_network
   internet_security_enabled = try(each.value.internet_security_enabled, false)
@@ -98,6 +102,7 @@ module "Landscape-Virtual-Hub-Route-Table-Routes" {
   source                  = "../../../AzureRM/Modules/Network/Azure-VirtualHubRouteTableRoute/1.0"
   for_each                = var.VirtualHubRouteTableRoutes
   name                    = each.value.name == null ? each.key : each.value.name
+
   route_table             = each.value.route_table
   destinations            = each.value.destinations
   destinations_type       = each.value.destinations_type

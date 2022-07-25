@@ -103,7 +103,7 @@ locals {
             var.loadbalancers[instance.loadbalancer_tag].backend_address_pool[instance.backend_pool_tag].id
           ) : data.azurerm_lb_backend_address_pool.azurerm_network_interface_backend_address_pool_association[concat(instance.backend_address_pool.load_balancer_name,"-",instance.backend_address_pool.name)].id
         ) : instance.id
-      }
+      } if v.backend_address_pool == null 
     ]
   if(v.backend_address_pool != null && v.backend_address_pool != [])])
 
@@ -141,12 +141,12 @@ locals {
   }]
 
 
-  application_security_group_ids = var.application_security_group == null || var.application_security_group == {} ? null : (
-    [for instance in var.application_security_group : (instance.application_security_group.id == null ? (
-      instance.application_security_group.name == null && instance.application_security_group.resource_group_name == null ? (
-        var.application_security_groups[instance.application_security_group.name].id
-      ) : data.azurerm_application_security_group.this[instance.application_security_group.name].id
-    ) : instance.application_security_group.id)]
+  application_security_group_ids = var.application_security_group == null || var.application_security_group == [] ? null : (
+    [for instance in var.application_security_group : (instance.id == null ? (
+      instance.name == null ? (
+        var.application_security_groups[instance.key].id
+      ) : data.azurerm_application_security_group.this[instance.name].id
+    ) : instance.id)]
   )
 
   network_security_group_id = var.network_security_group == null || var.network_security_group == {} ? null : (

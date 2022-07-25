@@ -105,6 +105,7 @@ variable "purge_protection_enabled" {
   default     = false # Enable with caution: this setting unconditionally prevents purging the Key Vault for 90 days
 }
 
+# TODO : add code for application ID lookup
 variable "access_policy" {
   type = list(object({
     tenant_id               = string                 #   (Required) The Azure Active Directory tenant ID that should be used for authenticating requests to the key vault. Must match the tenant_id used above.
@@ -129,20 +130,20 @@ variable "access_policy" {
 
 variable "network_acls" {
   type = object({
-    default_action = optional(string)       # Can be "Allow" or "Deny"
-    bypass         = optional(string)       # Can be "AzureServices" or "None"
-    ip_rules       = optional(list(string)) # IP ranges. Notes: if only one value is specified it should be embraced in the square brackets; single IPs should be set as ranges with the /32 mask.
+    default_action =          string        # (Required) Specifies which traffic can bypass the network rules. Possible values are AzureServices and None.
+    bypass         =          string        # (Required) The Default Action to use when no rules match from ip_rules / virtual_network_subnet_ids. Possible values are Allow and Deny.
+    ip_rules       = optional(list(string)) #  (Optional) One or more IP Addresses, or CIDR Blocks which should be able to access the Key Vault.
     virtual_network_subnet = optional(list(object({
       id                   = optional(string)
       name                 = optional(string)
       virtual_network_name = optional(string)
       resource_group_name  = optional(string)
-      tag                  = optional(string)
+      key                  = optional(string)
       virtual_network_key  = optional(string)
-    }))) # Full subnet resource Ids. Note: if only one value is specified it should be embraced in the square brackets.
+    }))) # (Optional) One or more Subnet IDs which should be able to access this Key Vault.
 
   })
-  default = {}
+  default = null
 }
 
 variable "contact" {
