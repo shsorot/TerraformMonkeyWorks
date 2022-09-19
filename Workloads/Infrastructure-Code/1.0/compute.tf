@@ -142,10 +142,6 @@ module "Landscape-Disk-Encryption-Sets" {
   source                    = "../../../AzureRM/Modules/Compute/Azure-DiskEncryptionSet/1.0"
   for_each                  = var.DiskEncryptionSets
   name                      = each.value.name == null ? each.key : each.value.name
-<<<<<<< HEAD
-
-=======
->>>>>>> main
   resource_group            = each.value.resource_group
   location                  = try(each.value.location, null)
   tags                      = try(each.value.tags, local.tags)
@@ -171,10 +167,6 @@ module "Landscape-Managed-Disks" {
   source                        = "../../../AzureRM/Modules/Compute/Azure-ManagedDisk/1.0"
   for_each                      = var.ManagedDisks
   name                          = each.value.name == null ? each.key : each.value.name
-<<<<<<< HEAD
-
-=======
->>>>>>> main
   resource_group                = each.value.resource_group
   location                      = try(each.value.location, null)
   tags                          = try(each.value.tags, local.tags)
