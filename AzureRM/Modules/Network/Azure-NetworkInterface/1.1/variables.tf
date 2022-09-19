@@ -13,10 +13,10 @@ variable "resource_group" {
 
 variable "resource_groups" {
   type = map(object({
-    id       = optional(string)
-    location = optional(string)
-    tags     = optional(map(string))
-    name     = optional(string)
+    id       = optional(string)         # (Optional) Resource ID of the resource group.
+    location = optional(string)         # (Optional) Location on the resource group.
+    tags     = optional(map(string))    # (Optional) Tags attached to the resource group.
+    name     = optional(string)         # (Optional) Name of the resource group.
   }))
   description = <<EOF
    (Optional) Output of Module Azure-ResourceGroup. Used to lookup RG properties using Terraform Object Keys"
@@ -79,12 +79,12 @@ variable "ip_configuration" {
   type = list(object({
     name = string # Required, Name of the IP configuration.If Empty, key name is used.
     subnet = object({
-      id                   = optional(string)
-      name                 = optional(string)
-      virtual_network_name = optional(string)
-      resource_group_name  = optional(string)
-      key                  = optional(string)
-      virtual_network_key  = optional(string)
+      id                   = optional(string)         # Resource ID of the Subnet.
+      name                 = optional(string)         # Name of the Subnet if resource ID is not known.
+      virtual_network_name = optional(string)         # Name of the Parent Virtual network resource if subnet ID is not known.
+      resource_group_name  = optional(string)         # Resource group where Virtual network is located. If null, the Parent resource group is used for lookup
+      key                  = optional(string)         # Key to be used for subnet lookup if output of Azure-VirtualNetwork\1.1 is used
+      virtual_network_key  = optional(string)         # Key to be used for Virtual Network lookup if output of Azure-VirtualNetwork\1.1 is used
     })
     private_ip_address         = optional(string) # Private IP Address. If left null, dynamic allocation is used.
     private_ip_address_allocation = optional(string) # Private IP Address allocation method. Possible values: Dynamic, Static. Default: Dynamic.
@@ -93,7 +93,7 @@ variable "ip_configuration" {
 
     # (Optional) The public IP address to associate with this IP configuration. Only one public ip can be attached to an IP configuration
     public_ip_address = optional(object({
-      id                  = optional(string)
+      id                  = optional(string)      
       name                = optional(string)
       resource_group_name = optional(string)
       key                 = optional(string)

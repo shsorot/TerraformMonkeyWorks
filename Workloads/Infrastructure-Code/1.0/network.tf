@@ -214,7 +214,7 @@ variable "NetworkInterfaces" {
 
 
 module "Landscape-Virtual-Network-Interfaces" {
-  source                        = "../../../AzureRM/Modules/Network/Azure-NetworkInterface/2.0"
+  source                        = "../../../AzureRM/Modules/Network/Azure-NetworkInterface/1.1"
   for_each                      = var.NetworkInterfaces
   name                          = each.value.name == null ? each.key : each.value.name
 
