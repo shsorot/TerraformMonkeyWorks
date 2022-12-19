@@ -22,12 +22,12 @@ variable "description" {
 
 variable "permissions" {
   type = object({
-    actions          = optional(list(string)) # (Optional) One or more Allowed Actions, such as *, Microsoft.Resources/subscriptions/resourceGroups/read
-    data_actions     = optional(list(string)) # (Optional) One or more Allowed Data Actions, such as *, Microsoft.Storage/storageAccounts/blobServices/containers/blobs/read
-    not_actions      = optional(list(string)) # (Optional) One or more Disallowed Actions, such as *, Microsoft.Resources/subscriptions/resourceGroups/read
-    not_data_actions = optional(list(string)) # (Optional) One or more Disallowed Data Actions, such as *, Microsoft.Resources/subscriptions/resourceGroups/read
+    actions          = optional(list(string)) # (Optional) One or more Allowed Actions, such as *, Microsoft.Resources/subscriptions/resourceGroups/read. See "https://docs.microsoft.com/azure/role-based-access-control/resource-provider-operations"
+    data_actions     = optional(list(string)) # (Optional) One or more Allowed Data Actions, such as *, Microsoft.Storage/storageAccounts/blobServices/containers/blobs/read. See "https://docs.microsoft.com/azure/role-based-access-control/resource-provider-operations"
+    not_actions      = optional(list(string)) # (Optional) One or more Disallowed Actions, such as *, Microsoft.Resources/subscriptions/resourceGroups/read. See "https://docs.microsoft.com/azure/role-based-access-control/resource-provider-operations"
+    not_data_actions = optional(list(string)) # (Optional) One or more Disallowed Data Actions, such as *, Microsoft.Resources/subscriptions/resourceGroups/read. See "https://docs.microsoft.com/azure/role-based-access-control/resource-provider-operations"
   })
-  description = "(Optional) A permissions block as defined in type."
+  description = "(Optional) A Single permissions block as defined in object type."
 }
 
 variable "assignable_scopes" {

@@ -6,7 +6,7 @@ resource "azurerm_role_definition" "this" {
   scope       = local.scope
   description = var.description
   # Currently this must be explicitly specified.
-  # TODO : investigate possible discovery using data block
+  # TODO : investigate possible discovery using data block. Must be specified as list of resource Ids or long string subscription id.
   assignable_scopes = local.assignable_scopes
   dynamic "permissions" {
     for_each = var.permissions == null ? [] : [1]

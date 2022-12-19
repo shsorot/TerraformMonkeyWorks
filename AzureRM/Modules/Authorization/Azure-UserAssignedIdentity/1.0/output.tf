@@ -1,3 +1,19 @@
+output "name"{
+  value = azurerm_user_assigned_identity.this.name
+  description = "Name of the managed identity object."
+}
+
+output "resource_group_name"{
+  value = azurerm_user_assigned_identity.this.resource_group_name
+  description = "Resource group of the managed identity object."
+}
+
+output "location"{
+  value = azurerm_user_assigned_identity.this.location
+  description = "Location of the Azure managed identity object."
+}
+
+
 output "id" {
   value       = azurerm_user_assigned_identity.this.id
   description = "The user assigned identity ID."

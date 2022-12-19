@@ -1,8 +1,10 @@
 resource "azurerm_role_assignment" "this" {
   name = var.name
-  # Currently this must be explicitly specified.
-  # TODO : investigate possible discovery using data block 
+  # Currently this must be explicitly specified.must be provided as list of resource ID's and subscription ID in full string format
+  # TODO : investigate possible discovery using data block.
   scope              = local.scope
+  
+  # Conflicts with role_definition_name
   role_definition_id = local.role_definition_id
 
   # Conflicts with role_definition_id
@@ -18,5 +20,6 @@ resource "azurerm_role_assignment" "this" {
   delegated_managed_identity_resource_id = var.delegated_managed_identity_resource_id
 
   description                      = var.description
+  # Note, if set to false and identity does not exists as service principal, assignment will fataly fail.
   skip_service_principal_aad_check = var.skip_service_principal_aad_check
 }
