@@ -7,7 +7,8 @@ resource "azurerm_disk_encryption_set" "this" {
   # Added in provider > 3.xx.x
   auto_key_rotation_enabled = var.auto_key_rotation_enabled
   encryption_type           = var.encryption_type
-
+  # TODO: check for future code based lookup possibility
+  federated_client_id       = var.federated_client_id 
   # Currently only possible type is "SystemAssigned", but code left to accomodate future changes.
   identity {
     type = var.identity.type == null ? "SystemAssigned" : var.identity.type

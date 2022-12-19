@@ -226,10 +226,10 @@ locals {
   )]
 
 
-  source_image_reference = var.source_image_reference == null ? {
-    publisher = "Canonical"
-    offer     = "UbuntuServer"
-    sku       = "18.04-LTS"
+  source_image_reference = (var.source_image_reference == null || var.source_image_reference == {} )? {
+    publisher = "MicrosoftWindowsServer"
+    offer     = "WindowsServer"
+    sku       = "2019-Datacenter"
     version   = "latest"
   } : var.source_image_reference
 
@@ -264,7 +264,7 @@ locals {
     var.custom_data.raw == null ? filebase64(var.custom_data.file) : var.custom_data.raw
   )
 
-  winrm_listener = var.winrm_listener == null || var.winrm_listener == {} ? null : (
+  winrm_listener = var.winrm_listener == null || var.winrm_listener == [] ? {} : (
     [ for instance in var.winrm_listener : {
         protocol = instance.protocol
         certificate_url = instance.certificate.url.id == null ? (

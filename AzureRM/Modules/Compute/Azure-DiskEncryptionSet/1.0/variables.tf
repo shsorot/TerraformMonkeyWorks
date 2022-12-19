@@ -97,3 +97,9 @@ variable "encryption_type" {
   description = " (Optional) The type of key used to encrypt the data of the disk. Possible values are EncryptionAtRestWithCustomerKey, EncryptionAtRestWithPlatformAndCustomerKeys and ConfidentialVmEncryptedWithCustomerKey. Defaults to EncryptionAtRestWithCustomerKey."
   default     = "EncryptionAtRestWithCustomerKey"
 }
+
+variable "federated_client_id"{
+  type = string
+  description = "(Optional) Multi-tenant application client id to access key vault in a different tenant.Must be explicitly specified, no lookup possible."
+  default = null
+}

@@ -350,7 +350,7 @@ variable "proximity_placement_groups" {
 }
 
 
-
+# TODO: to be
 variable "secret" {
   type = list(object({
     key_vault = object({
@@ -405,12 +405,7 @@ variable "source_image_reference" {
     sku       = optional(string) #   (Optional) Specifies the SKU of the image used to create the virtual machines.
     version   = optional(string) #   (Optional) Specifies the version of the image used to create the virtual machines.
   })
-  default = {
-    publisher = "MicrosoftWindowsServer"
-    offer     = "WindowsServer"
-    sku       = "2016-Datacenter"
-    version   = "latest"
-  }
+  default = null
 }
 
 # added in provider > 3.xx.x

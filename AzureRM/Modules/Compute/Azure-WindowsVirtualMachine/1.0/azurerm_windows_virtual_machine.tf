@@ -39,7 +39,7 @@ resource "azurerm_windows_virtual_machine" "this" {
 
   # Multiple Blocks, Optional
   dynamic "additional_unattend_content"{
-    for_each = { for idx,instance in var.additional_unattend_content :idx => instance }
+    for_each = { for idx,instance in (var.additional_unattend_content == null || var.additional_unattend_content == [] ? [] : var.additional_unattend_content) : idx => instance}
     content {
       content = each.value.content
       setting = each.value.content
@@ -89,9 +89,9 @@ resource "azurerm_windows_virtual_machine" "this" {
 
   # added in provider > 3.xx.x  
   # Can be None, Windows_Client and Windows_Server. This refers to Azure Hybrid Use Benefit
-  license_type  = var.license_type
+  license_type  = var.license_type == null ? "None" : var.license_type
   # This can only be configured when priority is set to Spot.
-  max_bid_price = var.priority == "Spot" ? var.max_bid_price : null
+  max_bid_price = (var.priority == "Spot") ? var.max_bid_price : null
 
   # Possible values are Manual,AutomaticByOS and AutomaticByPlatform.
   # If patch_mode is set to AutomaticByPlatform then provision_vm_agent must also be set to true. 
@@ -110,7 +110,7 @@ resource "azurerm_windows_virtual_machine" "this" {
   platform_fault_domain = var.platform_fault_domain
   priority              = var.priority
   # If patch_mode is set to AutomaticByPlatform then provision_vm_agent must also be set to true.
-  provision_vm_agent = var.patch_mode == "AutomaticByPlatform " ? true : var.provision_vm_agent
+  provision_vm_agent = (var.patch_mode == "AutomaticByPlatform") ? true : var.provision_vm_agent
 
   proximity_placement_group_id = local.proximity_placement_group_id
 
@@ -137,7 +137,7 @@ resource "azurerm_windows_virtual_machine" "this" {
   source_image_id = local.source_image_id
 
   dynamic "source_image_reference" {
-    for_each = local.source_image_reference == null ? [1] : []
+    for_each = local.source_image_reference == null ? [] : [1]
     content {
       publisher = local.source_image_reference.publisher
       offer     = local.source_image_reference.offer

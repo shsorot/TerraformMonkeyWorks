@@ -69,6 +69,7 @@ variable "admin_password" {
   default     = null
 }
 
+# Added for v1.1, option to use a local 'pub' file , raw string , Azure SSH Key object or Azure key vault secret.
 variable "admin_ssh_key" {
   type = list(object({
     username   = string
@@ -144,15 +145,6 @@ variable "additional_capabilities" {
   })
   description = "(Optional) Should the capacity to enable Data Disks of the UltraSSD_LRS storage account type be supported on this Virtual Machine? Defaults to false"
   default     = null
-}
-
-variable "additional_unattend_content" {
-  type = list(object({
-    content = string # (Required) The XML formatted content that is added to the unattend.xml file for the specified path and component. Changing this forces a new resource to be created.
-    setting = string # (Required) The name of the setting to which the content applies. Possible values are AutoLogon and FirstLogonCommands. Changing this forces a new resource to be created.
-  }))
-  sensitive = true
-  default = null
 }
 
 
@@ -257,12 +249,6 @@ variable "edge_zone" {
   default     = null
 }
 
-variable "enable_automatic_updates"{
-  type = bool
-  description = "(Optional)(Optional) Specifies if Automatic Updates are Enabled for the Windows Virtual Machine. Changing this forces a new resource to be created."
-  default = false
-}
-
 variable "encryption_at_host_enabled" {
   type        = bool
   description = "(Optional) Should all of the disks (including the temp disk) attached to this Virtual Machine be encrypted by enabling Encryption at Host?"
@@ -365,6 +351,7 @@ variable "proximity_placement_groups" {
 }
 
 
+# TODO: to be
 variable "secret" {
   type = list(object({
     key_vault = object({
@@ -375,7 +362,6 @@ variable "secret" {
     }) #   (Required) The ID of the Key Vault from which all Secrets should be sourced.
     # TODO: change 'url' to object with id, name and key for lookup. Keyvault is pulled from 
     certificate = list(object({
-      store  = string # (Required) The certificate store on the Virtual Machine where the certificate should be added.
       url = object({
         id                = optional(string)
         name              = optional(string)
@@ -386,8 +372,6 @@ variable "secret" {
   default = null
 }
 
-
-
 # Added in provider > 3.xx.x
 variable "secure_boot_enabled" {
   type        = bool
@@ -395,12 +379,6 @@ variable "secure_boot_enabled" {
   default     = false
 }
 
-
-# variable "source_image_id" {
-#   type        = string
-#   description = "(Optional) The ID of the Image which this Virtual Machine should be created from. Changing this forces a new resource to be created."
-#   default     = null
-# }
 
 variable "source_image"{
   type = object({
@@ -428,12 +406,7 @@ variable "source_image_reference" {
     sku       = optional(string) #   (Optional) Specifies the SKU of the image used to create the virtual machines.
     version   = optional(string) #   (Optional) Specifies the version of the image used to create the virtual machines.
   })
-  default = {
-    publisher = "MicrosoftWindowsServer"
-    offer     = "WindowsServer"
-    sku       = "2019-Datacenter"
-    version   = "latest"
-  }
+  default = null
 }
 
 # added in provider > 3.xx.x
@@ -447,19 +420,12 @@ variable "termination_notification" {
   }
 }
 
-variable "timezone"{
-  type = string
-  description = "(Optional) Specifies the Time Zone which should be used by the Virtual Machine, the possible values are defined here: https://jackstromberg.com/2017/01/list-of-time-zones-consumed-by-azure/ ."
-  default = null
-}
-
 # added in provider > 3.xx.x
 variable "user_data" {
   type = object({
     raw  = optional(string) # (Optional) The Base64-Encoded User Data which should be used for this Virtual Machine.
     file = optional(string) # (Optional) The file whose content will be encoded as Base64 and used for this Virtual Machine.
   })
-  sensitive = true
   default = null
 }
 # added in provider > 3.xx.x
@@ -505,24 +471,6 @@ variable "user_assigned_identities" {
     id = optional(string)
   }))
   default = {}
-}
-
-
-variable "winrm_listener"{
-  type = list(object({
-    protocol = string # (Required) Specifies Specifies the protocol of listener. Possible values are Http or Https
-    certificate = optional(object({
-      url = object({
-        id = optional(string)
-        name = optional(string)
-        key = optional(string)
-        key_vault_name = optional(string)
-        key_vault_resource_group_name = optional(string)
-        key_vault_key = optional(string)
-      })
-    })) #  (Optional) The Secret URL of a Key Vault Certificate, which must be specified when protocol is set to Https.
-  }))
-  default = []
 }
 
 variable "key_vault_certificates"{
