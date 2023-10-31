@@ -187,7 +187,7 @@ variable "loadbalancer_nat_rule" {
 }
 
 variable "virtual_networks" {
-  description = "(Optional) Output object from Module Azure-VirtualNetwork, to be used with 'virtual_network_tag' and 'virtual_network_tag'"
+  description = "(Optional) Output object from Module Azure-VirtualNetwork, to be used with 'virtual_network_key' and 'virtual_network_key'"
   type = map(object({
     id   = string # Resource ID of the virtual Network
     name = string # Name of the Virtual Network

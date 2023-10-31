@@ -11,6 +11,7 @@ module "Landscape-Storage-Accounts" {
   resource_group             = each.value.resource_group
   location                   = try(each.value.location, null)
   account_kind               = try(each.value.account_kind, null)
+  account_tier               = try(each.value.account_tier,"Standard")
   account_replication_type   = try(each.value.account_replication_type, null)
   access_tier                = try(each.value.access_tier, null)
   enable_https_traffic_only  = try(each.value.enable_https_traffic_only, null)
@@ -73,10 +74,13 @@ module "Landscape-Storage-Shares" {
   for_each             = var.StorageShares
   name                 = each.value.name == null ? each.key : each.value.name
 
-  storage_account_name = each.value.storage_account_name
-  acl                  = try(each.value.acl, null)
-  quota                = try(each.value.quota, null)
+  storage_account      = each.value.storage_account
+  access_tier          = try(each.value.access_tier,"Hot")
+  acl                  = try(each.value.acl, [])
+  enabled_protocol     = try(each.value.enabled_protocol,"SMB")
+  quota                = try(each.value.quota, 100)
   metadata             = try(each.value.metadata, null)
+  storage_accounts     = module.Landscape-Storage-Accounts
   depends_on = [
     module.Landscape-Storage-Accounts
   ]

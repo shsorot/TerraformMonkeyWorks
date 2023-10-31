@@ -39,7 +39,7 @@ data "azurerm_dns_zone" "this" {
 locals {
   subnet_id = var.subnet.id == null ? (
     var.subnet.name == null && var.subnet.virtual_network_name == null ? (
-      var.virtual_networks[var.subnet.virtual_network_tag].subnet[var.subnet.key].id
+      var.virtual_networks[var.subnet.virtual_network_key].subnet[var.subnet.key].id
     ) : data.azurerm_subnet.this[0].id
   ) : var.subnet.id
 

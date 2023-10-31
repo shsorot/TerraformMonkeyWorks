@@ -3,9 +3,36 @@ variable "name" {
   description = "(Required) The name of the share. Must be unique within the storage account where the share is located."
 }
 
-variable "storage_account_name" {
-  type        = string
+variable "storage_account" {
+  type        = object({
+    name = optional(string)
+    key  = optional(string)
+  })
   description = "(Required) Specifies the storage account in which to create the share. Changing this forces a new resource to be created."
+}
+
+variable "access_tier" {
+  type = string
+  description = "(Optional) The access tier of the File Share. Possible values are Hot, Cool and TransactionOptimized, Premium."
+  default = null
+}
+
+variable "acl"{
+  type = list(object({
+    id            = string #(Required) The ID which should be used for this Shared Identifier.
+    access_policy = optional(object({
+      permissions = optional(string) # (Required) The permissions which should be associated with this Shared Identifier. Possible value is combination of r (read), w (write), d (delete), and l (list).
+      start       = optional(string) # (Optional) The time at which this Access Policy should be valid from, in ISO8601 format.
+      expiry      = optional(string) # (Optional) The time at which this Access Policy should be valid until, in ISO8601 format.
+    }))
+  }))
+  default = null
+}
+
+variable "enabled_protocol" {
+  type = string
+  description = "(Optional) The protocol used for the share. Possible values are SMB and NFS. The SMB indicates the share can be accessed by SMBv3.0, SMBv2.1 and REST. The NFS indicates the share can be accessed by NFSv4.1. Defaults to SMB. Changing this forces a new resource to be created."
+  default = "SMB"
 }
 
 variable "quota" {
@@ -25,14 +52,10 @@ variable "metadata" {
   default     = {}
 }
 
-variable "acl" { # Key value is used for ACL ID
+variable "storage_accounts"{
   type = map(object({
-    access_policy = object({
-      permissions = string           #     (Required) The permissions which should be associated with this Shared Identifier. Possible value is combination of r (read), w (write), d (delete), and l (list).
-      start       = optional(string) #   (Optional) The time at which this Access Policy should be valid from, in ISO8601 format.
-      expiry      = optional(string) #    (Optional) The time at which this Access Policy should be valid until, in ISO8601 format.
-    })
+    id    = string
+    name  = string
   }))
-  default = null
+  description = "(Optional) Output of module Azure-StorageAccount"
 }
-

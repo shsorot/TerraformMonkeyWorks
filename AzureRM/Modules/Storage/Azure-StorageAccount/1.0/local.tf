@@ -11,6 +11,12 @@ data "azurerm_resource_group" "this" {
   name  = var.resource_group.name
 }
 
+
+# Data block for azurerm_subnet for 'network_rules' property
+# data "azurerm_subnet" "this"{
+  # for_each = { for  idx,instance in var.network_rules.virtual_network_subnet}
+# }
+#<TODO> Add rule for network subnets block
 #Create the local variables
 locals {
   client_id               = data.azurerm_client_config.current.client_id
@@ -22,4 +28,5 @@ locals {
   tags                    = merge(var.tags, (var.inherit_tags == true ? local.resource_group_tags : {}))
   resource_group_location = var.resource_group.name == null ? var.resource_groups[var.resource_group.key].location : data.azurerm_resource_group.this[0].location
   location                = var.location == null ? local.resource_group_location : var.location
+
 }

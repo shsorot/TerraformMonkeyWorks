@@ -26,12 +26,28 @@ locals {
 # Data block for User assigned identity
 # TODO: fix this code, this is broken
 data "azurerm_user_assigned_identity" "this" {
-  for_each = { for instance in (var.identity == null || var.identity == {} ? [] : (var.identity.identity == [] || var.identity.identity == {} ? [] : var.identity.identity ) ) : instance.name => instance if ( instance.name == null && instance.resource_group_name == null ? false : true) }
+  for_each = { for instance in local.user_assigned_identities : instance.name => instance if (instance.name == null ? false : true) }
   name                = each.value.name
   resource_group_name = coalesce(each.value.resource_group_name, local.resource_group_name)
 }
 
+data "azurerm_key_vault" "this"{
+  count = var.encryption == null || var.encryption == {} ? 0 : (var.encryption.key_vault_key.key_vault_name == null && var.encryption.key_vault_key.name == null ? 0 : 1)
+  name = var.encryption.key_vault_key.key_vault_name
+  resource_group_name = coalesce(local.resource_group_name, var.encryption.key_vault_key.resource_group_name)
+}
+
+data "azurerm_key_vault_key" "this" {
+  count = var.encryption == null || var.encryption == {} ? 0 : (var.encryption.key_vault_key.key_vault_name == null && var.encryption.key_vault_key.name == null ? 0 : 1)
+  name = var.encryption.key_vault_key.name
+  key_vault_id = data.azurerm_key_vault.this[0].id
+}
+
 locals {
+  identity_user_assigned_identity = var.identity == null || var.identity == {} ? [] : (var.identity.identity == [] || var.identity.identity == null ? [] : var.identity.identity)
+  encryption_user_assigned_identity = var.encryption == null || var.encryption == {} ? [] : (var.encryption.user_assigned_identity == {} || var.encryption.user_assigned_identity == null ? [] : [var.encryption.user_assigned_identity])
+  user_assigned_identities = distinct(concat(local.identity_user_assigned_identity,local.encryption_user_assigned_identity ))
+
   identity = var.identity == null || var.identity == {} ? null : {
     type = var.identity.type
     # Create a list of managed identities.
@@ -44,5 +60,21 @@ locals {
         ) : instance.id
       )]
     ) : null
+  }
+
+  encryption = var.encryption == null || var.encryption == {} ? null : {
+    user_assigned_identity_id = var.encryption.user_assigned_identity == null || var.encryption.user_assigned_identity == {} ? null : (
+      var.encryption.user_assigned_identity.id == null ? (
+        var.encryption.user_assigned_identity.name == null ? (
+           var.user_assigned_identities[var.encryption.user_assigned_identity.name].id
+        ) : data.azurerm_user_assigned_identity.this[var.encryption.user_assigned_identity.name].id
+      ) : var.encryption.user_assigned_identity.id
+    )
+    key_source = try(var.encryption.key_source,"Microsoft.Keyvault")
+    key_vault_key_id = var.encryption.key_vault_key.id == null ? (
+      var.encryption.key_vault_key.name == null && var.encryption.key_vault_key.resource_group_name == null ? (
+        var.key_vault_keys[var.encryption.key_vault_key.key].id
+      ) : data.azurerm_key_vault_key.this[0].id
+    ) : var.encryption.key_vault_key.id
   }
 }

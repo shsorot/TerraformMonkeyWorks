@@ -15,7 +15,7 @@ resource "azurerm_lb" "this" {
       subnet_id = frontend_ip_configuration.value.subnet == null ? null : (
         frontend_ip_configuration.value.subnet.id == null ? (
           try(frontend_ip_configuration.value.subnet.name, null) == null && try(frontend_ip_configuration.value.subnet.virtual_network_name, null) == null ? (
-            var.virtual_networks[frontend_ip_configuration.value.subnet.virtual_network_tag].subnet[frontend_ip_configuration.value.subnet.key].id
+            var.virtual_networks[frontend_ip_configuration.value.subnet.virtual_network_key].subnet[frontend_ip_configuration.value.subnet.key].id
           ) : "/subscriptions/${local.subscription_id}/resourceGroups/${try(frontend_ip_configuration.value.subnet.resource_group_name, local.resource_group_name)}/providers/Microsoft.Network/virtualNetworks/${frontend_ip_configuration.value.subnet.virtual_network_name}/subnets/${frontend_ip_configuration.value.subnet.name}"
         ) : frontend_ip_configuration.value.subnet.id
       )

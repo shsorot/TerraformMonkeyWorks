@@ -72,6 +72,7 @@ data "azurerm_lb" "this" {
   resource_group_name = coalesce(each.value.resource_group_name, local.resource_group_name)
 }
 
+# <TODO> Merge all "azurerm_lb" blocks
 # # Data block used by azurerm_network_interface_backend_address_pool_association.tf code
 data "azurerm_lb" "azurerm_network_interface_backend_address_pool_association"{
   for_each = { for instance in var.ip_configuration :
@@ -137,7 +138,7 @@ locals {
       ) : instance.public_ip_address.id
     )
     primary            = instance.primary
-    private_ip_address = instance.private_ip_address_allocation == "Static" ? instance.private_ip_address_allocation : null
+    private_ip_address = instance.private_ip_address_allocation == "Static" ? instance.private_ip_address : null
   }]
 
 

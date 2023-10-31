@@ -12,6 +12,10 @@ resource "azurerm_lb_rule" "this" {
 
   backend_address_pool_ids = each.value.backend_address_pool_name == null ? null : [azurerm_lb_backend_address_pool.this[each.value.backend_address_pool_name].id]
   probe_id                 = each.value.probe_name == null ? null : azurerm_lb_probe.this[each.value.probe_name].id
+  enable_floating_ip       = each.value.enable_floating_ip == null ? false : each.value.enable_floating_ip
   idle_timeout_in_minutes  = each.value.idle_timeout_in_minutes == null ? 4 : each.value.idle_timeout_in_minutes
+  load_distribution        = each.value.load_distribution == null ? "Default" : each.value.load_distribution
+  disable_outbound_snat    = each.value.disable_outbound_snat == null ? false : each.value.disable_outbound_snat
+  enable_tcp_reset         = each.value.enable_tcp_reset == null ? false : each.value.enable_tcp_reset
   depends_on               = [azurerm_lb.this, azurerm_lb_backend_address_pool.this, azurerm_lb_probe.this]
 }

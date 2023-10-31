@@ -242,7 +242,6 @@ variable "network_rules" {
     private_link_access = optional(map(object({
       endpoint_tenant_id   = optional(string) # (Optional) The tenant id of the azurerm_private_endpoint of the resource access rule. Defaults to the current tenant id.
       endpoint_resource_id = string           # (Required) The resource id of the azurerm_private_endpoint of the resource access rule.
-
     })))
   })
   default = {}

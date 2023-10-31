@@ -21,3 +21,5 @@ locals {
   resource_group_location = var.resource_group.name == null ? var.resource_groups[var.resource_group.key].location : data.azurerm_resource_group.this[0].location
   location                = var.location == null ? local.resource_group_location : var.location
 }
+
+# various simplified local variable blocks 

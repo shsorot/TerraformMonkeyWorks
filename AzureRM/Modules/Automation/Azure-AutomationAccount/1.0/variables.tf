@@ -46,6 +46,12 @@ variable "sku_name" {
   default     = "Basic"
 }
 
+variable "local_authentication_enabled"{
+  type = bool
+  description = "(Optional)(Optional) Whether requests using non-AAD authentication are blocked."
+  default = false
+}
+
 variable "tags" {
   description = "(Optional) A mapping of tags to assign to the resource."
   type        = map(string)
@@ -77,10 +83,39 @@ variable "identity" {
   default     = null
 }
 
+variable "encryption"{
+  type = object({
+    user_assigned_identity = optional(object({
+      id                  = optional(string) #(Optional) The ID of the User Assigned Identity which should be assigned to this Automation Account.
+      name                = optional(string) #(Optional) The name of the User Assigned Identity which should be assigned to this Automation Account. Used to lookup ID using data blocks
+      resource_group_name = optional(string) #(Optional) Resource group name to be used with the property 'name'. If null, core resource group will be used.
+      key                 = optional(string) #(Optional) Terraform object key used to lookup ID using output of module Azure-UserAssignedIdentity supplied to variable 'user_assigned_identities'
+    }))
+    key_source            = optional(string) #(Optional) The source of the encryption key. Possible values are Microsoft.Keyvault and Microsoft.Storage.
+    key_vault_key      = object({
+      id               = optional(string) # Resource Id of the Key to be used for encrypting data in the automation account
+      name             = optional(string) # Name of the key , to be used for lookup along with keyvault name when resource ID is not available
+      key_vault_name   = optional(string) # To be used when 'name' is provided.
+      resource_group_name = optional(string) # To be used with key_vault_name
+      key              = optional(string) # To be used to perform  keypair lookup from the output of module Azure-KeyvaultKey
+    })
+  })
+  default = null
+}
+
 variable "user_assigned_identities" {
   type = map(object({
     id = optional(string) #(Optional) The property id from output of module Azure-UserAssignedIdentity
   }))
   description = "(Optional)Output of module Azure-UserAssignedIdentity. Used to lookup ID using Terraform Object Keys"
   default     = {}
+}
+
+
+variable "key_vault_keys"{
+  type = map(object({
+    id = optional(string) # (Optional) the property ID from the output of module Azure-KeyVaultKey, used to lookup ID using terraform object Keys
+  }))
+    description = "(Optional) the property ID from the output of module Azure-KeyVaultKey, used to lookup ID using terraform object Keys"
+    default = {}
 }

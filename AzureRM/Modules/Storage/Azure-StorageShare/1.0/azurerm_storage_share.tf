@@ -1,9 +1,9 @@
 resource "azurerm_storage_share" "this" {
   name                 = var.name
-  storage_account_name = var.storage_account_name
-
+  storage_account_name = local.storage_account_name
+  access_tier          = var.access_tier
   dynamic "acl" {
-    for_each = var.acl == null || var.acl == {} ? {} : var.acl
+    for_each = { for idx,instance in (var.acl == null || var.acl == [] ? [] : var.acl) : idx => instance if ( instance == null || instance == {} ? false : true )  }
     content {
       id = each.key
       access_policy {
@@ -13,8 +13,7 @@ resource "azurerm_storage_share" "this" {
       }
     }
   }
-
-
+  enabled_protocol = var.enabled_protocol
   quota    = var.quota
   metadata = var.metadata
 }

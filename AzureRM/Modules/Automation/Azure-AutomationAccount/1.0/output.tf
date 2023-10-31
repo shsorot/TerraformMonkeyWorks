@@ -35,3 +35,12 @@ output "dsc_secondary_access_key" {
   sensitive   = true
 }
 
+output "hybrid_service_url"{
+  value = azurerm_automation_account.this.hybrid_service_url
+  description = "The URL of automation hybrid service which is used for hybrid worker on-boarding With this Automation Account."
+}
+
+output "identity"{
+  value = azurerm_automation_account.this.identity
+  description = "Contains Principal ID and Tenant ID associated with this automation account Identity."
+}

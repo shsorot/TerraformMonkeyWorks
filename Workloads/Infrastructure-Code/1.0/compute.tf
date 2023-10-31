@@ -266,7 +266,7 @@ module "Landscape-Azure-Linux-Virtual-Machines" {
   proximity_placement_group       = try(each.value.proximity_placement_group, null)
   secret                          = try(each.value.secret, null)
   secure_boot_enabled             = try(each.value.secure_boot_enabled, false)
-  source_image                    = try(each.value.source_image_id, null)
+  source_image                    = try(each.value.source_image, null)
   source_image_reference          = try(each.value.source_image_reference, null)
   termination_notification        = try(each.value.termination_notification, null)
   user_data                       = try(each.value.user_data, null)
